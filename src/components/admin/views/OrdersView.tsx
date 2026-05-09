@@ -1,111 +1,164 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  ShoppingCart, 
   Search, 
   Filter, 
-  MoreHorizontal, 
   ChevronRight, 
   Printer, 
   Download,
   Package,
   Clock,
-  CheckCircle2,
+  Plus,
+  Loader2,
   AlertCircle
 } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-
-const mockOrders = [
-  { id: "#MAR-4829", customer: "Sarah Johnson", items: "3 Items", total: "KES 5,200", status: "Processing", type: "Standard", date: "Today, 10:30 AM" },
-  { id: "#MAR-4828", customer: "David Kimani", items: "1 Item", total: "KES 1,800", status: "Shipped", type: "Express", date: "Today, 09:15 AM" },
-  { id: "#MAR-4827", customer: "Mary Wanjiku", items: "5 Items", total: "KES 12,500", status: "Delivered", type: "Standard", date: "Yesterday" },
-  { id: "#MAR-4826", customer: "James Omondi", items: "2 Items", total: "KES 3,400", status: "Pending", type: "Standard", date: "Yesterday" },
-];
+import { getOrders } from '@/api/orders';
+import toast from 'react-hot-toast';
+import { format } from 'date-fns';
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'Processing': return 'bg-blue-500/10 text-blue-600';
-    case 'Shipped': return 'bg-amber-500/10 text-amber-600';
-    case 'Delivered': return 'bg-emerald-500/10 text-emerald-600';
-    case 'Pending': return 'bg-slate-500/10 text-slate-600';
-    default: return 'bg-slate-500/10 text-slate-600';
+    case 'PENDING': return 'bg-white/5 text-slate-400 border-white/10';
+    case 'CONFIRMED': return 'bg-primary-pink/10 text-primary-pink border-primary-pink/20';
+    case 'PROCESSING': return 'bg-primary-pink/10 text-primary-pink border-primary-pink/20';
+    case 'DISPATCHED': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    case 'DELIVERED': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+    case 'CANCELLED': return 'bg-red-500/10 text-red-500 border-red-500/20';
+    default: return 'bg-white/5 text-slate-400 border-white/10';
   }
 };
 
 export const OrdersView: React.FC = () => {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getOrders({ search: searchQuery });
+      if (response.success) {
+        setOrders(response.data);
+      } else {
+        setError(response.error?.message || 'Failed to fetch orders');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error?.message || 'An error occurred while fetching orders');
+      toast.error('Could not load orders');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [searchQuery]);
+
   return (
-    <div className="space-y-6 px-8">
+    <div className="space-y-8 px-8">
       {/* View Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-white/50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200/50 dark:border-slate-800/50 flex items-center gap-2">
-            <Search className="h-4 w-4 text-slate-400" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="bg-secondary-black p-2 rounded-2xl border border-white/5 flex items-center gap-3 px-4 shadow-xl focus-within:border-primary-gold/30 transition-all">
+            <Search className="h-4 w-4 text-slate-500" />
             <input 
               type="text" 
-              placeholder="Search orders, customers..." 
-              className="bg-transparent border-none outline-none text-sm font-bold placeholder:text-slate-400 w-64"
+              placeholder="SEARCH ORDERS..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent border-none outline-none text-[10px] font-black tracking-widest placeholder:text-slate-600 w-64 text-white uppercase"
             />
           </div>
-          <Button variant="outline" size="sm" className="rounded-xl border-slate-200/50 font-bold text-xs uppercase tracking-wider">
-            <Filter className="h-3.5 w-3.5 mr-2" /> Filters
-          </Button>
+          <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-secondary-black border border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+            <Filter className="h-3.5 w-3.5" /> Filters
+          </button>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="rounded-xl border-slate-200/50 font-bold text-xs uppercase tracking-wider">
-            <Download className="h-3.5 w-3.5 mr-2" /> Export
-          </Button>
-          <Button size="sm" className="rounded-xl bg-emerald-500 hover:bg-emerald-600 font-bold text-xs uppercase tracking-wider">
-            <Printer className="h-3.5 w-3.5 mr-2" /> Batch Print
-          </Button>
+        <div className="flex items-center gap-3">
+          <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-secondary-black border border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+            <Download className="h-3.5 w-3.5" /> Export
+          </button>
+          <button className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-primary-gold text-white text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary-gold/20">
+            <Plus className="h-3.5 w-3.5" /> Create Order
+          </button>
         </div>
       </div>
 
-      {/* Orders Table-like Grid */}
-      <div className="space-y-3">
-        {mockOrders.map((order, i) => (
-          <motion.div
-            key={order.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <Loader2 className="h-12 w-12 text-primary-gold animate-spin" />
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Loading Order Streams...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <AlertCircle className="h-12 w-12 text-red-500 opacity-50" />
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{error}</p>
+          <button 
+            onClick={fetchOrders}
+            className="text-[9px] font-black text-primary-gold uppercase tracking-widest hover:underline"
           >
-            <Card className="border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-950/40 backdrop-blur-xl rounded-2xl hover:bg-white/60 dark:hover:bg-slate-900/60 transition-colors group cursor-pointer">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-500 font-black text-xs">
-                    {order.type === 'Express' ? <Clock className="h-5 w-5 text-amber-500" /> : <Package className="h-5 w-5" />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-sm tracking-tight text-slate-900 dark:text-slate-100">{order.id}</span>
-                      <Badge variant="outline" className={`text-[9px] uppercase tracking-widest font-black py-0 px-2 rounded-full border-none ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </Badge>
+            Reconnect
+          </button>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="text-center py-32">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No active orders found.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4">
+          {orders.map((order, i) => (
+            <motion.div
+              key={order.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="group"
+            >
+              <div className="bg-secondary-black border border-white/5 p-6 rounded-3xl hover:border-primary-pink/30 transition-all duration-500 cursor-pointer relative overflow-hidden">
+                {/* Highlight line on hover */}
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-pink scale-y-0 group-hover:scale-y-100 transition-transform duration-500" />
+                
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                  <div className="flex items-center gap-5">
+                    <div className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${
+                      order.isExpress ? 'bg-primary-pink/10 text-primary-pink' : 'bg-primary-gold/10 text-primary-gold'
+                    } group-hover:scale-110`}>
+                      {order.isExpress ? <Clock className="h-6 w-6" /> : <Package className="h-6 w-6" />}
                     </div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">{order.customer} · {order.date}</p>
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-black text-lg tracking-tighter text-white">#{order.orderNumber}</span>
+                        <span className={`text-[9px] uppercase tracking-[0.2em] font-black py-1 px-3 rounded-full border ${getStatusColor(order.status)}`}>
+                          {order.status}
+                        </span>
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                        <span className="text-white">{order.customer?.name || order.recipientName}</span>
+                        <span className="h-1 w-1 rounded-full bg-slate-800" />
+                        <span>{format(new Date(order.createdAt), 'MMM dd, hh:mm a')}</span>
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-8">
-                  <div className="text-right hidden md:block">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Items</p>
-                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">{order.items}</p>
+                  <div className="flex items-center gap-12 ml-auto md:ml-0">
+                    <div className="text-right hidden sm:block">
+                      <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">Items</p>
+                      <p className="font-black text-sm text-white mt-1">{order.items?.length || 0} Products</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">Investment</p>
+                      <p className="font-black text-lg text-primary-gold mt-0.5 tracking-tight">KES {Number(order.totalKes).toLocaleString()}</p>
+                    </div>
+                    <div className="p-3 rounded-full bg-white/5 text-slate-500 group-hover:text-white group-hover:bg-primary-pink transition-all">
+                      <ChevronRight className="h-5 w-5" />
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total</p>
-                    <p className="font-black text-sm text-slate-900 dark:text-slate-100">{order.total}</p>
-                  </div>
-                  <Button variant="ghost" size="icon" className="rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900">
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

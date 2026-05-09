@@ -11,6 +11,8 @@ import Policies from './pages/Policies';
 import Occasions from './pages/Occasions';
 import Checkout from './pages/Checkout';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
+import { ProtectedRoute } from './components/admin/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import { TooltipProvider } from './components/ui/tooltip';
 
@@ -31,16 +33,19 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-black text-gray-200">
         <Routes>
-          <Route path="/*" element={<AdminDashboard />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin/*" element={<AdminDashboard />} />
+          </Route>
         </Routes>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-primary-black text-gray-200 selection:bg-primary-pink selection:text-white flex flex-col">
+    <div className="min-h-screen bg-primary-black text-gray-200 selection:bg-primary-gold selection:text-black flex flex-col">
       {/* Announcement Bar */}
-      <div className="bg-primary-pink text-white py-2 text-center text-[10px] font-bold uppercase tracking-widest relative z-[60]">
+      <div className="bg-primary-gold text-black py-2 text-center text-[10px] font-bold uppercase tracking-widest relative z-[60]">
         🚚 Free delivery within Nairobi on orders over KES 3,000 | 🌸 Same-day delivery available
       </div>
       

@@ -39,7 +39,7 @@ export default function Checkout() {
       <section className="py-24 sm:py-32 bg-secondary-black border-b border-white/5">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
-            <span className="text-primary-pink uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Secure Checkout</span>
+            <span className="text-primary-gold uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Secure Checkout</span>
             <h1 className="text-5xl sm:text-7xl font-black uppercase leading-none tracking-tighter mb-8">Complete Your Selection</h1>
           </div>
         </div>
@@ -54,24 +54,24 @@ export default function Checkout() {
                 {/* Shipping Details */}
                 <div>
                   <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-10 flex items-center gap-4">
-                    <FiTruck className="text-primary-pink" /> 1. Shipping Details
+                    <FiTruck className="text-primary-gold" /> 1. Shipping Details
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="flex flex-col gap-4">
                       <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">First Name</label>
-                      <input type="text" className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium" required />
+                      <input type="text" className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium" required />
                     </div>
                     <div className="flex flex-col gap-4">
                       <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Last Name</label>
-                      <input type="text" className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium" required />
+                      <input type="text" className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium" required />
                     </div>
                     <div className="flex flex-col gap-4 sm:col-span-2">
                       <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Full Delivery Address</label>
-                      <input type="text" placeholder="Apartment, Street, Area" className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium" required />
+                      <input type="text" placeholder="Apartment, Street, Area" className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium" required />
                     </div>
                     <div className="flex flex-col gap-4">
                       <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Contact Phone</label>
-                      <input type="tel" placeholder="+254 7..." className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium" required />
+                      <input type="tel" placeholder="+254 7..." className="bg-transparent border-b border-white/10 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium" required />
                     </div>
                     <div className="flex flex-col gap-4">
                       <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">City</label>
@@ -83,14 +83,14 @@ export default function Checkout() {
                 {/* Payment Method */}
                 <div>
                   <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-10 flex items-center gap-4">
-                    <FiCreditCard className="text-primary-pink" /> 2. Payment Method
+                    <FiCreditCard className="text-primary-gold" /> 2. Payment Method
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="p-8 border-2 border-primary-pink bg-primary-pink/5 relative group cursor-pointer">
+                    <div className="p-8 border-2 border-primary-gold bg-primary-gold/5 relative group cursor-pointer">
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-lg font-black uppercase tracking-tighter text-white">M-Pesa Express</span>
-                        <div className="w-6 h-6 rounded-full border-4 border-primary-pink flex items-center justify-center">
-                          <div className="w-2 h-2 rounded-full bg-primary-pink"></div>
+                        <div className="w-6 h-6 rounded-full border-4 border-primary-gold flex items-center justify-center">
+                          <div className="w-2 h-2 rounded-full bg-primary-gold"></div>
                         </div>
                       </div>
                       <p className="text-[10px] text-gray-400 font-medium leading-relaxed">Push notification will be sent to your phone for secure payment.</p>
@@ -146,7 +146,7 @@ export default function Checkout() {
                       <div className="flex-1">
                         <h4 className="text-[11px] font-black uppercase tracking-tighter text-white leading-tight mb-1">{item.name}</h4>
                         <p className="text-[10px] text-gray-500 font-bold">Qty: {item.quantity}</p>
-                        <p className="text-[11px] text-primary-pink font-black mt-1">KES {item.price}</p>
+                        <p className="text-[11px] text-primary-gold font-black mt-1">KES {item.price}</p>
                       </div>
                     </div>
                   ))}
@@ -163,7 +163,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex justify-between items-center pt-6 border-t border-white/5">
                     <span className="text-lg font-black uppercase tracking-tighter text-white">Total Amount</span>
-                    <span className="text-2xl font-black uppercase tracking-tighter text-primary-pink">KES {grandTotal.toLocaleString()}</span>
+                    <span className="text-2xl font-black uppercase tracking-tighter text-primary-gold">KES {grandTotal.toLocaleString()}</span>
                   </div>
                 </div>
 

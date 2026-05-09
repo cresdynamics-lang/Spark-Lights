@@ -16,10 +16,36 @@ import { CustomersView } from "@/components/admin/views/CustomersView"
 import { StaffView } from "@/components/admin/views/StaffView"
 import { LogisticsView } from "@/components/admin/views/LogisticsView"
 import { AnalyticsView } from "@/components/admin/views/AnalyticsView"
-import { FlowerIcon } from "lucide-react"
+import { InventoryView } from "@/components/admin/views/InventoryView"
+import { DiscountsView } from "@/components/admin/views/DiscountsView"
+import { SubscriptionsView } from "@/components/admin/views/SubscriptionsView"
+import { SettingsView } from "@/components/admin/views/SettingsView"
+import { CategoriesView } from "@/components/admin/views/CategoriesView"
+import { DispatchView } from "@/components/admin/views/DispatchView"
+
+import { useAuthStore } from "@/store/authStore"
+import { ShieldAlertIcon, FlowerIcon } from "lucide-react"
 
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState("Dashboard")
+  const { user } = useAuthStore()
+  const role = user?.role || 'FLORIST'
+
+  const AccessDenied = () => (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center py-32 px-8 text-center"
+    >
+      <div className="p-6 rounded-full bg-red-500/10 mb-6">
+        <ShieldAlertIcon className="h-12 w-12 text-red-500" />
+      </div>
+      <h2 className="text-2xl font-black tracking-tight text-white uppercase">Access Restricted</h2>
+      <p className="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px] max-w-sm mx-auto">
+        Your account role ({role}) does not have clearance for this module. Please contact the store owner.
+      </p>
+    </motion.div>
+  )
 
   const renderContent = () => {
     switch (activeView) {
@@ -27,13 +53,15 @@ export default function AdminDashboard() {
       case "Dashboard":
         return (
           <>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <DashboardStats />
-            </motion.div>
+            {['OWNER', 'MANAGER'].includes(role) && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <DashboardStats />
+              </motion.div>
+            )}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -45,22 +73,35 @@ export default function AdminDashboard() {
         )
       case "Live Orders":
       case "Order List & Details":
+      case "Order History":
         return <OrdersView />
       case "Dispatch Board":
+        return <DispatchView />
       case "Delivery Logistics":
         return <LogisticsView />
       case "Product Catalog":
       case "Flower Management":
         return <ProductsView />
+      case "Inventory Tracking":
+        return <InventoryView />
+      case "Categories":
+        return <CategoriesView />
       case "Customer List":
       case "CRM Dashboard":
         return <CustomersView />
+      case "Analytics Hub":
       case "Financial Reports":
       case "Analytics Dashboard":
-        return <AnalyticsView />
+        return ['OWNER', 'MANAGER'].includes(role) ? <AnalyticsView /> : <AccessDenied />
       case "Staff & Permissions":
       case "Team Management":
-        return <StaffView />
+        return role === 'OWNER' ? <StaffView /> : <AccessDenied />
+      case "Discounts & Promo":
+        return <DiscountsView />
+      case "Subscriptions":
+        return <SubscriptionsView />
+      case "System Settings":
+        return role === 'OWNER' ? <SettingsView /> : <AccessDenied />
       default:
         return (
           <motion.div 
@@ -68,10 +109,10 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center min-h-[400px] text-center px-8"
           >
-            <div className="p-6 rounded-full bg-emerald-500/10 mb-6">
-              <FlowerIcon className="h-12 w-12 text-emerald-500 animate-pulse" />
+            <div className="p-6 rounded-full bg-primary-gold/10 mb-6">
+              <FlowerIcon className="h-12 w-12 text-primary-gold animate-pulse" />
             </div>
-            <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100 uppercase">
+            <h2 className="text-2xl font-black tracking-tight text-white uppercase">
               {activeView}
             </h2>
             <p className="text-slate-500 mt-2 font-bold uppercase tracking-[0.2em] text-[10px] opacity-60">
@@ -84,9 +125,9 @@ export default function AdminDashboard() {
 
   return (
     <TooltipProvider>
-      <SidebarProvider className="font-sans antialiased">
+      <SidebarProvider className="font-sans antialiased dark">
         <AppSidebar variant="floating" onNavigate={setActiveView} activeView={activeView} />
-        <SidebarInset className="bg-slate-50/50 dark:bg-slate-950/50 min-h-screen overflow-hidden">
+        <SidebarInset className="bg-primary-black min-h-screen overflow-hidden">
           <SiteHeader />
           <div className="flex flex-1 flex-col gap-12 pb-24">
 
@@ -99,26 +140,26 @@ export default function AdminDashboard() {
             >
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                  <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-3">
-                    <div className="h-7 w-1.5 bg-emerald-500 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.3)]" />
+                  <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+                    <div className="h-7 w-1.5 bg-primary-pink rounded-full shadow-[0_0_15px_rgba(219,39,119,0.3)]" />
                     {activeView === "Dashboard" ? "Control Centre" : activeView}
                   </h1>
-                  <p className="text-slate-500 dark:text-slate-400 mt-1 font-bold text-xs tracking-widest uppercase opacity-60">
+                  <p className="text-slate-400 mt-1 font-bold text-xs tracking-widest uppercase opacity-60">
                     Marigold Flowers Ecommerce · {activeView === "Dashboard" ? "Administration" : "Module Management"}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md p-1.5 px-3 rounded-xl border border-slate-200/50 dark:border-slate-800/50">
+                <div className="flex items-center gap-3 bg-secondary-black backdrop-blur-md p-1.5 px-3 rounded-xl border border-white/5">
                   <div className="flex -space-x-2">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-8 w-8 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden shadow-sm">
+                      <div key={i} className="h-8 w-8 rounded-full border-2 border-secondary-black bg-secondary-black flex items-center justify-center overflow-hidden shadow-sm">
                         <img src={`https://i.pravatar.cc/150?u=${i + 20}`} alt="Staff" className="h-full w-full object-cover" />
                       </div>
                     ))}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-slate-900 dark:text-slate-100">3 Staff Online</span>
-                    <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1">
-                      <div className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" /> Live
+                    <span className="text-[10px] font-black text-white">3 Staff Online</span>
+                    <span className="text-[8px] font-bold text-primary-gold uppercase tracking-widest flex items-center gap-1">
+                      <div className="h-1 w-1 rounded-full bg-primary-gold animate-pulse" /> Live
                     </span>
                   </div>
                 </div>

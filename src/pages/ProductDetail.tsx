@@ -47,7 +47,7 @@ export default function ProductDetail() {
             <div className="aspect-[4/5] overflow-hidden border border-white/5 shadow-2xl relative group">
               <img src={product.img} alt={product.name} className="w-full h-full object-cover" />
               {product.badge && (
-                <div className="absolute top-8 left-8 bg-primary-pink text-white text-[10px] font-black px-4 py-2 uppercase tracking-[0.2em] shadow-2xl">
+                <div className="absolute top-8 left-8 bg-primary-gold text-white text-[10px] font-black px-4 py-2 uppercase tracking-[0.2em] shadow-2xl">
                   {product.badge}
                 </div>
               )}
@@ -64,7 +64,7 @@ export default function ProductDetail() {
             <h1 className="text-4xl sm:text-6xl font-serif mb-8 leading-tight">{product.name}</h1>
             
             <div className="flex items-center gap-6 mb-12">
-              <span className="text-3xl font-bold text-white">KES {currentPrice}</span>
+              <span className="text-3xl font-bold text-primary-pink">KES {currentPrice}</span>
               {product.oldPrice && <span className="text-xl text-gray-600 line-through">KES {product.oldPrice}</span>}
             </div>
 
@@ -91,9 +91,9 @@ export default function ProductDetail() {
             {/* Quantity and Cart */}
             <div className="flex flex-col sm:flex-row gap-6 mb-16">
               <div className="flex items-center border border-white/10 h-16 sm:w-40">
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="flex-1 hover:text-primary-pink transition-colors text-xl">-</button>
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="flex-1 hover:text-primary-gold transition-colors text-xl">-</button>
                 <span className="flex-1 text-center font-bold">{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)} className="flex-1 hover:text-primary-pink transition-colors text-xl">+</button>
+                <button onClick={() => setQuantity(q => q + 1)} className="flex-1 hover:text-primary-gold transition-colors text-xl">+</button>
               </div>
               <button className="flex-[2] btn-primary h-16 flex items-center justify-center gap-3 group">
                 <FiShoppingCart size={20} className="group-hover:rotate-12 transition-transform" />
@@ -114,7 +114,7 @@ export default function ProductDetail() {
             {/* Details Accordion Placeholder */}
             <div className="border-t border-white/5 py-10">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
-                <span className="w-8 h-[1px] bg-primary-pink"></span> Product Description
+                <span className="w-8 h-[1px] bg-primary-gold"></span> Product Description
               </h3>
               <div className="text-gray-400 text-sm leading-relaxed space-y-4">
                 {product.longDesc.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}
@@ -123,7 +123,7 @@ export default function ProductDetail() {
 
             <div className="border-t border-white/5 py-10">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
-                <span className="w-8 h-[1px] bg-primary-pink"></span> Care Instructions
+                <span className="w-8 h-[1px] bg-primary-gold"></span> Care Instructions
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">{product.careInstructions}</p>
             </div>

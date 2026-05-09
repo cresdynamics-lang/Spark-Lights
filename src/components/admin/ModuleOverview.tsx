@@ -1,200 +1,212 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   ShoppingCart, 
   Truck, 
-  Flower2, 
-  Box, 
-  Users, 
-  BarChart3, 
-  Tag, 
-  Heart, 
-  Settings, 
-  ShieldCheck,
-  ListFilter,
-  CheckSquare,
-  MapPin,
-  UserCheck,
-  Package,
-  Layers,
-  UserCircle,
-  PieChart,
-  CircleDollarSign,
-  Ticket,
-  Percent,
-  Repeat,
-  Bell,
-  Globe,
-  Users2,
+  Package, 
+  ArrowUpRight,
   Clock,
-  Map,
-  Zap,
-  Printer,
-  MessageSquare,
-  UserPlus,
-  ArrowRightLeft,
-  Search,
-  FileText,
-  CreditCard,
-  Target
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
+  Plus
 } from "lucide-react";
-import { ModuleCard, ModuleField } from "./ModuleCard";
+import { getOrders } from '@/api/orders';
+import { getProducts } from '@/api/products';
+import { motion } from 'framer-motion';
+import { format } from 'date-fns';
+import { useAuthStore } from '@/store/authStore';
 
 export const ModuleOverview: React.FC = () => {
+  const { user } = useAuthStore();
+  const role = user?.role || 'FLORIST';
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const orderParams: any = { limit: 5 };
+        if (role === 'DRIVER') {
+          orderParams.status = 'READY,OUT_FOR_DELIVERY';
+        }
+
+        const [ordersRes, productsRes] = await Promise.all([
+          getOrders(orderParams),
+          getProducts({ limit: 4 })
+        ]);
+        if (ordersRes.success) setRecentOrders(ordersRes.data);
+        if (productsRes.success) setTopProducts(productsRes.data);
+      } catch (error) {
+        console.error("Failed to load dashboard overview data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="px-8 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="h-64 bg-secondary-black border border-white/5 rounded-[2.5rem] animate-pulse" />
+        </div>
+        <div className="space-y-6">
+          <div className="h-64 bg-secondary-black border border-white/5 rounded-[2.5rem] animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-10 p-4 lg:p-8 pt-0">
+    <div className="px-8 grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
       
-      {/* 1. Orders Management */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-              <ShoppingCart className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <h2 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight">1. Order Management</h2>
+      {/* 1. Live Orders Feed */}
+      <section className="lg:col-span-2 space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-3">
+            <ShoppingCart className="h-5 w-5 text-primary-gold" />
+            <h2 className="text-sm font-black text-white uppercase tracking-tight">Live Order Feed</h2>
           </div>
-          <div className="h-px flex-1 mx-6 bg-gradient-to-r from-emerald-100 to-transparent dark:from-emerald-900/20" />
+          <button className="text-[10px] font-black text-primary-gold uppercase tracking-widest flex items-center gap-1 hover:underline">
+            View All <ArrowUpRight size={12} />
+          </button>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ModuleCard title="Order List & Deep Filters" icon={ListFilter} badge="Main View">
-            <ModuleField icon={Target} label="Core Tracking" value="Auto-generated #ID, Real-time status tags" />
-            <ModuleField icon={Users} label="Stakeholders" value="Customer Profile vs Recipient details" />
-            <ModuleField icon={Clock} label="Temporal" value="Order date vs Promised delivery slot" />
-            <ModuleField icon={Layers} label="Product Mix" value="Bouquet size, Flower types, Custom add-ons" />
-            <ModuleField icon={MessageSquare} label="Personalization" value="Message card text, Special instructions" />
-            <ModuleField icon={CreditCard} label="Financials" value="Total, Delivery fee, Tax (16%), Discounts" />
-            <ModuleField icon={ArrowRightLeft} label="Source" value="Website, WhatsApp, Phone, Walk-in" />
-            <ModuleField icon={Search} label="Searchable" value="Filter by driver, area, channel, or date" />
-          </ModuleCard>
 
-          <ModuleCard title="Actions & Flow Control" icon={Zap} badge="Workflow" badgeVariant="success">
-            <ModuleField icon={CheckSquare} label="Status Sync" value="One-click status updates with audit log" />
-            <ModuleField icon={Printer} label="Florist Hub" value="Print work tickets with floral recipes" />
-            <ModuleField icon={Printer} label="Logistics" value="Print delivery slips with location QR" />
-            <ModuleField icon={MessageSquare} label="Communication" value="Send WhatsApp / SMS status updates" />
-            <ModuleField icon={UserPlus} label="Dispatching" value="Manually assign Drivers or Florists" />
-            <ModuleField icon={ArrowRightLeft} label="Adjustments" value="Refunds, Partial refunds, Order edits" />
-            <ModuleField icon={Clock} label="History" value="Full audit trail of every status change" />
-            <ModuleField icon={FileText} label="Bulk Ops" value="CSV Exports, Multi-order status updates" />
-          </ModuleCard>
+        <div className="bg-secondary-black border border-white/5 rounded-[2.5rem] overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/5">
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Order</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Customer</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
+                  <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {recentOrders.length > 0 ? recentOrders.map((order, i) => (
+                  <motion.tr 
+                    key={order.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-white group-hover:text-primary-gold transition-colors">#{order.orderNumber}</span>
+                        <span className="text-[10px] font-medium text-slate-500">{format(new Date(order.createdAt), 'MMM d, HH:mm')}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-slate-300">{order.recipientName}</span>
+                        <span className="text-[10px] font-medium text-slate-500">{order.deliveryArea}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest ${
+                        order.status === 'DELIVERED' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                        order.status === 'PENDING' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                        'bg-primary-pink/10 text-primary-pink border-primary-pink/20'
+                      }`}>
+                        {order.status === 'DELIVERED' ? <CheckCircle2 size={10} /> : <Clock size={10} />}
+                        {order.status}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <span className="text-sm font-black text-white">KES {Number(order.totalKes).toLocaleString()}</span>
+                    </td>
+                  </motion.tr>
+                )) : (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                      No recent orders found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      {/* 2. Delivery & Dispatch */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-              <Truck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+      {/* 2. Top Products & Quick Actions */}
+      {role !== 'DRIVER' && (
+        <section className="space-y-6">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <Package className="h-5 w-5 text-primary-pink" />
+              <h2 className="text-sm font-black text-white uppercase tracking-tight">Active Inventory</h2>
             </div>
-            <h2 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight">2. Delivery & Dispatch</h2>
+            <button className="text-[10px] font-black text-primary-pink uppercase tracking-widest flex items-center gap-1 hover:underline">
+              Manage <ExternalLink size={12} />
+            </button>
           </div>
-          <div className="h-px flex-1 mx-6 bg-gradient-to-r from-emerald-100 to-transparent dark:from-emerald-900/20" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ModuleCard title="Delivery Master Board" icon={Map} badge="Critical" badgeVariant="warning">
-            <ModuleField icon={Clock} label="Time Slots" value="Morning / Afternoon run management" />
-            <ModuleField icon={MapPin} label="Live Map" value="Real-time pins of all daily deliveries" />
-            <ModuleField icon={Zap} label="Route Opt" value="AI-driven path optimization for drivers" />
-            <ModuleField icon={UserCheck} label="GPS Tracking" value="Monitor live driver location on-map" />
-            <ModuleField icon={Package} label="Proof of Life" value="Photo upload + Digital signature capture" />
-            <ModuleField icon={Globe} label="Geo-fencing" value="Zone-based delivery fees & blockouts" />
-          </ModuleCard>
 
-          <ModuleCard title="Fleet Management" icon={Users2}>
-            <ModuleField label="Profiles" value="Driver info, Vehicle docs, License tracking" />
-            <ModuleField label="Workload" value="Daily order limit per driver / time slot" />
-            <ModuleField label="Efficiency" value="On-time delivery percentage per staff" />
-            <ModuleField label="Finance" value="Driver earnings & commission tracker" />
-          </ModuleCard>
-        </div>
-      </section>
+          <div className="space-y-4">
+            {topProducts.map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + (i * 0.1) }}
+                className="bg-secondary-black border border-white/5 p-4 rounded-3xl flex items-center gap-4 hover:border-white/10 transition-all group"
+              >
+                <div className="h-12 w-12 rounded-2xl overflow-hidden bg-primary-black flex-shrink-0 border border-white/5">
+                  <img 
+                    src={product.images?.[0]?.url || "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=400"} 
+                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                    alt={product.name} 
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs font-black text-white uppercase truncate tracking-tight">{product.name}</h3>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{product.variants?.[0]?.stockQty || 0} In Stock</span>
+                    <div className="h-1 w-1 rounded-full bg-slate-700" />
+                    <span className="text-[10px] font-black text-primary-gold">KES {Number(product.variants?.[0]?.priceKes).toLocaleString()}</span>
+                  </div>
+                </div>
+                {Number(product.variants?.[0]?.stockQty) < 5 && (
+                  <AlertCircle className="h-4 w-4 text-amber-500 animate-pulse" />
+                )}
+              </motion.div>
+            ))}
 
-      {/* 3. Product & Inventory */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-              <Flower2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="w-full bg-primary-pink/10 border border-primary-pink/20 text-primary-pink font-black py-4 rounded-3xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary-pink/20 transition-all"
+            >
+              <Plus size={14} /> Add New Product
+            </motion.button>
+          </div>
+
+          {/* Dispatch Quick Glance */}
+          <div className="bg-gradient-to-br from-primary-gold/10 to-transparent border border-primary-gold/20 p-8 rounded-[2.5rem] mt-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Truck className="h-5 w-5 text-primary-gold" />
+              <h3 className="text-xs font-black text-white uppercase tracking-widest">Fleet Status</h3>
             </div>
-            <h2 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight">3. Catalog & Inventory</h2>
-          </div>
-          <div className="h-px flex-1 mx-6 bg-gradient-to-r from-emerald-100 to-transparent dark:from-emerald-900/20" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <ModuleCard title="Product Intel" icon={Package} className="xl:col-span-1">
-            <ModuleField label="Basic" value="Name, SKU, Categories, Status" />
-            <ModuleField label="Visuals" value="Gallery, Hero Image, Alt Text" />
-            <ModuleField label="SEO" value="Meta titles, Slugs, Descriptions" />
-          </ModuleCard>
-
-          <ModuleCard title="Pricing Engine" icon={CreditCard} className="xl:col-span-1">
-            <ModuleField label="Dynamics" value="Base price vs Sale price (dated)" />
-            <ModuleField label="Variations" value="Size (S/M/L), Stem Count, Add-ons" />
-            <ModuleField label="Logic" value="Tax classes, Shipping weight calc" />
-          </ModuleCard>
-
-          <ModuleCard title="Stock Control" icon={Box} className="xl:col-span-1" badge="Perishable" badgeVariant="warning">
-            <ModuleField label="Flowers" value="Variety, Stems, Freshness Tracking" />
-            <ModuleField label="Alerts" value="Low stock auto-notifications" />
-            <ModuleField label="Supplies" value="Wrapping, Ribbons, Vases, Cards" />
-          </ModuleCard>
-        </div>
-      </section>
-
-      {/* 4. CRM & Analytics */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-              <Users className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">In Transit</span>
+                <span className="text-xs font-black text-white">4 Orders</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div className="w-2/3 h-full bg-primary-gold" />
+              </div>
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
+                3 Drivers actively delivering across Nairobi Central & Westlands.
+              </p>
             </div>
-            <h2 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight">4. CRM & Business Intelligence</h2>
           </div>
-          <div className="h-px flex-1 mx-6 bg-gradient-to-r from-emerald-100 to-transparent dark:from-emerald-900/20" />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <ModuleCard title="Customer CRM" icon={UserCircle}>
-            <ModuleField label="Profile" value="LTV, Avg Order Value, Order History" />
-            <ModuleField label="Occasions" value="Saved Birthdays / Anniversary Alerts" />
-            <ModuleField label="Preferences" value="Flower dislikes, Pet-safe only notes" />
-          </ModuleCard>
-
-          <ModuleCard title="Business Analytics" icon={BarChart3}>
-            <ModuleField label="Sales" value="Revenue by Area, Category, Channel" />
-            <ModuleField label="Trends" value="Seasonal spikes, Heatmap of orders" />
-            <ModuleField label="Retention" value="New vs Returning, Cart Abandonment" />
-          </ModuleCard>
-        </div>
-      </section>
-
-      {/* 5. Marketing, Subscriptions, System */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
-              <Tag className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <h2 className="text-base font-black text-slate-900 dark:text-slate-100 tracking-tight">5. Marketing & System Control</h2>
-          </div>
-          <div className="h-px flex-1 mx-6 bg-gradient-to-r from-emerald-100 to-transparent dark:from-emerald-900/20" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <ModuleCard title="Marketing" icon={Ticket}>
-            <ModuleField label="Promo" value="Coupons, Flash Sales, Bundles" />
-            <ModuleField label="Loyalty" value="Points per KES spent program" />
-          </ModuleCard>
-
-          <ModuleCard title="Subscriptions" icon={Heart} badge="Revenue">
-            <ModuleField label="Plans" value="Weekly / Monthly recurring orders" />
-            <ModuleField label="Control" value="Skip delivery, Auto-charge status" />
-          </ModuleCard>
-
-          <ModuleCard title="System & Roles" icon={ShieldCheck}>
-            <ModuleField label="RBAC" value="Super Admin, Manager, Florist Roles" />
-            <ModuleField label="Config" value="M-Pesa Paybill, Business Hours, VAT" />
-          </ModuleCard>
-        </div>
-      </section>
+        </section>
+      )}
 
     </div>
   );

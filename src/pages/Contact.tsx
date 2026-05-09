@@ -5,7 +5,7 @@ const fadeIn = {
   initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 1, ease: [0.22, 1, 0.36, 1] }
+  transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }
 };
 
 export default function Contact() {
@@ -16,7 +16,7 @@ export default function Contact() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div {...fadeIn}>
-              <span className="text-primary-pink uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Inquiries</span>
+              <span className="text-primary-gold uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Inquiries</span>
               <h1 className="text-5xl sm:text-8xl font-black uppercase leading-none tracking-tighter mb-8">Let's Create <br/> Together</h1>
               <p className="text-gray-500 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
                 Whether you're planning a grand gala or seeking the perfect individual bloom, our artisan concierge is ready to assist.
@@ -37,7 +37,7 @@ export default function Contact() {
               className="lg:w-1/3 space-y-16"
             >
               <div>
-                <span className="text-primary-pink uppercase tracking-[0.4em] text-[9px] font-black mb-10 block">Direct Access</span>
+                <span className="text-primary-gold uppercase tracking-[0.4em] text-[9px] font-black mb-10 block">Direct Access</span>
                 <div className="space-y-12">
                   {[
                     { icon: <FiPhone />, label: 'Concierge', value: '+254 700 000 000' },
@@ -47,13 +47,13 @@ export default function Contact() {
                   ].map((item) => (
                     <div key={item.label} className="group">
                       <div className="flex items-center gap-6 mb-4">
-                        <div className="text-primary-pink transition-transform duration-500 group-hover:scale-125">
+                        <div className="text-primary-gold transition-transform duration-500 group-hover:scale-125">
                           {item.icon}
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-500 group-hover:text-white transition-colors">{item.label}</span>
                       </div>
-                      <p className="text-xl font-black uppercase text-white group-hover:text-primary-pink transition-colors tracking-tighter">{item.value}</p>
-                      {item.sub && <p className="text-[10px] text-primary-pink font-black uppercase tracking-widest mt-2">{item.sub}</p>}
+                      <p className="text-xl font-black uppercase text-white group-hover:text-primary-gold transition-colors tracking-tighter">{item.value}</p>
+                      {item.sub && <p className="text-[10px] text-primary-gold font-black uppercase tracking-widest mt-2">{item.sub}</p>}
                     </div>
                   ))}
                 </div>
@@ -64,11 +64,11 @@ export default function Contact() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center group">
                     <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">Monday – Saturday</span>
-                    <span className="text-sm font-black uppercase text-white group-hover:text-primary-pink transition-colors">08:00 — 18:00</span>
+                    <span className="text-sm font-black uppercase text-white group-hover:text-primary-gold transition-colors">08:00 — 18:00</span>
                   </div>
                   <div className="flex justify-between items-center group">
                     <span className="text-sm font-medium text-gray-400 group-hover:text-white transition-colors">Sunday</span>
-                    <span className="text-sm font-black uppercase text-white group-hover:text-primary-pink transition-colors">09:00 — 14:00</span>
+                    <span className="text-sm font-black uppercase text-white group-hover:text-primary-gold transition-colors">09:00 — 14:00</span>
                   </div>
                 </div>
               </div>
@@ -82,21 +82,21 @@ export default function Contact() {
               className="lg:w-2/3"
             >
               <form className="grid grid-cols-1 sm:grid-cols-2 gap-10 bg-tertiary-black p-12 sm:p-20 border border-white/5 shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-pink/5 blur-[100px] group-hover:bg-primary-pink/10 transition-all duration-1000"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-gold/5 blur-[100px] group-hover:bg-primary-gold/10 transition-all duration-1000"></div>
                 
                 <div className="flex flex-col gap-4">
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Full Identity</label>
-                  <input type="text" placeholder="Your Name" className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium placeholder:text-gray-700" required />
+                  <input type="text" placeholder="Your Name" className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium placeholder:text-gray-700" required />
                 </div>
                 
                 <div className="flex flex-col gap-4">
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Digital Address</label>
-                  <input type="email" placeholder="email@address.com" className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium placeholder:text-gray-700" required />
+                  <input type="email" placeholder="email@address.com" className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium placeholder:text-gray-700" required />
                 </div>
                 
                 <div className="flex flex-col gap-4 sm:col-span-2">
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Curation Type</label>
-                  <select className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium appearance-none cursor-pointer">
+                  <select className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium appearance-none cursor-pointer">
                     <option className="bg-primary-black">Order Inquiry</option>
                     <option className="bg-primary-black">Bespoke Arrangement</option>
                     <option className="bg-primary-black">Wedding & Gala Curation</option>
@@ -107,7 +107,7 @@ export default function Contact() {
                 
                 <div className="flex flex-col gap-4 sm:col-span-2">
                   <label className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">Your Vision</label>
-                  <textarea rows={6} placeholder="How can we elevate your occasion?" className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-pink transition-colors text-white font-medium resize-none placeholder:text-gray-700" required></textarea>
+                  <textarea rows={6} placeholder="How can we elevate your occasion?" className="bg-transparent border-b border-white/10 px-0 py-4 focus:outline-none focus:border-primary-gold transition-colors text-white font-medium resize-none placeholder:text-gray-700" required></textarea>
                 </div>
                 
                 <div className="sm:col-span-2 pt-10">

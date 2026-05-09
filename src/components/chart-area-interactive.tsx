@@ -129,7 +129,7 @@ const chartData = [
 const chartConfig = {
   sales: {
     label: "Total Sales",
-    color: "hsl(var(--primary-pink))",
+    color: "hsl(var(--primary-gold))",
   },
   orders: {
     label: "Total Orders",

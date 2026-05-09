@@ -6,7 +6,7 @@ const fadeIn = {
   initial: { opacity: 0, y: 40 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 1, ease: [0.22, 1, 0.36, 1] }
+  transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }
 };
 
 export default function Occasions() {
@@ -17,7 +17,7 @@ export default function Occasions() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div {...fadeIn}>
-              <span className="text-primary-pink uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Mood Curation</span>
+              <span className="text-primary-gold uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Mood Curation</span>
               <h1 className="text-5xl sm:text-8xl font-black uppercase leading-none tracking-tighter mb-8">Shop By <br/> Occasion</h1>
               <p className="text-gray-500 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
                 Every arrangement is artisanally curated to perfectly match the mood, meaning, and gravity of your special event.
@@ -35,7 +35,7 @@ export default function Occasions() {
                 key={occ.id}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: i * 0.1, duration: 1, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
                 viewport={{ once: true }}
                 className="group relative flex flex-col"
               >
@@ -45,8 +45,8 @@ export default function Occasions() {
                   
                   {/* Overlay Reveal */}
                   <div className="absolute inset-0 flex flex-col justify-end p-12 translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
-                     <span className="text-primary-pink text-[9px] font-black uppercase tracking-[0.4em] mb-4 block opacity-0 group-hover:opacity-100 transition-opacity duration-500">Hand-Selected Specimens</span>
-                     <h3 className="text-4xl sm:text-6xl font-black uppercase text-white group-hover:text-primary-pink transition-colors duration-500 tracking-tighter mb-6">{occ.name}</h3>
+                     <span className="text-primary-gold text-[9px] font-black uppercase tracking-[0.4em] mb-4 block opacity-0 group-hover:opacity-100 transition-opacity duration-500">Hand-Selected Specimens</span>
+                     <h3 className="text-4xl sm:text-6xl font-black uppercase text-white group-hover:text-primary-gold transition-colors duration-500 tracking-tighter mb-6">{occ.name}</h3>
                      <Link 
                         to={`/shop?category=${occ.id}`} 
                         className="btn-primary w-fit py-4 px-10 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity duration-700"
@@ -59,7 +59,7 @@ export default function Occasions() {
                    <p className="text-gray-500 text-lg font-medium leading-relaxed mb-6">
                       {occ.tagline}. Our artisans select the most vibrant seasonal blooms to tell your story with elegance and poise.
                    </p>
-                   <Link to={`/shop?category=${occ.id}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-white border-b-2 border-primary-pink pb-2 hover:text-primary-pink transition-all">
+                   <Link to={`/shop?category=${occ.id}`} className="text-[10px] font-black uppercase tracking-[0.3em] text-white border-b-2 border-primary-gold pb-2 hover:text-primary-gold transition-all">
                       View Collection →
                    </Link>
                 </div>

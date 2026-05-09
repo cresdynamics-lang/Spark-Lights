@@ -1,103 +1,160 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Users, 
   Search, 
-  UserPlus, 
   Mail, 
   Phone, 
-  MapPin, 
-  History,
-  TrendingUp,
-  Star,
-  ChevronRight
+  UserPlus,
+  ChevronRight,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-
-const mockCustomers = [
-  { id: 1, name: "Sarah Johnson", email: "sarah.j@example.com", phone: "+254 712 345 678", orders: 14, spent: "KES 42,500", segment: "VIP", status: "Active" },
-  { id: 2, name: "David Kimani", email: "dkimani@work.co.ke", phone: "+254 722 000 111", orders: 3, spent: "KES 8,200", segment: "Regular", status: "Active" },
-  { id: 3, name: "Alice Mwangi", email: "alice.m@domain.com", phone: "+254 733 999 888", orders: 28, spent: "KES 112,000", segment: "VIP", status: "Inactive" },
-];
+import { getCustomers } from '@/api/customers';
+import toast from 'react-hot-toast';
 
 export const CustomersView: React.FC = () => {
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const fetchCustomers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await getCustomers({ search: searchQuery });
+      if (response.success) {
+        setCustomers(response.data);
+      } else {
+        setError(response.error?.message || 'Failed to fetch clients');
+      }
+    } catch (err: any) {
+      setError('An error occurred while connecting to the database');
+      toast.error('Connection Lost');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCustomers();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   return (
-    <div className="space-y-6 px-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="bg-white/50 dark:bg-slate-900/50 p-2 rounded-xl border border-slate-200/50 dark:border-slate-800/50 flex items-center gap-2">
-          <Search className="h-4 w-4 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search customers by name or email..." 
-            className="bg-transparent border-none outline-none text-sm font-bold placeholder:text-slate-400 w-80"
-          />
+    <div className="space-y-8 px-8">
+      {/* View Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h2 className="text-xl font-black text-white uppercase tracking-tight">Client Directory</h2>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Manage relationships and customer history</p>
         </div>
-        <Button className="rounded-xl bg-emerald-500 hover:bg-emerald-600 font-bold text-xs uppercase tracking-wider">
-          <UserPlus className="h-4 w-4 mr-2" /> Add New Customer
-        </Button>
+        
+        <div className="flex items-center gap-4">
+          <div className="bg-secondary-black p-2 rounded-2xl border border-white/5 flex items-center gap-3 px-4 shadow-xl focus-within:border-primary-pink/30 transition-all">
+            <Search className="h-4 w-4 text-slate-500" />
+            <input 
+              type="text" 
+              placeholder="SEARCH CLIENTS..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent border-none outline-none text-[10px] font-black tracking-widest placeholder:text-slate-600 w-64 text-white uppercase"
+            />
+          </div>
+          <button className="flex items-center gap-2 bg-primary-pink text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary-pink/20">
+            <UserPlus className="h-4 w-4" /> Add Client
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        {mockCustomers.map((customer, i) => (
-          <motion.div
-            key={customer.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <Card className="border-slate-200/50 dark:border-slate-800/50 bg-white/40 dark:bg-slate-950/40 backdrop-blur-xl rounded-2xl group hover:shadow-md transition-all duration-300 overflow-hidden">
-              <CardContent className="p-0">
-                <div className="flex flex-col md:flex-row md:items-center p-5 gap-6">
-                  {/* Customer Info */}
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="h-12 w-12 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-inner">
-                      <Users className="h-6 w-6 text-emerald-600" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-black text-base text-slate-900 dark:text-slate-100">{customer.name}</h3>
-                        <Badge className={`font-black text-[8px] uppercase tracking-wider ${
-                          customer.segment === 'VIP' ? 'bg-purple-500' : 'bg-blue-500'
-                        } text-white border-none`}>
-                          {customer.segment}
-                        </Badge>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <Loader2 className="h-12 w-12 text-primary-pink animate-spin" />
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Accessing Client Records...</p>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <AlertCircle className="h-12 w-12 text-red-500 opacity-50" />
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{error}</p>
+        </div>
+      ) : (
+        <div className="bg-secondary-black rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/[0.02]">
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Client Name</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Contact Information</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Orders</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Investment</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest">Status</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customers.map((customer, i) => (
+                  <motion.tr 
+                    key={customer.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="border-b border-white/5 hover:bg-white/[0.01] transition-colors group"
+                  >
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-full bg-primary-black border border-white/10 flex items-center justify-center text-primary-gold font-black text-sm group-hover:border-primary-pink transition-colors uppercase">
+                          {customer.name.split(' ').map((n: string) => n[0]).join('')}
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-white uppercase tracking-tight">{customer.name}</p>
+                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">ID: {customer.id.slice(0, 8).toUpperCase()}</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 mt-1 text-slate-500">
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider"><Mail className="h-3 w-3" /> {customer.email}</span>
-                        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider"><Phone className="h-3 w-3" /> {customer.phone}</span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2 text-slate-400 group-hover:text-primary-pink transition-colors">
+                          <Mail size={12} />
+                          <span className="text-[11px] font-bold lowercase tracking-tight">{customer.email || 'no-email@set.com'}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-500">
+                          <Phone size={12} />
+                          <span className="text-[11px] font-bold tracking-tight">{customer.phone}</span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 md:flex md:items-center gap-8 px-6 md:border-x border-slate-200/50 dark:border-slate-800/50">
-                    <div className="text-center md:text-left">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Orders</p>
-                      <p className="font-black text-lg text-slate-900 dark:text-slate-100">{customer.orders}</p>
-                    </div>
-                    <div className="text-center md:text-left">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lifetime Spent</p>
-                      <p className="font-black text-lg text-emerald-600 dark:text-emerald-400">{customer.spent}</p>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-end gap-2">
-                    <Button variant="ghost" className="rounded-xl font-bold text-[10px] uppercase tracking-wider">
-                      <History className="h-3.5 w-3.5 mr-2" /> History
-                    </Button>
-                    <Button variant="outline" className="rounded-xl border-slate-200/50 font-bold text-[10px] uppercase tracking-wider">
-                      View Profile
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
+                    </td>
+                    <td className="px-8 py-6 text-center">
+                      <span className="text-sm font-black text-white">{customer.orderCount || 0}</span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className="text-sm font-black text-primary-gold">KES {Number(customer.totalSpent || 0).toLocaleString()}</span>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
+                        customer.isVip ? 'bg-primary-gold/10 text-primary-gold border-primary-gold/20' : 
+                        'bg-white/5 text-slate-400 border-white/10'
+                      }`}>
+                        {customer.isVip ? 'VIP' : 'REGULAR'}
+                      </span>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                      <button className="p-3 rounded-full bg-white/5 text-slate-500 group-hover:text-white group-hover:bg-primary-gold transition-all">
+                        <ChevronRight size={16} />
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+            {customers.length === 0 && (
+              <div className="text-center py-20">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No clients found matching your search.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

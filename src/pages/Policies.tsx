@@ -7,7 +7,7 @@ const fadeIn = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true },
-  transition: { duration: 0.8, ease: "easeOut" }
+  transition: { duration: 0.8, ease: "easeOut" as const }
 };
 
 export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund' }) {
@@ -20,7 +20,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
           {type === 'faq' && (
             <motion.div {...fadeIn}>
               <div className="text-center mb-24">
-                <FiHelpCircle className="text-primary-pink text-5xl mx-auto mb-8" />
+                <FiHelpCircle className="text-primary-gold text-5xl mx-auto mb-8" />
                 <h1 className="text-4xl sm:text-6xl font-serif mb-6">Frequently Asked Questions</h1>
                 <p className="text-gray-500">Everything you need to know about our flowers and services.</p>
               </div>
@@ -28,7 +28,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
               <div className="space-y-16">
                 {FAQS.map((cat) => (
                   <div key={cat.category}>
-                    <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary-pink mb-10 border-b border-white/5 pb-4">{cat.category}</h2>
+                    <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary-gold mb-10 border-b border-white/5 pb-4">{cat.category}</h2>
                     <div className="space-y-4">
                       {cat.questions.map((item) => (
                         <div key={item.q} className="border border-white/5 bg-secondary-black overflow-hidden">
@@ -65,7 +65,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
           {type === 'delivery' && (
             <motion.div {...fadeIn}>
               <div className="text-center mb-24">
-                <FiTruck className="text-primary-pink text-5xl mx-auto mb-8" />
+                <FiTruck className="text-primary-gold text-5xl mx-auto mb-8" />
                 <h1 className="text-4xl sm:text-6xl font-serif mb-6">Delivery Information</h1>
                 <p className="text-gray-500">How we get our blooms to your door across Nairobi.</p>
               </div>
@@ -78,11 +78,11 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm">
                     <div className="bg-primary-black p-6 border border-white/5">
-                      <h3 className="font-black text-primary-pink uppercase tracking-widest text-[10px] mb-4">Same-Day Delivery</h3>
+                      <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Same-Day Delivery</h3>
                       <p className="text-gray-500">Order by 1:00 PM for delivery before 6:00 PM same day. Cost: KES 500.</p>
                     </div>
                     <div className="bg-primary-black p-6 border border-white/5">
-                      <h3 className="font-black text-primary-pink uppercase tracking-widest text-[10px] mb-4">Scheduled Delivery</h3>
+                      <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Scheduled Delivery</h3>
                       <p className="text-gray-500">Pick your date and window (Morning or Afternoon). Free over KES 3,000.</p>
                     </div>
                   </div>
@@ -105,7 +105,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
           {type === 'refund' && (
             <motion.div {...fadeIn}>
               <div className="text-center mb-24">
-                <FiCornerUpLeft className="text-primary-pink text-5xl mx-auto mb-8" />
+                <FiCornerUpLeft className="text-primary-gold text-5xl mx-auto mb-8" />
                 <h1 className="text-4xl sm:text-6xl font-serif mb-6">Refund & Returns Policy</h1>
                 <p className="text-gray-500">Our promise to you and your satisfaction.</p>
               </div>
@@ -126,7 +126,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                       <li>Arrangement significantly different from order.</li>
                       <li>Order not delivered on promised date due to our error.</li>
                     </ul>
-                    <p className="text-xs text-primary-pink italic">Issues must be reported within 24 hours with photos.</p>
+                    <p className="text-xs text-primary-gold italic">Issues must be reported within 24 hours with photos.</p>
                   </div>
                   <div className="space-y-6">
                     <h3 className="text-lg font-serif text-white">What Does Not Qualify</h3>

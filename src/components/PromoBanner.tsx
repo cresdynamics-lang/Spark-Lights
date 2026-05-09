@@ -22,7 +22,7 @@ export default function PromoBanner() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="max-w-xl text-right"
         >
-          <span className="text-primary-pink uppercase tracking-[0.5em] text-[10px] font-bold mb-6 block">Limited Edition</span>
+          <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-bold mb-6 block">Limited Edition</span>
           <h2 className="text-4xl sm:text-6xl font-serif mb-8 text-white leading-tight">Mother's Day Collection 2026</h2>
           <p className="text-lg text-gray-300 mb-12 italic leading-relaxed">
             "Because she deserves the very best. Pre-order our exclusive Mother's Day bouquets today and receive a complimentary luxury candle."

@@ -18,7 +18,6 @@ import {
   UsersIcon, 
   FileTextIcon, 
   Settings2Icon, 
-  CircleHelpIcon, 
   CommandIcon,
   PackageIcon,
   ShieldCheckIcon
@@ -150,6 +149,8 @@ const data = {
   ],
 }
 
+import { useAuthStore } from "@/store/authStore"
+
 export function AppSidebar({ 
   onNavigate, 
   activeView, 
@@ -158,6 +159,50 @@ export function AppSidebar({
   onNavigate?: (view: string) => void,
   activeView?: string
 }) {
+  const { user } = useAuthStore()
+  const role = user?.role || 'FLORIST'
+
+  // Helper to check if a navigation item or sub-item should be visible
+  const isVisible = (title: string) => {
+    // Universal access
+    if (["Main Dashboard", "Dashboard"].includes(title)) return true;
+
+    // Driver specific
+    if (role === 'DRIVER') {
+      return ["Dispatch Board"].includes(title);
+    }
+
+    // Florist/Staff specific
+    if (role === 'FLORIST') {
+      const restricted = ["Analytics Hub", "Financial Reports", "System Settings", "Staff & Permissions", "Discounts & Promo", "WhatsApp Logs"];
+      return !restricted.includes(title);
+    }
+
+    // Manager specific
+    if (role === 'MANAGER') {
+      const restricted = ["System Settings", "Staff & Permissions"];
+      return !restricted.includes(title);
+    }
+
+    // Owner sees everything
+    return true;
+  }
+
+  // Filter main navigation
+  const filteredNavMain = data.navMain.map(section => {
+    // If the section title itself isn't allowed (e.g. Driver shouldn't see Store Management)
+    const items = section.items?.filter(item => isVisible(item.title)) || [];
+    return { ...section, items };
+  }).filter(section => {
+    if (role === 'DRIVER') {
+      return section.title === 'Overview' || section.title === 'Order Flow';
+    }
+    return section.items && section.items.length > 0;
+  });
+
+  // Filter secondary navigation
+  const filteredNavSecondary = data.navSecondary.filter(item => isVisible(item.title))
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -176,11 +221,15 @@ export function AppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} onNavigate={onNavigate} activeView={activeView} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" onNavigate={onNavigate} activeView={activeView} />
+        <NavMain items={filteredNavMain} onNavigate={onNavigate} activeView={activeView} />
+        <NavSecondary items={filteredNavSecondary} className="mt-auto" onNavigate={onNavigate} activeView={activeView} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{
+          name: user?.name || "Staff Member",
+          email: user?.email || "staff@marigold.co.ke",
+          avatar: user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`
+        }} />
       </SidebarFooter>
     </Sidebar>
   )

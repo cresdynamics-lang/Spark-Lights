@@ -19,8 +19,8 @@ export default function Navbar() {
     visible: { 
       opacity: 1, 
       y: 0, 
-      pointerEvents: 'all' as const,
-      transition: { duration: 0.3, ease: "easeOut" } 
+      pointerEvents: 'auto' as const,
+      transition: { duration: 0.3, ease: "easeOut" as const } 
     }
   };
 
@@ -36,12 +36,12 @@ export default function Navbar() {
           <div className="flex items-center gap-8">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-white hover:text-primary-pink transition-colors"
+              className="lg:hidden text-white hover:text-primary-gold transition-colors"
             >
               {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
-            <Link to="/" className="text-2xl sm:text-4xl font-black text-primary-pink tracking-tighter hover:scale-105 transition-transform duration-300">
-              MARIGOLD
+            <Link to="/" className="text-2xl sm:text-4xl font-black tracking-tighter hover:scale-105 transition-transform duration-300">
+              <span className="text-primary-gold">MARI</span><span className="text-primary-pink">GOLD</span>
             </Link>
           </div>
 
@@ -77,7 +77,7 @@ export default function Navbar() {
                     <ul className="space-y-4">
                       {['New Arrivals', 'Best Sellers', 'Gift Sets', 'Subscription', 'Bespoke'].map(item => (
                         <li key={item}>
-                          <Link to={`/shop?filter=${item.toLowerCase().replace(' ', '-')}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-pink transition-colors block">
+                          <Link to={`/shop?filter=${item.toLowerCase().replace(' ', '-')}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors block">
                             {item}
                           </Link>
                         </li>
@@ -111,12 +111,12 @@ export default function Navbar() {
                   >
                     <div className="grid grid-cols-1 gap-4">
                       {OCCASIONS.slice(0, 6).map(occ => (
-                        <Link key={occ.id} to={`/shop?category=${occ.id}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-pink transition-colors flex items-center gap-3">
-                          <span className="w-1.5 h-1.5 bg-primary-pink/30 rounded-full"></span>
+                        <Link key={occ.id} to={`/shop?category=${occ.id}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors flex items-center gap-3">
+                          <span className="w-1.5 h-1.5 bg-primary-gold/30 rounded-full"></span>
                           {occ.name}
                         </Link>
                       ))}
-                      <Link to="/occasions" className="text-[9px] font-black uppercase tracking-widest text-primary-pink mt-4 border-t border-white/5 pt-4 inline-block">
+                      <Link to="/occasions" className="text-[9px] font-black uppercase tracking-widest text-primary-gold mt-4 border-t border-white/5 pt-4 inline-block">
                         View All Occasions →
                       </Link>
                     </div>
@@ -126,25 +126,25 @@ export default function Navbar() {
             </li>
 
             <li className="h-full flex items-center">
-              <Link to="/about" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors relative group">
+              <Link to="/about" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
                 Our Story
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-pink transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
               </Link>
             </li>
 
             <li className="h-full flex items-center">
-              <Link to="/contact" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors relative group">
+              <Link to="/contact" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
                 Contact
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-pink transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
               </Link>
             </li>
           </ul>
 
           <div className="flex items-center gap-4 sm:gap-8">
-            <button className="hover:text-primary-pink transition-all hover:scale-110 hidden sm:block"><FiSearch size={20} /></button>
+            <button className="hover:text-primary-gold transition-all hover:scale-110 hidden sm:block"><FiSearch size={20} /></button>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="hover:text-primary-pink transition-all hover:scale-110 relative"
+              className="hover:text-primary-gold transition-all hover:scale-110 relative"
             >
               <FiShoppingCart size={20} />
               {getItemCount > 0 && (
@@ -183,7 +183,7 @@ export default function Navbar() {
                   <Link 
                     to={item === 'Home' ? '/' : item === 'Our Story' ? '/about' : `/${item.toLowerCase()}`}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-4xl font-black uppercase italic tracking-tighter text-white hover:text-primary-pink transition-colors"
+                    className="text-4xl font-black uppercase italic tracking-tighter text-white hover:text-primary-gold transition-colors"
                   >
                     {item}
                   </Link>

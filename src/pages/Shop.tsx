@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiSearch, FiArrowRight, FiPlus } from 'react-icons/fi';
 import { PRODUCTS, OCCASIONS } from '../data/content';
@@ -24,7 +25,7 @@ export default function Shop() {
 
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter(product => {
-      const matchesCategory = activeCategory === 'all' || product.category === activeCategory;
+      const matchesCategory = activeCategory === 'all' || (product as any).categories?.includes(activeCategory) || (product as any).tag === activeCategory;
       const priceValue = parseInt(product.price.replace(/,/g, ''));
       
       let matchesPrice = true;
@@ -72,7 +73,7 @@ export default function Shop() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${
-                  activeCategory === cat.id ? 'text-primary-pink' : 'text-gray-600 hover:text-white'
+                  activeCategory === cat.id ? 'text-primary-pink border-b border-primary-pink' : 'text-gray-600 hover:text-white'
                 }`}
               >
                 {cat.name}
@@ -111,7 +112,7 @@ export default function Shop() {
                   <div className="aspect-[3/4] overflow-hidden bg-tertiary-black border border-white/5 relative mb-8">
                     <img src={product.img} alt={product.name} className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
-                      {product.badge && <span className="bg-primary-pink text-white text-[9px] font-black px-4 py-1 uppercase tracking-widest shadow-xl">{product.badge}</span>}
+                      {product.badge && <span className="bg-primary-gold text-white text-[9px] font-black px-4 py-1 uppercase tracking-widest shadow-xl">{product.badge}</span>}
                       <span className="bg-black text-white text-[9px] font-black px-4 py-1 uppercase tracking-widest shadow-xl border border-white/5">KES {product.price}</span>
                     </div>
                     
@@ -125,13 +126,18 @@ export default function Shop() {
                         >
                           <FiPlus /> Add to Cart
                         </button>
-                        <button className="btn-secondary w-full py-4 text-[10px]">View Masterpiece</button>
+                        <Link 
+                          to={`/product/${product.slug}`}
+                          className="btn-secondary w-full py-4 text-[10px] flex items-center justify-center hover:border-primary-pink hover:text-primary-pink transition-all"
+                        >
+                          View Masterpiece
+                        </Link>
                       </div>
                     </div>
                   </div>
                   <div className="text-center px-4">
                     <h3 className="text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-2 leading-none">{product.name}</h3>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 block">{product.category}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 block">{(product as any).tag || ''}</span>
                   </div>
                 </motion.div>
               ))}
@@ -156,9 +162,9 @@ export default function Shop() {
       {/* Corporate Inquiry Banner */}
       <section className="py-24 container mx-auto px-6">
         <div className="bg-secondary-black border border-white/5 p-16 sm:p-24 flex flex-col lg:flex-row justify-between items-center gap-12 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-pink/5 blur-[120px] -z-10 group-hover:bg-primary-pink/10 transition-all duration-1000"></div>
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-gold/5 blur-[120px] -z-10 group-hover:bg-primary-gold/10 transition-all duration-1000"></div>
           <div className="max-w-2xl text-center lg:text-left">
-            <span className="text-primary-pink uppercase tracking-[0.5em] text-[10px] font-black mb-6 block">Bespoke Curation</span>
+            <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-black mb-6 block">Bespoke Curation</span>
             <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white leading-none mb-8">Corporate <br/> & Large Scale</h2>
             <p className="text-gray-500 font-medium leading-relaxed">Elevate your office, hotel, or gala event with our exclusive artisan partnerships. Custom subscriptions and volume pricing available.</p>
           </div>

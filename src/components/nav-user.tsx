@@ -18,7 +18,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
+import { LogOutIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, EllipsisVerticalIcon, Loader2 } from "lucide-react"
+import { useAuthStore } from "@/store/authStore"
+import { logout as logoutApi } from "@/api/auth"
+import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+import toast from "react-hot-toast"
 
 export function NavUser({
   user,
@@ -30,6 +35,25 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
+  const { logout, refreshToken } = useAuthStore()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      if (refreshToken) {
+        await logoutApi(refreshToken)
+      }
+    } catch (error) {
+      console.error("Logout API failed:", error)
+    } finally {
+      logout()
+      toast.success("Logged out successfully")
+      navigate("/admin/login")
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -42,7 +66,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -54,7 +78,7 @@ export function NavUser({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg bg-secondary-black border-white/5 text-slate-300"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -63,39 +87,43 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
+                  <span className="truncate font-medium text-white">{user.name}</span>
+                  <span className="truncate text-xs text-slate-500">
                     {user.email}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRoundIcon
-                />
+              <DropdownMenuItem className="focus:bg-white/5 focus:text-white cursor-pointer">
+                <CircleUserRoundIcon className="size-4 mr-2" />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon
-                />
+              <DropdownMenuItem className="focus:bg-white/5 focus:text-white cursor-pointer">
+                <CreditCardIcon className="size-4 mr-2" />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon
-                />
+              <DropdownMenuItem className="focus:bg-white/5 focus:text-white cursor-pointer">
+                <BellIcon className="size-4 mr-2" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOutIcon
-              />
-              Log out
+            <DropdownMenuSeparator className="bg-white/5" />
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="focus:bg-red-500/10 focus:text-red-500 text-red-500/80 cursor-pointer"
+            >
+              {isLoggingOut ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <LogOutIcon className="size-4 mr-2" />
+              )}
+              {isLoggingOut ? "Signing out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

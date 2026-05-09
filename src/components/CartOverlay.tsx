@@ -36,7 +36,7 @@ export default function CartOverlay({ isOpen, onClose }: CartOverlayProps) {
             <div className="p-8 border-b border-white/5 flex justify-between items-center">
               <div>
                 <h2 className="text-2xl font-black uppercase tracking-tighter text-white">Your Selection</h2>
-                <p className="text-[10px] text-primary-pink font-black uppercase tracking-widest mt-1">{getItemCount()} Artisan Pieces</p>
+                <p className="text-[10px] text-primary-gold font-black uppercase tracking-widest mt-1">{getItemCount()} Artisan Pieces</p>
               </div>
               <button onClick={onClose} className="w-12 h-12 flex items-center justify-center hover:bg-white/5 transition-colors border border-white/10 rounded-full">
                 <FiX size={20} />
@@ -62,11 +62,11 @@ export default function CartOverlay({ isOpen, onClose }: CartOverlayProps) {
                         <div>
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="text-lg font-black uppercase tracking-tighter text-white leading-tight">{item.name}</h3>
-                            <button onClick={() => removeItem(item.id)} className="text-gray-600 hover:text-primary-pink transition-colors">
+                            <button onClick={() => removeItem(item.id)} className="text-gray-600 hover:text-primary-gold transition-colors">
                               <FiTrash2 size={16} />
                             </button>
                           </div>
-                          <p className="text-primary-pink text-sm font-black uppercase">KES {item.price}</p>
+                          <p className="text-primary-gold text-sm font-black uppercase">KES {item.price}</p>
                         </div>
                         
                         <div className="flex items-center gap-4 border border-white/10 w-fit p-1 rounded-full">
@@ -102,7 +102,7 @@ export default function CartOverlay({ isOpen, onClose }: CartOverlayProps) {
                   <Link 
                     to="/checkout" 
                     onClick={onClose}
-                    className="btn-primary w-full py-6 flex items-center justify-center gap-4 shadow-xl shadow-primary-pink/10"
+                    className="btn-primary w-full py-6 flex items-center justify-center gap-4 shadow-xl shadow-primary-gold/10"
                   >
                     Proceed to Checkout
                   </Link>

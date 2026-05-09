@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import sequelize from "./config/db.js";
+import "./models/index.js"; // Initialize models and associations
 
 dotenv.config();
 
@@ -17,10 +18,13 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await sequelize.authenticate();
-    console.log("PostgreSQL connected successfully");
+    console.log("postgres db connected");
+
+    // Sync models
+    await sequelize.sync({ alter: true });
 
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`backend is starting at http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("Database connection error:", error);
