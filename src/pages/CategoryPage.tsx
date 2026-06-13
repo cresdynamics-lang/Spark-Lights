@@ -63,9 +63,9 @@ export default function CategoryPage() {
         </div>
       </section>
 
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+      <section className="py-12 sm:py-24">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8 lg:gap-12">
             <AnimatePresence mode="popLayout">
               {products.map((product) => (
                 <motion.div
@@ -76,45 +76,60 @@ export default function CategoryPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="group"
                 >
-                  <div className="aspect-[3/4] overflow-hidden bg-tertiary-black border border-white/5 relative mb-8">
+                  <div className="product-image-frame mb-3 sm:mb-8">
                     <img
                       src={product.img}
                       alt={`${product.name} — KES ${product.price} Nairobi`}
-                      className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
                     />
-                    <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
+                    <div className="absolute top-2 left-2 sm:top-6 sm:left-6 z-10 flex flex-col gap-1.5 sm:gap-2">
                       {product.badge && (
-                        <span className="bg-primary-gold text-white text-[9px] font-black px-4 py-1 uppercase tracking-widest">
+                        <span className="bg-primary-gold text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest">
                           {product.badge}
                         </span>
                       )}
-                      <span className="bg-black text-white text-[9px] font-black px-4 py-1 uppercase tracking-widest border border-white/5">
+                      <span className="bg-black text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest border border-white/5">
                         KES {product.price}
                       </span>
                     </div>
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center p-12 text-center gap-6">
-                      <p className="text-gray-300 text-sm font-medium leading-relaxed">{product.shortDesc}</p>
-                      <div className="flex flex-col gap-4 w-full">
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden sm:flex flex-col justify-center items-center p-6 lg:p-12 text-center gap-4 lg:gap-6">
+                      <p className="text-gray-300 text-sm font-medium leading-relaxed line-clamp-4">{product.shortDesc}</p>
+                      <div className="flex flex-col gap-3 w-full max-w-xs">
                         <button
                           onClick={() => addItem(product)}
-                          className="btn-primary w-full py-4 text-[10px] flex items-center justify-center gap-2"
+                          className="btn-primary w-full text-[10px] flex items-center justify-center gap-2"
                         >
                           <FiPlus /> Add to Cart
                         </button>
                         <Link
                           to={`/product/${product.slug}`}
-                          className="btn-secondary w-full py-4 text-[10px] flex items-center justify-center"
+                          className="btn-secondary w-full text-[10px] flex items-center justify-center"
                         >
                           View Details
                         </Link>
                       </div>
                     </div>
                   </div>
-                  <div className="text-center px-4">
-                    <h2 className="text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-2">
+
+                  <div className="flex flex-col gap-2 sm:hidden mb-3">
+                    <button
+                      onClick={() => addItem(product)}
+                      className="btn-primary w-full text-[9px] flex items-center justify-center gap-1.5"
+                    >
+                      <FiPlus size={12} /> Add to Cart
+                    </button>
+                    <Link
+                      to={`/product/${product.slug}`}
+                      className="btn-secondary w-full text-[9px] text-center"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+
+                  <div className="text-center px-1 sm:px-4">
+                    <h2 className="text-sm sm:text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-1 sm:mb-2 line-clamp-2">
                       {product.name}
                     </h2>
-                    <p className="text-[10px] text-primary-gold font-black uppercase tracking-widest">
+                    <p className="text-[8px] sm:text-[10px] text-primary-gold font-black uppercase tracking-widest">
                       KES {product.price} · Nairobi
                     </p>
                   </div>

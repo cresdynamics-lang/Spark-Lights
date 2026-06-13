@@ -89,11 +89,11 @@ export default function Home() {
             <p className="text-lg sm:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
               {HERO_SLIDES[currentSlide].subtitle}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/shop" className="btn-primary text-center py-4 px-10">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none">
+              <Link to="/shop" className="btn-primary text-center w-full sm:w-auto">
                 {HERO_SLIDES[currentSlide].cta}
               </Link>
-              <a href={BRAND.whatsappUrl} className="btn-secondary text-center py-4 px-10">
+              <a href={BRAND.whatsappUrl} className="btn-secondary text-center w-full sm:w-auto">
                 Order on WhatsApp
               </a>
             </div>
@@ -220,24 +220,24 @@ export default function Home() {
             <Link to="/shop" className="btn-secondary text-[10px]">View All Lights →</Link>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {featured.map((prod) => (
               <motion.div key={prod.id} {...fadeIn} className="group">
-                <Link to={`/product/${prod.slug}`} className="block aspect-[4/5] overflow-hidden border border-white/5 relative mb-5">
-                  <img src={prod.img} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                <Link to={`/product/${prod.slug}`} className="block product-image-frame mb-3 sm:mb-5">
+                  <img src={prod.img} alt={prod.name} loading="lazy" />
                   {prod.badge && (
-                    <span className="absolute top-4 left-4 bg-primary-gold text-black text-[9px] font-black px-3 py-1 uppercase">
+                    <span className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-primary-gold text-black text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-3 sm:py-1 uppercase">
                       {prod.badge}
                     </span>
                   )}
-                  <span className="absolute bottom-4 left-4 bg-black/80 text-white text-sm font-black px-3 py-1">
+                  <span className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 bg-black/80 text-white text-xs sm:text-sm font-black px-2 py-0.5 sm:px-3 sm:py-1">
                     KES {prod.price}
                   </span>
                 </Link>
-                <h3 className="font-black uppercase tracking-tight text-white group-hover:text-primary-gold transition-colors">
+                <h3 className="text-sm sm:text-base font-black uppercase tracking-tight text-white group-hover:text-primary-gold transition-colors line-clamp-2">
                   {prod.name}
                 </h3>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">{prod.shortDesc}</p>
+                <p className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2 line-clamp-2">{prod.shortDesc}</p>
               </motion.div>
             ))}
           </div>
@@ -275,20 +275,26 @@ export default function Home() {
           <motion.div {...fadeIn} className="mb-12">
             <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">All Products</h2>
           </motion.div>
-          <div className="flex gap-8 overflow-x-auto pb-8 no-scrollbar snap-x">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
             {topProducts.map((prod) => (
-              <div key={prod.id} className="min-w-[280px] snap-start group">
-                <div className="aspect-[3/4] overflow-hidden border border-white/5 relative bg-tertiary-black mb-5">
-                  <img src={prod.img} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-4 p-6">
-                    <button onClick={() => addItem(prod)} className="btn-primary w-full py-3 text-[10px] flex items-center justify-center gap-2">
+              <div key={prod.id} className="group">
+                <div className="product-image-frame mb-3 sm:mb-5">
+                  <img src={prod.img} alt={prod.name} loading="lazy" />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex flex-col justify-center items-center gap-3 p-4">
+                    <button onClick={() => addItem(prod)} className="btn-primary w-full text-[10px] flex items-center justify-center gap-2">
                       <FiPlus size={14} /> Add to Cart
                     </button>
-                    <Link to={`/product/${prod.slug}`} className="btn-secondary w-full py-3 text-[10px] text-center">View Details</Link>
+                    <Link to={`/product/${prod.slug}`} className="btn-secondary w-full text-[10px] text-center">View Details</Link>
                   </div>
                 </div>
-                <h3 className="font-black uppercase text-white text-sm">{prod.name}</h3>
-                <p className="text-primary-gold font-bold text-sm mt-1">KES {prod.price}</p>
+                <div className="flex flex-col gap-2 sm:hidden mb-2">
+                  <button onClick={() => addItem(prod)} className="btn-primary w-full text-[9px] flex items-center justify-center gap-1.5">
+                    <FiPlus size={12} /> Add to Cart
+                  </button>
+                  <Link to={`/product/${prod.slug}`} className="btn-secondary w-full text-[9px] text-center">View Details</Link>
+                </div>
+                <h3 className="font-black uppercase text-white text-xs sm:text-sm line-clamp-2">{prod.name}</h3>
+                <p className="text-primary-gold font-bold text-xs sm:text-sm mt-1">KES {prod.price}</p>
               </div>
             ))}
           </div>

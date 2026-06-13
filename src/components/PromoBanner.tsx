@@ -28,9 +28,9 @@ export default function PromoBanner() {
             Get a free quote on WhatsApp before you buy.
           </p>
         </motion.div>
-        <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex gap-4">
-          <a href={BRAND.whatsappUrl} className="btn-primary py-4 px-10">Get Install Quote</a>
-          <Link to="/shop" className="btn-secondary py-4 px-10">Shop Lights</Link>
+        <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <a href={BRAND.whatsappUrl} className="btn-primary w-full sm:w-auto text-center">Get Install Quote</a>
+          <Link to="/shop" className="btn-secondary w-full sm:w-auto text-center">Shop Lights</Link>
         </motion.div>
       </div>
     </section>

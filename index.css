@@ -191,6 +191,7 @@ img {
   letter-spacing: 0.1em;
   display: inline-block;
   border: 1px solid var(--primary-gold);
+  max-width: 100%;
 }
 
 .btn-primary:hover {
@@ -206,7 +207,28 @@ img {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   display: inline-block;
-  margin-left: 16px;
+  margin-left: 0;
+  max-width: 100%;
+}
+
+/* Product images — full visibility, no crop */
+.product-image-frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--tertiary-black);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.product-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: 0.5rem;
 }
 
 .btn-secondary:hover {
@@ -373,7 +395,8 @@ img {
 .product-img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: var(--transition-smooth);
 }
 
@@ -576,6 +599,20 @@ img {
   }
 }
 
+@media (min-width: 640px) {
+  .btn-secondary:not(.w-full) {
+    margin-left: 16px;
+  }
+
+  .product-image-frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  .product-image-frame img {
+    padding: 0.75rem;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-links {
     display: none;
@@ -586,13 +623,45 @@ img {
   .hero-subtitle {
     font-size: 1rem;
   }
-  .trust-grid, .category-grid, .testimonial-grid {
+  .trust-grid, .testimonial-grid {
     grid-template-columns: 1fr;
+  }
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
   .section-title {
     font-size: 2.5rem;
   }
   .newsletter-form {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 639px) {
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 14px;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    line-height: 1.35;
+  }
+
+  .btn-primary.py-4,
+  .btn-secondary.py-4,
+  .btn-primary.py-6,
+  .btn-secondary.py-6 {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .btn-primary.px-10,
+  .btn-secondary.px-10,
+  .btn-primary.px-12,
+  .btn-secondary.px-12,
+  .btn-primary.px-16,
+  .btn-secondary.px-16 {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }

@@ -90,11 +90,13 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       : 'border-white/10 hover:border-primary-pink/50'
                   }`}
                 >
-                  <img
-                    src={product.img}
-                    alt={product.name}
-                    className="w-20 h-20 object-cover rounded-xl flex-shrink-0"
-                  />
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-tertiary-black border border-white/10 rounded-xl flex items-center justify-center p-1">
+                    <img
+                      src={product.img}
+                      alt={product.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
                   <div className="min-w-0">
                     <h3 className="text-sm font-black uppercase tracking-tight text-white group-hover:text-primary-gold transition-colors truncate">
                       {product.name}

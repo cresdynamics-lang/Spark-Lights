@@ -55,8 +55,8 @@ export default function CartOverlay({ isOpen, onClose }: CartOverlayProps) {
                 <div className="space-y-8">
                   {items.map((item) => (
                     <motion.div layout key={item.id} className="flex gap-6 group">
-                      <div className="w-24 h-32 flex-shrink-0 bg-tertiary-black border border-white/5 overflow-hidden">
-                        <img src={item.img} alt={item.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-tertiary-black border border-white/5 flex items-center justify-center p-1">
+                        <img src={item.img} alt={item.name} className="max-w-full max-h-full object-contain" />
                       </div>
                       <div className="flex-1 flex flex-col justify-between">
                         <div>

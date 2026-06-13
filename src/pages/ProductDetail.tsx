@@ -63,10 +63,10 @@ export default function ProductDetail() {
             animate={{ opacity: 1, x: 0 }}
             className="lg:w-1/2"
           >
-            <div className="aspect-[4/5] overflow-hidden border border-white/5 shadow-2xl relative group">
-              <img src={product.img} alt={product.name} className="w-full h-full object-cover" />
+            <div className="product-image-frame shadow-2xl">
+              <img src={product.img} alt={product.name} />
               {product.badge && (
-                <div className="absolute top-8 left-8 bg-primary-gold text-white text-[10px] font-black px-4 py-2 uppercase tracking-[0.2em] shadow-2xl">
+                <div className="absolute top-4 left-4 sm:top-8 sm:left-8 bg-primary-gold text-white text-[9px] sm:text-[10px] font-black px-3 py-1.5 sm:px-4 sm:py-2 uppercase tracking-[0.2em] shadow-2xl">
                   {product.badge}
                 </div>
               )}
@@ -119,12 +119,12 @@ export default function ProductDetail() {
             {/* Size Selector */}
             <div className="mb-12">
               <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-6">Select Option:</label>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-2 sm:gap-4">
                 {product.sizes.map((size) => (
                   <button 
                     key={size.label}
                     onClick={() => setSelectedSize(size.label)}
-                    className={`px-8 py-4 border text-[10px] font-bold uppercase tracking-[0.2em] transition-all ${selectedSize === size.label ? 'border-primary-pink bg-primary-pink text-white shadow-lg shadow-primary-pink/20' : 'border-white/10 text-gray-400 hover:border-white/30'}`}
+                    className={`px-4 py-2 sm:px-8 sm:py-4 border text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] transition-all ${selectedSize === size.label ? 'border-primary-pink bg-primary-pink text-white shadow-lg shadow-primary-pink/20' : 'border-white/10 text-gray-400 hover:border-white/30'}`}
                   >
                     {size.label}
                   </button>
@@ -133,21 +133,21 @@ export default function ProductDetail() {
             </div>
 
             {/* Quantity and Cart */}
-            <div className="flex flex-col sm:flex-row gap-6 mb-16">
-              <div className="flex items-center border border-white/10 h-16 sm:w-40">
-                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="flex-1 hover:text-primary-gold transition-colors text-xl">-</button>
-                <span className="flex-1 text-center font-bold">{quantity}</span>
-                <button onClick={() => setQuantity(q => q + 1)} className="flex-1 hover:text-primary-gold transition-colors text-xl">+</button>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 mb-12 sm:mb-16">
+              <div className="flex items-center border border-white/10 h-12 sm:h-16 sm:w-40">
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="flex-1 hover:text-primary-gold transition-colors text-lg sm:text-xl">-</button>
+                <span className="flex-1 text-center font-bold text-sm sm:text-base">{quantity}</span>
+                <button onClick={() => setQuantity(q => q + 1)} className="flex-1 hover:text-primary-gold transition-colors text-lg sm:text-xl">+</button>
               </div>
               <button
                 type="button"
                 onClick={() => product && addItem(product)}
-                className="flex-[2] btn-primary h-16 flex items-center justify-center gap-3 group"
+                className="flex-[2] btn-primary h-12 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 group text-[10px] sm:text-sm"
               >
-                <FiShoppingCart size={20} className="group-hover:rotate-12 transition-transform" />
+                <FiShoppingCart size={18} className="group-hover:rotate-12 transition-transform sm:w-5 sm:h-5" />
                 Add to Cart — KES {currentPrice}
               </button>
-              <button className="w-16 h-16 border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-gray-400 hover:text-primary-pink">
+              <button className="hidden sm:flex w-16 h-16 border border-white/10 items-center justify-center hover:bg-white/5 transition-all text-gray-400 hover:text-primary-pink">
                 <FiHeart size={20} />
               </button>
             </div>
@@ -156,9 +156,9 @@ export default function ProductDetail() {
               href={`${BRAND.whatsappUrl}?text=${encodeURIComponent(`Hi Spark Lights 254! I'd like to order:\n${product.name}\nKES ${currentPrice}\nQty: ${quantity}\nOption: ${selectedSize}\n\nPlease confirm stock & delivery to my area.`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full border-2 border-[#25D366] bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all py-6 flex items-center justify-center gap-3 font-black uppercase tracking-widest text-xs mb-6"
+              className="w-full border-2 border-[#25D366] bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all py-4 sm:py-6 flex items-center justify-center gap-2 sm:gap-3 font-black uppercase tracking-widest text-[10px] sm:text-xs mb-6"
             >
-              <FaWhatsapp size={22} /> Chat on WhatsApp to Order
+              <FaWhatsapp size={20} className="sm:w-[22px] sm:h-[22px]" /> Chat on WhatsApp to Order
             </a>
             <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-8 flex items-center justify-center gap-2">
               <FiTruck size={12} /> Most Kenyans order via WhatsApp — ask about stock &amp; delivery first
