@@ -1,12 +1,12 @@
 import type { StoreProduct } from '../types/product';
-import { sanitizePublicImageUrl } from './publicImages';
+import { sanitizeProductImageUrl } from './productImages';
 import { parsePriceFromFilename } from '../data/publicCatalog';
 
 export function mapApiProduct(p: Record<string, unknown>): StoreProduct | null {
   const variants = p.variants as { priceKes: number; label: string }[] | undefined;
   const images = p.images as { url: string }[] | undefined;
   const categories = p.categories as { category?: { slug: string } }[] | undefined;
-  const img = sanitizePublicImageUrl(images?.[0]?.url);
+  const img = sanitizeProductImageUrl(images?.[0]?.url);
 
   if (!img) return null;
 

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiPlus, FiMinus, FiTrash2, FiShoppingBag } from 'react-icons/fi';
 import { useCartStore } from '../store/useCartStore';
 import { Link } from 'react-router-dom';
+import ProductImage from './ProductImage';
 
 interface CartOverlayProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ export default function CartOverlay({ isOpen, onClose }: CartOverlayProps) {
                   {items.map((item) => (
                     <motion.div layout key={item.id} className="flex gap-6 group">
                       <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 bg-tertiary-black border border-white/5 flex items-center justify-center p-1">
-                        <img src={item.img} alt={item.name} className="max-w-full max-h-full object-contain" />
+                        <ProductImage src={item.img} alt={item.name} className="max-w-full max-h-full object-contain" />
                       </div>
                       <div className="flex-1 flex flex-col justify-between">
                         <div>

@@ -8,6 +8,7 @@ import { filterByCategory } from '../lib/searchProducts';
 import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { BRAND } from '../data/brand';
+import ProductImage from '../components/ProductImage';
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -77,7 +78,7 @@ export default function CategoryPage() {
                   className="group"
                 >
                   <div className="product-image-frame mb-3 sm:mb-8">
-                    <img
+                    <ProductImage
                       src={product.img}
                       alt={`${product.name} — KES ${product.price} Nairobi`}
                     />

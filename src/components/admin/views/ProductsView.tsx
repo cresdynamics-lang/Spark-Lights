@@ -8,8 +8,10 @@ import {
   AlertCircle,
   X,
   Save,
+  Upload,
+  Smartphone,
 } from 'lucide-react';
-import { updateProduct } from '@/api/products';
+import { updateProduct, uploadProductImage } from '@/api/products';
 import apiClient from '@/api/client';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +19,8 @@ import { useAuthStore } from '@/store/authStore';
 import { parsePriceFromFilename } from '@/data/publicCatalog';
 import PublicImage from '@/components/PublicImage';
 import { isPublicImageUrl } from '@/lib/publicImages';
+import { isAllowedProductImageUrl } from '@/lib/productImages';
+import { compressImageFile } from '@/lib/compressImage';
 import { slugFromImageUrl } from '@/lib/slugFromImage';
 import { ImageIcon } from 'lucide-react';
 
@@ -43,6 +47,7 @@ export const ProductsView: React.FC = () => {
   const role = user?.role || 'FLORIST';
   const [formData, setFormData] = useState(emptyForm);
   const [publicAssets, setPublicAssets] = useState<{ filename: string; url: string; suggestedPrice: number | null }[]>([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     apiClient.get('/products/public-assets').then((res) => {
@@ -152,9 +157,12 @@ export const ProductsView: React.FC = () => {
           fetchData();
         }
       } else {
-        const response = await apiClient.post('/products', {
+      const response = await apiClient.post('/products', {
           ...payload,
-          slug: slugFromImageUrl(formData.imageUrl),
+          slug: formData.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '') || slugFromImageUrl(formData.imageUrl),
         });
         if (response.data.success) {
           toast.success('Product published to storefront');
@@ -185,6 +193,41 @@ export const ProductsView: React.FC = () => {
       ...(suggested && !prev.priceKes ? { priceKes: String(suggested) } : {}),
       ...(suggested && !prev.name ? { name: `Modern Ceiling Light — KES ${suggested.toLocaleString()}` } : {}),
     }));
+  };
+
+  const handleDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose a photo from your phone or device');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const { base64 } = await compressImageFile(file);
+      const response = await uploadProductImage(base64, file.name);
+      if (!response.success || !response.data?.url) {
+        throw new Error(response.error?.message || 'Upload failed');
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        imageUrl: response.data.url,
+        ...(!prev.name ? { name: file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') } : {}),
+      }));
+      toast.success('Photo compressed & uploaded to database storage');
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message ||
+        (err as Error)?.message ||
+        'Image upload failed';
+      toast.error(message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const configuredImageUrls = new Set(
@@ -318,7 +361,7 @@ export const ProductsView: React.FC = () => {
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  {!isPublicImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} />}
+                  {!isPublicImageUrl(product.images?.[0]?.url) && !isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} />}
                   <div className="absolute top-4 right-4">
                     <span
                       className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
@@ -459,14 +502,52 @@ export const ProductsView: React.FC = () => {
 
                 <div className="space-y-3 md:col-span-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
-                    Product Image (from /public folder)
+                    Product Image
                   </label>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-primary-gold/10 border border-dashed border-primary-gold/40 rounded-2xl py-4 px-4 hover:bg-primary-gold/20 transition-all">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        disabled={uploadingImage}
+                        onChange={handleDeviceUpload}
+                      />
+                      {uploadingImage ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-primary-gold" />
+                      ) : (
+                        <Smartphone className="h-4 w-4 text-primary-gold" />
+                      )}
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                        {uploadingImage ? 'Compressing & uploading…' : 'Upload from phone / device'}
+                      </span>
+                    </label>
+                    <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white/5 border border-dashed border-white/20 rounded-2xl py-4 px-4 hover:border-white/40 transition-all">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingImage}
+                        onChange={handleDeviceUpload}
+                      />
+                      <Upload className="h-4 w-4 text-slate-400" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
+                        Choose from storage
+                      </span>
+                    </label>
+                  </div>
+
                   {formData.imageUrl && (
                     <div className="flex items-center gap-4 p-3 rounded-xl border border-primary-gold/30 bg-primary-gold/5">
-                      <img src={formData.imageUrl} alt="Selected" className="w-16 h-16 object-cover rounded-lg" />
+                      <PublicImage src={formData.imageUrl} alt="Selected" className="w-16 h-16 object-contain rounded-lg bg-black" />
                       <span className="text-[10px] text-slate-400 font-mono truncate">{formData.imageUrl}</span>
                     </div>
                   )}
+                  <p className="text-[9px] text-slate-600">
+                    Photos are compressed before upload. Or pick from the gallery below.
+                  </p>
                   <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 border border-white/10 rounded-2xl bg-primary-black">
                     {publicAssets.map((asset) => (
                       <button

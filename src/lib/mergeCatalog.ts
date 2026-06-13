@@ -2,15 +2,17 @@ import { PUBLIC_CATALOG } from '../data/publicCatalog';
 import type { StoreProduct } from '../types/product';
 import { resolveProductPrice } from './productPrice';
 
-/** Storefront always uses /public images; API only overlays editable fields (price, name, etc.). */
+/** Storefront merges /public catalog with API products; API-only uploads are appended. */
 export function mergePublicCatalogWithApi(apiProducts: StoreProduct[]): StoreProduct[] {
   const bySlug = new Map(apiProducts.map((p) => [p.slug, p]));
   const byImg = new Map(apiProducts.map((p) => [p.img, p]));
   const byId = new Map(apiProducts.map((p) => [p.id, p]));
+  const matchedApiIds = new Set<string>();
 
-  return PUBLIC_CATALOG.map((pub) => {
+  const merged = PUBLIC_CATALOG.map((pub) => {
     const api = bySlug.get(pub.slug) ?? byImg.get(pub.img) ?? byId.get(pub.id);
     if (!api) return pub;
+    matchedApiIds.add(api.id);
 
     return {
       ...pub,
@@ -24,6 +26,10 @@ export function mergePublicCatalogWithApi(apiProducts: StoreProduct[]): StorePro
         ? api.sizes
         : pub.sizes,
       badge: api.badge ?? pub.badge,
+      img: api.img || pub.img,
     };
   });
+
+  const apiOnly = apiProducts.filter((p) => !matchedApiIds.has(p.id));
+  return [...merged, ...apiOnly];
 }

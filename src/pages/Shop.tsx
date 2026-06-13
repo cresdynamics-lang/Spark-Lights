@@ -9,6 +9,7 @@ import { getCategoryName } from '../data/categories';
 import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { BRAND } from '../data/brand';
+import ProductImage from '../components/ProductImage';
 
 const CATEGORIES = [
   { id: 'all', name: 'All Lights' },
@@ -143,7 +144,7 @@ export default function Shop() {
                   className="group"
                 >
                   <div className="product-image-frame mb-3 sm:mb-8">
-                    <img src={product.img} alt={product.name} />
+                    <ProductImage src={product.img} alt={product.name} />
                     <div className="absolute top-2 left-2 sm:top-6 sm:left-6 z-10 flex flex-col gap-1.5 sm:gap-2">
                       {product.badge && <span className="bg-primary-gold text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest shadow-xl">{product.badge}</span>}
                     </div>

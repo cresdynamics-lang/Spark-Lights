@@ -24,3 +24,10 @@ export const createProductSchema = z.object({
 export const updateProductSchema = z.object({
   body: createProductSchema.shape.body.partial(),
 });
+
+export const uploadImageSchema = z.object({
+  body: z.object({
+    imageData: z.string().min(100),
+    filename: z.string().optional(),
+  }),
+});

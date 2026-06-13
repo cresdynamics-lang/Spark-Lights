@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ProductImage from './ProductImage';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProducts } from '../context/ProductContext';
@@ -91,7 +92,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   }`}
                 >
                   <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-tertiary-black border border-white/10 rounded-xl flex items-center justify-center p-1">
-                    <img
+                    <ProductImage
                       src={product.img}
                       alt={product.name}
                       className="max-w-full max-h-full object-contain"

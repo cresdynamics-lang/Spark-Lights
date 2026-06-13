@@ -15,6 +15,7 @@ import { useProducts } from '../context/ProductContext';
 import { usePublishedBlogs } from '../hooks/useBlogs';
 import InstallationGallery from '../components/InstallationGallery';
 import DeliveryBanner from '../components/DeliveryBanner';
+import ProductImage from '../components/ProductImage';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -89,11 +90,11 @@ export default function Home() {
             <p className="text-lg sm:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
               {HERO_SLIDES[currentSlide].subtitle}
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none">
-              <Link to="/shop" className="btn-primary text-center w-full sm:w-auto">
+            <div className="flex flex-row flex-wrap gap-2 sm:gap-4 w-full max-w-lg sm:max-w-none">
+              <Link to="/shop" className="btn-primary text-center flex-1 min-w-[8.5rem] text-[9px] sm:text-sm px-3 py-2.5 sm:py-4 sm:px-6 whitespace-nowrap">
                 {HERO_SLIDES[currentSlide].cta}
               </Link>
-              <a href={BRAND.whatsappUrl} className="btn-secondary text-center w-full sm:w-auto">
+              <a href={BRAND.whatsappUrl} className="btn-secondary text-center flex-1 min-w-[8.5rem] text-[9px] sm:text-sm px-3 py-2.5 sm:py-4 sm:px-6 whitespace-nowrap">
                 Order on WhatsApp
               </a>
             </div>
@@ -224,7 +225,7 @@ export default function Home() {
             {featured.map((prod) => (
               <motion.div key={prod.id} {...fadeIn} className="group">
                 <Link to={`/product/${prod.slug}`} className="block product-image-frame mb-3 sm:mb-5">
-                  <img src={prod.img} alt={prod.name} loading="lazy" />
+                  <ProductImage src={prod.img} alt={prod.name} loading="lazy" />
                   {prod.badge && (
                     <span className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-primary-gold text-black text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-3 sm:py-1 uppercase z-10">
                       {prod.badge}
@@ -278,7 +279,7 @@ export default function Home() {
             {topProducts.map((prod) => (
               <div key={prod.id} className="group">
                 <div className="product-image-frame mb-3 sm:mb-5">
-                  <img src={prod.img} alt={prod.name} loading="lazy" />
+                  <ProductImage src={prod.img} alt={prod.name} loading="lazy" />
                   <span className="product-price-badge">KES {prod.price}</span>
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex flex-col justify-center items-center gap-3 p-4">
                     <button onClick={() => addItem(prod)} className="btn-primary w-full text-[10px] flex items-center justify-center gap-2">

@@ -14,6 +14,7 @@ import {
   buildProductSeoKeywords,
 } from '../lib/seo';
 import DeliveryBanner from '../components/DeliveryBanner';
+import ProductImage from '../components/ProductImage';
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -64,7 +65,7 @@ export default function ProductDetail() {
             className="lg:w-1/2"
           >
             <div className="product-image-frame shadow-2xl">
-              <img src={product.img} alt={product.name} />
+              <ProductImage src={product.img} alt={product.name} loading="eager" fetchPriority="high" />
               {product.badge && (
                 <div className="absolute top-4 left-4 sm:top-8 sm:left-8 bg-primary-gold text-white text-[9px] sm:text-[10px] font-black px-3 py-1.5 sm:px-4 sm:py-2 uppercase tracking-[0.2em] shadow-2xl">
                   {product.badge}

@@ -46,3 +46,9 @@ FRONTEND_URL=https://your-domain.vercel.app
 URL-encode `@` in passwords as `%40` (e.g. `SparkLights@254` → `SparkLights%40254`).
 
 Copy connection strings from Supabase Dashboard → **Project Settings → Database → Connection string → URI** (Transaction pooler for `DATABASE_URL`).
+
+### Product photo uploads (admin)
+
+Run **`storage.sql`** once to create the public `product-images` bucket.
+
+Admin → Products → **Upload from phone / device** compresses JPEGs client-side and stores them in Supabase Storage. URLs are saved on `ProductImage` records in Postgres.

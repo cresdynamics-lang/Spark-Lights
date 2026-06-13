@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import prisma from "../../config/prisma.js";
-import { isPublicImageUrl } from "../../lib/publicImages.js";
+import { isAllowedProductImageUrl } from "../../lib/productImages.js";
 
 /** Admin catalog — all products including inactive, no storefront filters */
 export const getAdminProducts = async (_req: Request, res: Response, next: NextFunction) => {
@@ -100,12 +100,12 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
       })) ??
       (imageUrl ? [{ url: imageUrl, isPrimary: true }] : []);
 
-    const imageCreates = rawImages.filter((img: { url: string }) => isPublicImageUrl(img.url));
+    const imageCreates = rawImages.filter((img: { url: string }) => isAllowedProductImageUrl(img.url));
 
     if (rawImages.length > 0 && imageCreates.length === 0) {
       return res.status(400).json({
         success: false,
-        error: { code: "INVALID_IMAGE", message: "Image must be a file from the /public folder (e.g. /3500.jpeg)" },
+        error: { code: "INVALID_IMAGE", message: "Image must be from /public or an uploaded Supabase product image" },
       });
     }
 
@@ -218,10 +218,10 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     }
 
     if (imageUrl !== undefined) {
-      if (imageUrl && !isPublicImageUrl(imageUrl)) {
+      if (imageUrl && !isAllowedProductImageUrl(imageUrl)) {
         return res.status(400).json({
           success: false,
-          error: { code: "INVALID_IMAGE", message: "Image must be a file from the /public folder (e.g. /3500.jpeg)" },
+          error: { code: "INVALID_IMAGE", message: "Image must be from /public or an uploaded Supabase product image" },
         });
       }
       await prisma.productImage.deleteMany({ where: { productId: id as string } });
