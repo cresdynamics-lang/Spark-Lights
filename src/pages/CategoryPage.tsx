@@ -87,10 +87,8 @@ export default function CategoryPage() {
                           {product.badge}
                         </span>
                       )}
-                      <span className="bg-black text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest border border-white/5">
-                        KES {product.price}
-                      </span>
                     </div>
+                    <span className="product-price-badge">KES {product.price}</span>
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden sm:flex flex-col justify-center items-center p-6 lg:p-12 text-center gap-4 lg:gap-6">
                       <p className="text-gray-300 text-sm font-medium leading-relaxed line-clamp-4">{product.shortDesc}</p>
                       <div className="flex flex-col gap-3 w-full max-w-xs">
@@ -129,8 +127,9 @@ export default function CategoryPage() {
                     <h2 className="text-sm sm:text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-1 sm:mb-2 line-clamp-2">
                       {product.name}
                     </h2>
-                    <p className="text-[8px] sm:text-[10px] text-primary-gold font-black uppercase tracking-widest">
-                      KES {product.price} · Nairobi
+                    <p className="product-price-label">KES {product.price}</p>
+                    <p className="text-[8px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
+                      Nairobi · same-day delivery
                     </p>
                   </div>
                 </motion.div>

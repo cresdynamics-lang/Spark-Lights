@@ -146,8 +146,8 @@ export default function Shop() {
                     <img src={product.img} alt={product.name} />
                     <div className="absolute top-2 left-2 sm:top-6 sm:left-6 z-10 flex flex-col gap-1.5 sm:gap-2">
                       {product.badge && <span className="bg-primary-gold text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest shadow-xl">{product.badge}</span>}
-                      <span className="bg-black text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest shadow-xl border border-white/5">KES {product.price}</span>
                     </div>
+                    <span className="product-price-badge">KES {product.price}</span>
                     
                     {/* Desktop hover overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden sm:flex flex-col justify-center items-center p-6 lg:p-12 text-center gap-4 lg:gap-6">
@@ -187,7 +187,8 @@ export default function Shop() {
 
                   <div className="text-center px-1 sm:px-4">
                     <h3 className="text-sm sm:text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-1 sm:mb-2 leading-tight line-clamp-2">{product.name}</h3>
-                    <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-gray-600 block line-clamp-1">
+                    <p className="product-price-label">KES {product.price}</p>
+                    <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-gray-600 block line-clamp-1 mt-1">
                       {(product.categories ?? []).map(getCategoryName).join(' · ')}
                     </span>
                   </div>

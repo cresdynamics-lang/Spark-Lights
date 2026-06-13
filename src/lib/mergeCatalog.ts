@@ -1,5 +1,6 @@
 import { PUBLIC_CATALOG } from '../data/publicCatalog';
 import type { StoreProduct } from '../types/product';
+import { resolveProductPrice } from './productPrice';
 
 /** Storefront always uses /public images; API only overlays editable fields (price, name, etc.). */
 export function mergePublicCatalogWithApi(apiProducts: StoreProduct[]): StoreProduct[] {
@@ -15,11 +16,13 @@ export function mergePublicCatalogWithApi(apiProducts: StoreProduct[]): StorePro
       ...pub,
       id: api.id,
       name: api.name,
-      price: api.price,
+      price: resolveProductPrice(api.price, pub.price),
       shortDesc: api.shortDesc || pub.shortDesc,
       longDesc: api.longDesc || pub.longDesc,
       categories: api.categories?.length ? api.categories : pub.categories,
-      sizes: api.sizes,
+      sizes: api.sizes?.some((s) => parseInt(s.price.replace(/,/g, ''), 10) > 0)
+        ? api.sizes
+        : pub.sizes,
       badge: api.badge ?? pub.badge,
     };
   });

@@ -1,5 +1,6 @@
 import type { StoreProduct } from '../types/product';
 import { sanitizePublicImageUrl } from './publicImages';
+import { parsePriceFromFilename } from '../data/publicCatalog';
 
 export function mapApiProduct(p: Record<string, unknown>): StoreProduct | null {
   const variants = p.variants as { priceKes: number; label: string }[] | undefined;
@@ -9,13 +10,23 @@ export function mapApiProduct(p: Record<string, unknown>): StoreProduct | null {
 
   if (!img) return null;
 
-  const priceKes = variants?.[0]?.priceKes ?? 0;
+  const filename = decodeURIComponent(img.split('/').pop() ?? '');
+  const filenamePrice = parsePriceFromFilename(filename);
+  const variantPrice = variants?.[0]?.priceKes;
+  const priceKes =
+    variantPrice && variantPrice > 0
+      ? variantPrice
+      : filenamePrice && filenamePrice > 0
+        ? filenamePrice
+        : 0;
+
+  const priceStr = priceKes > 0 ? priceKes.toLocaleString('en-KE') : '0';
 
   return {
     id: p.id as string,
     slug: p.slug as string,
     name: p.name as string,
-    price: Number(priceKes).toLocaleString('en-KE'),
+    price: priceStr,
     img,
     tag: (p.badgeLabel as string) || 'Lighting',
     categories: categories?.map((c) => c.category?.slug).filter(Boolean) as string[],
