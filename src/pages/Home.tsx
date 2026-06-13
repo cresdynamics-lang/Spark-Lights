@@ -91,10 +91,10 @@ export default function Home() {
               {HERO_SLIDES[currentSlide].subtitle}
             </p>
             <div className="flex flex-row flex-wrap gap-2 sm:gap-4 w-full max-w-lg sm:max-w-none">
-              <Link to="/shop" className="btn-primary text-center flex-1 min-w-[8.5rem] text-[9px] sm:text-sm px-3 py-2.5 sm:py-4 sm:px-6 whitespace-nowrap">
+              <Link to="/shop" className="btn-primary text-center flex-1 min-w-[7rem] text-[8px] sm:text-sm px-2 py-2 sm:py-4 sm:px-6 whitespace-nowrap">
                 {HERO_SLIDES[currentSlide].cta}
               </Link>
-              <a href={BRAND.whatsappUrl} className="btn-secondary text-center flex-1 min-w-[8.5rem] text-[9px] sm:text-sm px-3 py-2.5 sm:py-4 sm:px-6 whitespace-nowrap">
+              <a href={BRAND.whatsappUrl} className="btn-secondary text-center flex-1 min-w-[7rem] text-[8px] sm:text-sm px-2 py-2 sm:py-4 sm:px-6 whitespace-nowrap">
                 Order on WhatsApp
               </a>
             </div>
@@ -208,17 +208,23 @@ export default function Home() {
 
       {/* Featured */}
       <section className="py-20 sm:py-28">
-        <div className="container mx-auto px-6">
-          <motion.div {...fadeIn} className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-14">
-            <div>
-              <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-black mb-4 block">
+        <div className="container mx-auto px-4 sm:px-6">
+          <motion.div {...fadeIn} className="flex flex-row items-end justify-between gap-2 sm:gap-6 mb-8 sm:mb-14">
+            <div className="min-w-0 flex-1">
+              <span className="text-primary-gold uppercase tracking-[0.35em] sm:tracking-[0.5em] text-[8px] sm:text-[10px] font-black mb-2 sm:mb-4 block">
                 Featured Picks
               </span>
-              <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white">
+              <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black uppercase tracking-tighter text-white leading-none">
                 Popular in Nairobi
               </h2>
             </div>
-            <Link to="/shop" className="btn-secondary text-[10px]">View All Lights →</Link>
+            <Link
+              to="/shop"
+              className="btn-secondary btn-compact shrink-0 self-end text-[8px] sm:text-[10px] px-2 py-1.5 sm:px-5 sm:py-3 whitespace-nowrap"
+            >
+              <span className="sm:hidden">All Lights →</span>
+              <span className="hidden sm:inline">View All Lights →</span>
+            </Link>
           </motion.div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">

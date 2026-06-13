@@ -683,18 +683,25 @@ img {
 @media (max-width: 639px) {
   .btn-primary,
   .btn-secondary {
-    padding: 10px 14px;
-    font-size: 0.65rem;
-    letter-spacing: 0.05em;
-    line-height: 1.35;
+    padding: 8px 10px;
+    font-size: 0.58rem;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+  }
+
+  .btn-compact {
+    padding: 5px 8px !important;
+    font-size: 0.55rem !important;
+    letter-spacing: 0.03em;
+    line-height: 1.25;
   }
 
   .btn-primary.py-4,
   .btn-secondary.py-4,
   .btn-primary.py-6,
   .btn-secondary.py-6 {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .btn-primary.px-10,
@@ -703,7 +710,7 @@ img {
   .btn-secondary.px-12,
   .btn-primary.px-16,
   .btn-secondary.px-16 {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
