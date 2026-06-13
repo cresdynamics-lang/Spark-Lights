@@ -14,3 +14,8 @@ export const createProduct = async (data: any) => {
   const response = await apiClient.post('/products', data);
   return response.data;
 };
+
+export const updateProduct = async (id: string, data: any) => {
+  const response = await apiClient.patch(`/products/${id}`, data);
+  return response.data;
+};

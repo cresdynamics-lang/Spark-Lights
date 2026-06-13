@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Syne:wght@400..800&display=swap');
 
 @theme {
   --color-primary-black: #000000;
@@ -16,6 +16,7 @@
   
   --font-serif: "Cormorant", serif;
   --font-sans: "Montserrat", sans-serif;
+  --font-brand: "Syne", "Bricolage Grotesque", sans-serif;
   
   --animate-fade-in: fade-in 1.2s ease-out forwards;
   --animate-fade-in-up: fade-in-up 1.2s ease-out forwards;
@@ -76,6 +77,10 @@
 @layer base {
   body {
     @apply bg-primary-black text-soft-white font-sans antialiased selection:bg-primary-pink selection:text-white;
+  }
+
+  .font-brand {
+    font-family: var(--font-brand);
   }
   
   h1, h2, h3, h4, h5, h6 {

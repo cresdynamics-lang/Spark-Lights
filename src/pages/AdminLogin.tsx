@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LogIn, Mail, Lock, Loader2, Flower2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,13 @@ const AdminLogin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +29,17 @@ const AdminLogin: React.FC = () => {
       if (response.success) {
         login(response.data.staff, response.data.accessToken, response.data.refreshToken);
         toast.success('Welcome back, ' + response.data.staff.name);
-        navigate('/admin');
+        navigate('/admin', { replace: true });
       } else {
         toast.error(response.error?.message || 'Login failed');
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.error?.message || 'An error occurred during login');
+      const message =
+        error.response?.data?.error?.message ||
+        (error.code === 'ERR_NETWORK'
+          ? 'Cannot reach the API. Run npm run dev and wait for "API ready at http://localhost:3001".'
+          : 'An error occurred during login');
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +62,7 @@ const AdminLogin: React.FC = () => {
             <div className="w-16 h-16 bg-primary-gold/10 rounded-2xl flex items-center justify-center mb-4 border border-primary-gold/20">
               <Flower2 className="h-8 w-8 text-primary-gold" />
             </div>
-            <h1 className="text-2xl font-black text-white uppercase tracking-tighter">Marigold Admin</h1>
+            <h1 className="text-2xl font-black text-white uppercase tracking-tighter">Spark Lights Admin</h1>
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Executive Portal Access</p>
           </div>
 
@@ -65,7 +77,7 @@ const AdminLogin: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-primary-black border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm text-white font-bold outline-none focus:border-primary-gold/30 transition-all placeholder:text-slate-700"
-                  placeholder="admin@marigold.co.ke"
+                  placeholder="mary@sparklights.co.ke"
                 />
               </div>
             </div>

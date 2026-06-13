@@ -13,6 +13,9 @@ import {
 } from 'lucide-react';
 import { getStaff } from '@/api/staff';
 import toast from 'react-hot-toast';
+import AvatarInitials from '@/components/AvatarInitials';
+import PublicImage from '@/components/PublicImage';
+import { isPublicImageUrl } from '@/lib/publicImages';
 
 export const StaffView: React.FC = () => {
   const [staff, setStaff] = useState<any[]>([]);
@@ -103,11 +106,15 @@ export const StaffView: React.FC = () => {
                   <div className="flex items-center gap-5">
                     <div className="relative">
                       <div className="h-14 w-14 rounded-2xl bg-primary-black border border-white/10 flex items-center justify-center text-primary-gold font-black text-lg overflow-hidden group-hover:border-primary-gold transition-colors">
-                        <img 
-                          src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.id}`} 
-                          alt={member.name} 
-                          className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
-                        />
+                        {isPublicImageUrl(member.avatarUrl) ? (
+                          <PublicImage
+                            src={member.avatarUrl}
+                            alt={member.name}
+                            className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          />
+                        ) : (
+                          <AvatarInitials name={member.name} className="h-full w-full text-lg" />
+                        )}
                       </div>
                       {member.isActive && (
                         <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald-500 border-4 border-secondary-black rounded-full" />

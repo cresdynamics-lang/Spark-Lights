@@ -19,7 +19,7 @@ export default function Checkout() {
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
-      alert('Order Placed Successfully! Thank you for choosing Marigold.');
+      alert('Order Placed Successfully! Thank you for choosing Spark Lights 254.');
       clearCart();
       navigate('/');
     }, 3000);

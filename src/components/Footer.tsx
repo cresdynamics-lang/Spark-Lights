@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
 import { FiInstagram, FiFacebook, FiMessageCircle, FiPhone, FiMail, FiMapPin } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { BRAND } from '../data/brand';
+import { LIGHT_CATEGORIES } from '../data/categories';
+import BrandLogo from './BrandLogo';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -15,11 +18,11 @@ export default function Footer() {
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16 mb-24">
           <motion.div {...fadeIn}>
-            <Link to="/" className="font-serif text-3xl font-extrabold mb-8 block tracking-tighter">
-              <span className="text-primary-gold">MARI</span><span className="text-primary-pink">GOLD</span>
-            </Link>
+            <div className="mb-8">
+              <BrandLogo size="sm" showSubtitle={false} />
+            </div>
             <p className="text-gray-500 leading-relaxed mb-8 italic text-sm">
-              "Fresh flowers, crafted with love. Delivered to your door across Nairobi. Where every petal tells a story."
+              "{BRAND.tagline}. Same-day delivery across Nairobi — order via WhatsApp."
             </p>
             <div className="flex gap-4">
               {[FiInstagram, FiFacebook, FiMessageCircle].map((Icon, i) => (
@@ -43,6 +46,7 @@ export default function Footer() {
                 { name: 'Shop', path: '/shop' },
                 { name: 'About Us', path: '/about' },
                 { name: 'Contact', path: '/contact' },
+                { name: 'Lighting Guide', path: '/light-guide' },
                 { name: 'FAQs', path: '/faq' },
                 { name: 'Delivery Info', path: '/delivery' },
                 { name: 'Refund Policy', path: '/refund-policy' }
@@ -55,8 +59,12 @@ export default function Footer() {
           <motion.div {...fadeIn} transition={{ delay: 0.3 }}>
             <h3 className="text-primary-gold font-black uppercase tracking-[0.3em] mb-10 text-[10px]">Categories</h3>
             <ul className="space-y-4">
-              {['Birthday Flowers', 'Anniversary', 'Wedding Flowers', 'Sympathy', 'Corporate', 'Roses', 'Orchids', 'Sunflowers'].map(item => (
-                <li key={item}><Link to={`/shop?category=${item.toLowerCase()}`} className="text-sm text-gray-500 hover:text-primary-pink transition-colors font-medium">{item}</Link></li>
+              {LIGHT_CATEGORIES.map((cat) => (
+                <li key={cat.slug}>
+                  <Link to={`/category/${cat.slug}`} className="text-sm text-gray-500 hover:text-primary-pink transition-colors font-medium">
+                    {cat.name}
+                  </Link>
+                </li>
               ))}
             </ul>
           </motion.div>
@@ -65,10 +73,10 @@ export default function Footer() {
             <h3 className="text-primary-gold font-black uppercase tracking-[0.3em] mb-10 text-[10px]">Contact Us</h3>
             <ul className="space-y-6">
               {[
-                { icon: <FiPhone />, text: '+254 700 000 000' },
-                { icon: <FiMessageCircle />, text: 'WhatsApp: +254 700 000 000' },
-                { icon: <FiMail />, text: 'info@marigold.co.ke' },
-                { icon: <FiMapPin />, text: 'Westlands, Nairobi, Kenya' }
+                { icon: <FiPhone />, text: BRAND.phone },
+                { icon: <FiMessageCircle />, text: `WhatsApp: ${BRAND.phone}` },
+                { icon: <FiMail />, text: BRAND.email },
+                { icon: <FiMapPin />, text: BRAND.address }
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-4 group cursor-pointer">
                   <div className="text-primary-gold mt-1 group-hover:scale-125 transition-transform group-hover:text-primary-pink">{item.icon}</div>
@@ -80,7 +88,7 @@ export default function Footer() {
         </div>
         
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gray-600">
-          <p>&copy; 2026 Marigold Flowers Kenya. All rights reserved.</p>
+          <p>&copy; 2026 {BRAND.name}. All rights reserved.</p>
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
             {['M-PESA', 'VISA', 'MASTERCARD', 'CASH ON DELIVERY'].map(item => (
               <span key={item} className="hover:text-white cursor-default transition-colors">{item}</span>

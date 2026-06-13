@@ -1,13 +1,18 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiSearch, FiArrowRight, FiPlus } from 'react-icons/fi';
-import { PRODUCTS, OCCASIONS } from '../data/content';
+import { useSearchParams, Link } from 'react-router-dom';
+import { useProducts } from '../context/ProductContext';
+import { LIGHT_CATEGORIES } from '../data/categories';
+import { filterByCategory, searchProducts } from '../lib/searchProducts';
+import { getCategoryName } from '../data/categories';
 import { useCartStore } from '../store/useCartStore';
+import { usePageSEO } from '../hooks/usePageSEO';
+import { BRAND } from '../data/brand';
 
 const CATEGORIES = [
-  { id: 'all', name: 'All Collections' },
-  ...OCCASIONS.map(occ => ({ id: occ.id, name: occ.name }))
+  { id: 'all', name: 'All Lights' },
+  ...LIGHT_CATEGORIES.map((cat) => ({ id: cat.slug, name: cat.name })),
 ];
 
 const PRICE_RANGES = [
@@ -18,26 +23,38 @@ const PRICE_RANGES = [
 ];
 
 export default function Shop() {
-  const [activeCategory, setActiveCategory] = useState('all');
+  usePageSEO({
+    title: `Shop Lighting Nairobi | ${BRAND.name}`,
+    description: 'Browse chandeliers, ceiling lights, wall lights, pendants & outdoor lighting in Nairobi. Same-day delivery. Prices from KES 2,000.',
+    path: '/shop',
+    keywords: 'buy lights Nairobi, lighting shop Kenya, chandeliers online Nairobi',
+  });
+
+  const [searchParams] = useSearchParams();
+  const initialCategory = searchParams.get('category') ?? 'all';
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activePrice, setActivePrice] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const addItem = useCartStore((state) => state.addItem);
+  const { products } = useProducts();
+
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) setActiveCategory(cat);
+  }, [searchParams]);
 
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter(product => {
-      const matchesCategory = activeCategory === 'all' || (product as any).categories?.includes(activeCategory) || (product as any).tag === activeCategory;
+    let list = filterByCategory(products, activeCategory);
+    list = searchProducts(list, searchQuery);
+
+    return list.filter((product) => {
       const priceValue = parseInt(product.price.replace(/,/g, ''));
-      
-      let matchesPrice = true;
-      if (activePrice === 'under-5k') matchesPrice = priceValue < 5000;
-      else if (activePrice === '5k-10k') matchesPrice = priceValue >= 5000 && priceValue <= 10000;
-      else if (activePrice === 'over-10k') matchesPrice = priceValue > 10000;
-
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return matchesCategory && matchesPrice && matchesSearch;
+      if (activePrice === 'under-5k') return priceValue < 5000;
+      if (activePrice === '5k-10k') return priceValue >= 5000 && priceValue <= 10000;
+      if (activePrice === 'over-10k') return priceValue > 10000;
+      return true;
     });
-  }, [activeCategory, activePrice, searchQuery]);
+  }, [activeCategory, activePrice, searchQuery, products]);
 
   return (
     <div className="min-h-screen pb-32">
@@ -50,10 +67,10 @@ export default function Shop() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1 }}
             >
-              <span className="text-primary-pink uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">The Gallery</span>
-              <h1 className="text-6xl sm:text-8xl font-black uppercase leading-none tracking-tighter mb-8">Elevated <br/> Bloom Curation</h1>
+              <span className="text-primary-pink uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Shop</span>
+              <h1 className="text-6xl sm:text-8xl font-black uppercase leading-none tracking-tighter mb-8">Premium <br/> Lighting</h1>
               <p className="text-gray-500 text-lg font-medium max-w-2xl leading-relaxed">
-                Explore our meticulously curated selection of seasonal masterpieces, each artisanally crafted to define your most precious moments.
+                Chandeliers, ceiling lights, wall lights, and more — browse by category or search our full catalog.
               </p>
             </motion.div>
           </div>
@@ -69,15 +86,27 @@ export default function Shop() {
               <span className="text-[10px] font-black uppercase tracking-widest">Filter</span>
             </div>
             {CATEGORIES.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${
-                  activeCategory === cat.id ? 'text-primary-pink border-b border-primary-pink' : 'text-gray-600 hover:text-white'
-                }`}
-              >
-                {cat.name}
-              </button>
+              cat.id === 'all' ? (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory('all')}
+                  className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${
+                    activeCategory === 'all' ? 'text-primary-pink border-b border-primary-pink' : 'text-gray-600 hover:text-white'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ) : (
+                <Link
+                  key={cat.id}
+                  to={`/category/${cat.id}`}
+                  className={`text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-colors ${
+                    activeCategory === cat.id ? 'text-primary-pink border-b border-primary-pink' : 'text-gray-600 hover:text-white'
+                  }`}
+                >
+                  {cat.name}
+                </Link>
+              )
             ))}
           </div>
 
@@ -85,7 +114,7 @@ export default function Shop() {
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={16} />
             <input 
               type="text" 
-              placeholder="Search Curation..." 
+              placeholder="Search lights..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-[11px] font-black uppercase tracking-widest focus:outline-none focus:border-primary-pink transition-colors text-white"
@@ -137,7 +166,9 @@ export default function Shop() {
                   </div>
                   <div className="text-center px-4">
                     <h3 className="text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-2 leading-none">{product.name}</h3>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 block">{(product as any).tag || ''}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-600 block">
+                      {(product.categories ?? []).map(getCategoryName).join(' · ')}
+                    </span>
                   </div>
                 </motion.div>
               ))}
@@ -165,8 +196,8 @@ export default function Shop() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-gold/5 blur-[120px] -z-10 group-hover:bg-primary-gold/10 transition-all duration-1000"></div>
           <div className="max-w-2xl text-center lg:text-left">
             <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-black mb-6 block">Bespoke Curation</span>
-            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white leading-none mb-8">Corporate <br/> & Large Scale</h2>
-            <p className="text-gray-500 font-medium leading-relaxed">Elevate your office, hotel, or gala event with our exclusive artisan partnerships. Custom subscriptions and volume pricing available.</p>
+            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white leading-none mb-8">Commercial <br/> & Bulk Orders</h2>
+            <p className="text-gray-500 font-medium leading-relaxed">Offices, hotels, restaurants, and event venues — we supply and install lighting across Nairobi. Volume pricing on WhatsApp.</p>
           </div>
           <button className="btn-primary py-6 px-16 flex items-center gap-4 group">
             Request Proposal <FiArrowRight className="group-hover:translate-x-2 transition-transform" />

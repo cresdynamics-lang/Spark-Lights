@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sparklights.co.ke/sitemap.xml

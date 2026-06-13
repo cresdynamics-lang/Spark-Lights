@@ -2,20 +2,32 @@ import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiHeart, FiShoppingCart, FiMessageCircle, FiChevronRight, FiCheckCircle } from 'react-icons/fi';
-import { PRODUCTS } from '../data/content';
+import { useProducts } from '../context/ProductContext';
+import { BRAND } from '../data/brand';
+import { getCategoryName } from '../data/categories';
+import { usePageSEO } from '../hooks/usePageSEO';
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const product = useMemo(() => PRODUCTS.find(p => p.slug === slug), [slug]);
+  const { products } = useProducts();
+  const product = useMemo(() => products.find(p => p.slug === slug), [products, slug]);
   
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[1]?.label || '');
+  const [selectedSize, setSelectedSize] = useState(product?.sizes[0]?.label || '');
   const [quantity, setQuantity] = useState(1);
+
+  usePageSEO({
+    title: product ? `${product.name} Nairobi | Spark Lights 254` : 'Product | Spark Lights 254',
+    description: product
+      ? `Buy ${product.name} in Nairobi — KES ${product.price}. ${product.shortDesc} Same-day delivery. Order on WhatsApp.`
+      : 'Lighting product at Spark Lights 254, Nairobi.',
+    path: slug ? `/product/${slug}` : '/shop',
+  });
 
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-        <h1 className="text-4xl font-serif mb-6">Bouquet Not Found</h1>
+        <h1 className="text-4xl font-black uppercase mb-6">Product Not Found</h1>
         <Link to="/shop" className="btn-primary">Back to Shop</Link>
       </div>
     );
@@ -60,7 +72,18 @@ export default function ProductDetail() {
             animate={{ opacity: 1, x: 0 }}
             className="lg:w-1/2 flex flex-col"
           >
-            <span className="text-primary-pink uppercase tracking-[0.4em] text-[10px] font-bold mb-6 block">{product.tag}</span>
+            <span className="text-primary-pink uppercase tracking-[0.4em] text-[10px] font-bold mb-4 block">{product.tag}</span>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {(product.categories ?? []).map((slug) => (
+                <Link
+                  key={slug}
+                  to={`/category/${slug}`}
+                  className="text-[9px] font-black uppercase tracking-widest px-3 py-1 border border-primary-gold/30 text-primary-gold hover:bg-primary-gold/10 transition-colors"
+                >
+                  {getCategoryName(slug)}
+                </Link>
+              ))}
+            </div>
             <h1 className="text-4xl sm:text-6xl font-serif mb-8 leading-tight">{product.name}</h1>
             
             <div className="flex items-center gap-6 mb-12">
@@ -74,7 +97,7 @@ export default function ProductDetail() {
 
             {/* Size Selector */}
             <div className="mb-12">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-6">Select Arrangement Size:</label>
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-6">Select Option:</label>
               <div className="flex flex-wrap gap-4">
                 {product.sizes.map((size) => (
                   <button 
@@ -105,7 +128,7 @@ export default function ProductDetail() {
             </div>
 
             <a 
-              href={`https://wa.me/254700000000?text=I'd like to order the ${product.name} (${selectedSize})`}
+              href={`${BRAND.whatsappUrl}?text=${encodeURIComponent(`Hi Spark Lights 254! I'd like to order the ${product.name} (${selectedSize})`)}`}
               className="w-full border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all py-5 flex items-center justify-center gap-3 font-bold uppercase tracking-widest text-xs mb-16"
             >
               <FiMessageCircle size={20} /> Order via WhatsApp
@@ -117,16 +140,18 @@ export default function ProductDetail() {
                 <span className="w-8 h-[1px] bg-primary-gold"></span> Product Description
               </h3>
               <div className="text-gray-400 text-sm leading-relaxed space-y-4">
-                {product.longDesc.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}
+                {(product.longDesc ?? '').split('\n\n').map((p, i) => <p key={i}>{p}</p>)}
               </div>
             </div>
 
-            <div className="border-t border-white/5 py-10">
-              <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
-                <span className="w-8 h-[1px] bg-primary-gold"></span> Care Instructions
-              </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{product.careInstructions}</p>
-            </div>
+            {product.careInstructions && (
+              <div className="border-t border-white/5 py-10">
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                  <span className="w-8 h-[1px] bg-primary-gold"></span> Installation Notes
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{product.careInstructions}</p>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

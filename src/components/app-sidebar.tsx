@@ -26,8 +26,8 @@ import {
 const data = {
   user: {
     name: "Admin User",
-    email: "admin@marigold.com",
-    avatar: "https://i.pravatar.cc/150?u=40",
+    email: "admin@sparklights.co.ke",
+    avatar: "",
   },
   navMain: [
     {
@@ -214,7 +214,7 @@ export function AppSidebar({
             >
               <a href="#" onClick={(e) => { e.preventDefault(); onNavigate?.("Dashboard") }}>
                 <CommandIcon className="size-5!" />
-                <span className="text-base font-black tracking-tight text-slate-900 dark:text-slate-100">Marigold Admin</span>
+                <span className="text-base font-black tracking-tight text-slate-900 dark:text-slate-100">Spark Lights Admin</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -227,8 +227,8 @@ export function AppSidebar({
       <SidebarFooter>
         <NavUser user={{
           name: user?.name || "Staff Member",
-          email: user?.email || "staff@marigold.co.ke",
-          avatar: user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.id || 'default'}`
+          email: user?.email || "staff@sparklights.co.ke",
+          avatar: user?.avatarUrl || ''
         }} />
       </SidebarFooter>
     </Sidebar>

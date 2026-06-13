@@ -1,0 +1,49 @@
+-- =============================================================================
+-- OPTIONAL — wipe Sparklights tables (run only on empty/test projects)
+-- Run BEFORE 01_schema.sql if you need a clean reinstall
+-- =============================================================================
+
+DROP TABLE IF EXISTS "AuditLog" CASCADE;
+DROP TABLE IF EXISTS "StoreSetting" CASCADE;
+DROP TABLE IF EXISTS "WhatsappLog" CASCADE;
+DROP TABLE IF EXISTS "NotificationLog" CASCADE;
+DROP TABLE IF EXISTS "Subscription" CASCADE;
+DROP TABLE IF EXISTS "LoyaltyTransaction" CASCADE;
+DROP TABLE IF EXISTS "Coupon" CASCADE;
+DROP TABLE IF EXISTS "BlockoutDate" CASCADE;
+DROP TABLE IF EXISTS "DeliverySlotConfig" CASCADE;
+DROP TABLE IF EXISTS "DeliveryZone" CASCADE;
+DROP TABLE IF EXISTS "Payment" CASCADE;
+DROP TABLE IF EXISTS "OrderStatusHistory" CASCADE;
+DROP TABLE IF EXISTS "OrderAddon" CASCADE;
+DROP TABLE IF EXISTS "OrderItem" CASCADE;
+DROP TABLE IF EXISTS "Order" CASCADE;
+DROP TABLE IF EXISTS "InventoryMovement" CASCADE;
+DROP TABLE IF EXISTS "FlowerInventory" CASCADE;
+DROP TABLE IF EXISTS "Supplier" CASCADE;
+DROP TABLE IF EXISTS "ProductAddon" CASCADE;
+DROP TABLE IF EXISTS "ProductVariant" CASCADE;
+DROP TABLE IF EXISTS "ProductImage" CASCADE;
+DROP TABLE IF EXISTS "ProductTag" CASCADE;
+DROP TABLE IF EXISTS "ProductCategory" CASCADE;
+DROP TABLE IF EXISTS "Product" CASCADE;
+DROP TABLE IF EXISTS "FlowerTag" CASCADE;
+DROP TABLE IF EXISTS "Category" CASCADE;
+DROP TABLE IF EXISTS "Occasion" CASCADE;
+DROP TABLE IF EXISTS "Address" CASCADE;
+DROP TABLE IF EXISTS "Customer" CASCADE;
+DROP TABLE IF EXISTS "RefreshToken" CASCADE;
+DROP TABLE IF EXISTS "Staff" CASCADE;
+
+DROP TYPE IF EXISTS "OrderSource" CASCADE;
+DROP TYPE IF EXISTS "NotificationChannel" CASCADE;
+DROP TYPE IF EXISTS "CouponType" CASCADE;
+DROP TYPE IF EXISTS "SubscriptionFrequency" CASCADE;
+DROP TYPE IF EXISTS "SubscriptionStatus" CASCADE;
+DROP TYPE IF EXISTS "InventoryMovementType" CASCADE;
+DROP TYPE IF EXISTS "FlowerFreshness" CASCADE;
+DROP TYPE IF EXISTS "DeliverySlot" CASCADE;
+DROP TYPE IF EXISTS "PaymentMethod" CASCADE;
+DROP TYPE IF EXISTS "PaymentStatus" CASCADE;
+DROP TYPE IF EXISTS "OrderStatus" CASCADE;
+DROP TYPE IF EXISTS "Role" CASCADE;

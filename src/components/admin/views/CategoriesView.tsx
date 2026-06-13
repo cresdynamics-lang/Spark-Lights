@@ -14,6 +14,8 @@ import {
 import apiClient from '@/api/client';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import PublicImage from '@/components/PublicImage';
+import { isPublicImageUrl } from '@/lib/publicImages';
 
 export const CategoriesView: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
@@ -122,10 +124,10 @@ export const CategoriesView: React.FC = () => {
               className="bg-secondary-black border border-white/5 rounded-[2.5rem] overflow-hidden group hover:border-primary-gold/20 transition-all duration-500"
             >
               <div className="h-48 relative overflow-hidden bg-primary-black">
-                {category.imageUrl ? (
-                  <img 
-                    src={category.imageUrl} 
-                    alt={category.name} 
+                {isPublicImageUrl(category.imageUrl) ? (
+                  <PublicImage
+                    src={category.imageUrl}
+                    alt={category.name}
                     className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                 ) : (
@@ -192,12 +194,12 @@ export const CategoriesView: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Visual Asset URL</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Public Image Path</label>
                   <input 
-                    type="url" 
+                    type="text" 
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                    placeholder="https://images.unsplash.com/..."
+                    placeholder="/round1.jpg"
                     className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50 transition-all"
                   />
                 </div>

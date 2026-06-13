@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiSearch, FiShoppingCart, FiMessageCircle, FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
+import { FiSearch, FiShoppingCart, FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { OCCASIONS } from '../data/content';
+import { LIGHT_CATEGORIES } from '../data/categories';
 import { useCartStore } from '../store/useCartStore';
 import CartOverlay from './CartOverlay';
+import SearchOverlay from './SearchOverlay';
+import BrandLogo from './BrandLogo';
 
 export default function Navbar() {
   const [isShopOpen, setIsShopOpen] = useState(false);
-  const [isOccasionsOpen, setIsOccasionsOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const getItemCount = useCartStore((state) => state.getItemCount());
 
@@ -40,9 +43,7 @@ export default function Navbar() {
             >
               {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
-            <Link to="/" className="text-2xl sm:text-4xl font-black tracking-tighter hover:scale-105 transition-transform duration-300">
-              <span className="text-primary-gold">MARI</span><span className="text-primary-pink">GOLD</span>
-            </Link>
+            <BrandLogo size="md" />
           </div>
 
           <ul className="hidden lg:flex items-center gap-12 h-full">
@@ -75,10 +76,15 @@ export default function Navbar() {
                     className="absolute top-full left-0 w-64 bg-secondary-black border border-white/5 p-6 shadow-2xl"
                   >
                     <ul className="space-y-4">
-                      {['New Arrivals', 'Best Sellers', 'Gift Sets', 'Subscription', 'Bespoke'].map(item => (
-                        <li key={item}>
-                          <Link to={`/shop?filter=${item.toLowerCase().replace(' ', '-')}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors block">
-                            {item}
+                      <li>
+                        <Link to="/shop" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors block">
+                          All Products
+                        </Link>
+                      </li>
+                      {LIGHT_CATEGORIES.slice(0, 5).map((cat) => (
+                        <li key={cat.slug}>
+                          <Link to={`/category/${cat.slug}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors block">
+                            {cat.name}
                           </Link>
                         </li>
                       ))}
@@ -88,20 +94,19 @@ export default function Navbar() {
               </AnimatePresence>
             </li>
 
-            {/* Occasions Dropdown */}
+            {/* Categories Dropdown */}
             <li 
               className="h-full flex items-center relative"
-              onMouseEnter={() => setIsOccasionsOpen(true)}
-              onMouseLeave={() => setIsOccasionsOpen(false)}
+              onMouseEnter={() => setIsCategoriesOpen(true)}
+              onMouseLeave={() => setIsCategoriesOpen(false)}
             >
-              <Link to="/occasions" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors flex items-center gap-2 group">
-                Occasions
-                <FiChevronDown className={`transition-transform duration-300 ${isOccasionsOpen ? 'rotate-180' : ''}`} />
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-pink transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors flex items-center gap-2 group cursor-default">
+                Categories
+                <FiChevronDown className={`transition-transform duration-300 ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+              </span>
               
               <AnimatePresence>
-                {isOccasionsOpen && (
+                {isCategoriesOpen && (
                   <motion.div 
                     variants={dropdownVariants}
                     initial="hidden"
@@ -110,15 +115,12 @@ export default function Navbar() {
                     className="absolute top-full left-0 w-72 bg-secondary-black border border-white/5 p-6 shadow-2xl"
                   >
                     <div className="grid grid-cols-1 gap-4">
-                      {OCCASIONS.slice(0, 6).map(occ => (
-                        <Link key={occ.id} to={`/shop?category=${occ.id}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors flex items-center gap-3">
+                      {LIGHT_CATEGORIES.map((cat) => (
+                        <Link key={cat.slug} to={`/category/${cat.slug}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors flex items-center gap-3">
                           <span className="w-1.5 h-1.5 bg-primary-gold/30 rounded-full"></span>
-                          {occ.name}
+                          {cat.name}
                         </Link>
                       ))}
-                      <Link to="/occasions" className="text-[9px] font-black uppercase tracking-widest text-primary-gold mt-4 border-t border-white/5 pt-4 inline-block">
-                        View All Occasions →
-                      </Link>
                     </div>
                   </motion.div>
                 )}
@@ -126,8 +128,15 @@ export default function Navbar() {
             </li>
 
             <li className="h-full flex items-center">
+              <Link to="/light-guide" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
+                Light Guide
+                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+
+            <li className="h-full flex items-center">
               <Link to="/about" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
-                Our Story
+                About
                 <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
               </Link>
             </li>
@@ -141,7 +150,13 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-4 sm:gap-8">
-            <button className="hover:text-primary-gold transition-all hover:scale-110 hidden sm:block"><FiSearch size={20} /></button>
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="hover:text-primary-gold transition-all hover:scale-110"
+              aria-label="Search products"
+            >
+              <FiSearch size={20} />
+            </button>
             <button 
               onClick={() => setIsCartOpen(true)}
               className="hover:text-primary-gold transition-all hover:scale-110 relative"
@@ -153,20 +168,12 @@ export default function Navbar() {
                 </span>
               )}
             </button>
-            <motion.a 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="https://wa.me/254700000000" 
-              className="bg-[#25D366] hover:bg-[#128C7E] text-white px-5 sm:px-7 py-2.5 sm:py-3 rounded-none font-black text-[10px] sm:text-[11px] uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-green-500/20"
-            >
-              <FiMessageCircle size={18} /> <span className="hidden md:inline">WhatsApp Order</span>
-            </motion.a>
           </div>
         </div>
       </motion.nav>
 
-      {/* Cart Overlay */}
       <CartOverlay isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -178,17 +185,39 @@ export default function Navbar() {
             className="fixed inset-0 z-[90] bg-primary-black pt-32 px-10 lg:hidden"
           >
             <ul className="space-y-8">
-              {['Home', 'Shop', 'Occasions', 'Our Story', 'Contact'].map((item) => (
-                <li key={item}>
+              {[
+                { label: 'Home', to: '/' },
+                { label: 'Shop', to: '/shop' },
+                { label: 'Light Guide', to: '/light-guide' },
+                { label: 'About', to: '/about' },
+                { label: 'Contact', to: '/contact' },
+              ].map((item) => (
+                <li key={item.label}>
                   <Link 
-                    to={item === 'Home' ? '/' : item === 'Our Story' ? '/about' : `/${item.toLowerCase()}`}
+                    to={item.to}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="text-4xl font-black uppercase italic tracking-tighter text-white hover:text-primary-gold transition-colors"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}
+              <li className="pt-4 border-t border-white/10">
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-4">Categories</span>
+                <ul className="space-y-3">
+                  {LIGHT_CATEGORIES.map((cat) => (
+                    <li key={cat.slug}>
+                      <Link
+                        to={`/category/${cat.slug}`}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-lg font-black uppercase tracking-tight text-gray-400 hover:text-primary-gold transition-colors"
+                      >
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </li>
             </ul>
           </motion.div>
         )}

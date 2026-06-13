@@ -24,6 +24,7 @@ import { logout as logoutApi } from "@/api/auth"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import toast from "react-hot-toast"
+import { isPublicImageUrl } from "@/lib/publicImages"
 
 export function NavUser({
   user,
@@ -38,6 +39,7 @@ export function NavUser({
   const navigate = useNavigate()
   const { logout, refreshToken } = useAuthStore()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const avatarSrc = isPublicImageUrl(user.avatar) ? user.avatar : undefined
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -65,7 +67,7 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={avatarSrc} alt={user.name} />
                 <AvatarFallback className="rounded-lg">{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -86,7 +88,7 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={avatarSrc} alt={user.name} />
                   <AvatarFallback className="rounded-lg">{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

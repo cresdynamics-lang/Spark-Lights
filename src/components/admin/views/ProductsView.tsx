@@ -1,21 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Plus, 
-  Search, 
-  Edit3, 
-  Trash2, 
-  Layers,
+import {
+  Plus,
+  Search,
+  Edit3,
+  Trash2,
   Loader2,
   AlertCircle,
   X,
-  ImageIcon,
-  Save
+  Save,
 } from 'lucide-react';
-import { getProducts } from '@/api/products';
+import { updateProduct } from '@/api/products';
 import apiClient from '@/api/client';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
+import { parsePriceFromFilename } from '@/data/publicCatalog';
+import PublicImage from '@/components/PublicImage';
+import { isPublicImageUrl } from '@/lib/publicImages';
+import { slugFromImageUrl } from '@/lib/slugFromImage';
+import { ImageIcon } from 'lucide-react';
+
+const emptyForm = {
+  name: '',
+  shortDescription: '',
+  longDescription: '',
+  priceKes: '',
+  stockQty: '',
+  categoryIds: [] as string[],
+  imageUrl: '',
+  isActive: true,
+};
 
 export const ProductsView: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -24,30 +38,42 @@ export const ProductsView: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const { user } = useAuthStore();
   const role = user?.role || 'FLORIST';
+  const [formData, setFormData] = useState(emptyForm);
+  const [publicAssets, setPublicAssets] = useState<{ filename: string; url: string; suggestedPrice: number | null }[]>([]);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    shortDescription: '',
-    longDescription: '',
-    priceKes: '',
-    stockQty: '',
-    categoryId: '',
-    imageUrl: '',
-    isActive: true
-  });
+  useEffect(() => {
+    apiClient.get('/products/public-assets').then((res) => {
+      if (res.data.success) setPublicAssets(res.data.data);
+    }).catch(() => {});
+  }, []);
 
   const fetchData = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const [productsRes, categoriesRes] = await Promise.all([
-        getProducts({ search: searchQuery }),
-        apiClient.get('/products/categories')
+        apiClient.get('/products/admin/list'),
+        apiClient.get('/products/categories'),
       ]);
-      if (productsRes.success) setProducts(productsRes.data);
+      if (productsRes.data.success) {
+        const list = productsRes.data.data as any[];
+        const q = searchQuery.trim().toLowerCase();
+        setProducts(
+          q
+            ? list.filter(
+                (p) =>
+                  p.name?.toLowerCase().includes(q) ||
+                  p.slug?.toLowerCase().includes(q) ||
+                  p.images?.[0]?.url?.toLowerCase().includes(q)
+              )
+            : list
+        );
+      }
       if (categoriesRes.data.success) setCategories(categoriesRes.data.data);
-    } catch (err: any) {
+    } catch {
       setError('An error occurred while fetching catalog data');
       toast.error('Could not load products catalog');
     } finally {
@@ -59,27 +85,89 @@ export const ProductsView: React.FC = () => {
     fetchData();
   }, [searchQuery]);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const toggleCategory = (categoryId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      categoryIds: prev.categoryIds.includes(categoryId)
+        ? prev.categoryIds.filter((id) => id !== categoryId)
+        : [...prev.categoryIds, categoryId],
+    }));
+  };
+
+  const openCreate = () => {
+    setEditingProduct(null);
+    setFormData(emptyForm);
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (product: any) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name ?? '',
+      shortDescription: product.shortDescription ?? '',
+      longDescription: product.longDescription ?? '',
+      priceKes: String(product.variants?.[0]?.priceKes ?? ''),
+      stockQty: String(product.variants?.[0]?.stockQty ?? ''),
+      categoryIds:
+        product.categories?.map((c: any) => c.categoryId ?? c.category?.id).filter(Boolean) ?? [],
+      imageUrl: product.images?.[0]?.url ?? '',
+      isActive: product.isActive ?? true,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await apiClient.post('/products', {
-        ...formData,
-        priceKes: parseFloat(formData.priceKes),
-        stockQty: parseInt(formData.stockQty),
-        slug: formData.name.toLowerCase().replace(/ /g, '-'),
-        variants: [{
+    if (formData.categoryIds.length === 0) {
+      toast.error('Select at least one category');
+      return;
+    }
+    if (!formData.imageUrl) {
+      toast.error('Select a product image from the gallery');
+      return;
+    }
+
+    const payload = {
+      name: formData.name,
+      shortDescription: formData.shortDescription || `${formData.name} — Spark Lights 254, Nairobi.`,
+      longDescription: formData.longDescription || formData.shortDescription || `${formData.name} — Spark Lights 254, Nairobi.`,
+      categoryIds: formData.categoryIds,
+      isActive: formData.isActive,
+      imageUrl: formData.imageUrl,
+      variants: [
+        {
           label: 'Default',
           priceKes: parseFloat(formData.priceKes),
-          stockQty: parseInt(formData.stockQty)
-        }]
-      });
-      if (response.data.success) {
-        toast.success("Flower added to collection");
-        setIsModalOpen(false);
-        fetchData();
+          stockQty: parseInt(formData.stockQty, 10) || 0,
+        },
+      ],
+    };
+
+    try {
+      if (editingProduct) {
+        const response = await updateProduct(editingProduct.id, payload);
+        if (response.success) {
+          toast.success('Product saved — storefront updates on next page load');
+          setIsModalOpen(false);
+          fetchData();
+        }
+      } else {
+        const response = await apiClient.post('/products', {
+          ...payload,
+          slug: slugFromImageUrl(formData.imageUrl),
+        });
+        if (response.data.success) {
+          toast.success('Product published to storefront');
+          setIsModalOpen(false);
+          fetchData();
+        }
       }
-    } catch (error) {
-      toast.error("Failed to add product");
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error
+          ?.message ||
+        (editingProduct ? 'Failed to update product' : 'Failed to add product');
+      toast.error(message);
     }
   };
 
@@ -89,48 +177,133 @@ export const ProductsView: React.FC = () => {
     return 'Active';
   };
 
+  const selectPublicImage = (url: string, filename: string) => {
+    const suggested = parsePriceFromFilename(filename);
+    setFormData((prev) => ({
+      ...prev,
+      imageUrl: url,
+      ...(suggested && !prev.priceKes ? { priceKes: String(suggested) } : {}),
+      ...(suggested && !prev.name ? { name: `Modern Ceiling Light — KES ${suggested.toLocaleString()}` } : {}),
+    }));
+  };
+
+  const configuredImageUrls = new Set(
+    products.flatMap((p) => p.images?.map((img: { url: string }) => img.url) ?? [])
+  );
+  const unpublishedAssets = publicAssets.filter((a) => !configuredImageUrls.has(a.url));
+
+  const publishAsset = (url: string, filename: string) => {
+    const suggested = parsePriceFromFilename(filename);
+    setEditingProduct(null);
+    setFormData({
+      ...emptyForm,
+      imageUrl: url,
+      priceKes: suggested ? String(suggested) : '',
+      name: suggested ? `Modern Ceiling Light — KES ${suggested.toLocaleString()}` : '',
+      stockQty: '10',
+      shortDescription: 'Premium lighting for homes and offices in Nairobi.',
+    });
+    setIsModalOpen(true);
+  };
+
+  const CategoryCheckboxes = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {categories.map((cat) => (
+        <label
+          key={cat.id}
+          className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+            formData.categoryIds.includes(cat.id)
+              ? 'border-primary-gold/50 bg-primary-gold/10'
+              : 'border-white/10 bg-primary-black hover:border-white/20'
+          }`}
+        >
+          <input
+            type="checkbox"
+            checked={formData.categoryIds.includes(cat.id)}
+            onChange={() => toggleCategory(cat.id)}
+            className="accent-primary-gold w-4 h-4"
+          />
+          <span className="text-[10px] font-black uppercase tracking-widest text-white">
+            {cat.name}
+          </span>
+        </label>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-8 px-8 pb-12">
-      {/* View Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="bg-secondary-black p-2 rounded-2xl border border-white/5 flex items-center gap-3 px-4 shadow-xl focus-within:border-primary-gold/30 transition-all">
             <Search className="h-4 w-4 text-slate-500" />
-            <input 
-              type="text" 
-              placeholder="SEARCH CATALOG..." 
+            <input
+              type="text"
+              placeholder="SEARCH CATALOG..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-transparent border-none outline-none text-[10px] font-black tracking-widest placeholder:text-slate-600 w-64 text-white uppercase"
             />
           </div>
-          <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-secondary-black border border-white/5 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">
-            <Layers className="h-3.5 w-3.5" /> Filter by Type
-          </button>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
+        <button
+          onClick={openCreate}
           className="flex items-center gap-2 bg-primary-gold text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-primary-gold/20"
         >
-          <Plus className="h-4 w-4" /> Add New Flower
+          <Plus className="h-4 w-4" /> Add New Product
         </button>
       </div>
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <Loader2 className="h-12 w-12 text-primary-gold animate-spin" />
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Fetching Luxury Catalog...</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Fetching catalog...</p>
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <AlertCircle className="h-12 w-12 text-red-500 opacity-50" />
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{error}</p>
-          <button onClick={fetchData} className="text-[9px] font-black text-primary-gold uppercase tracking-widest hover:underline">Retry Connection</button>
+          <button onClick={fetchData} className="text-[9px] font-black text-primary-gold uppercase tracking-widest hover:underline">
+            Retry Connection
+          </button>
         </div>
       ) : (
+        <>
+        {unpublishedAssets.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-black text-white uppercase tracking-tight px-1">
+              Public images not yet in catalog ({unpublishedAssets.length})
+            </h3>
+            <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-8 gap-3">
+              {unpublishedAssets.map((asset) => (
+                <button
+                  key={asset.filename}
+                  type="button"
+                  onClick={() => publishAsset(asset.url, asset.filename)}
+                  className="relative aspect-square overflow-hidden rounded-xl border border-dashed border-white/20 hover:border-primary-gold/50 transition-all group"
+                >
+                  <img src={asset.url} alt={asset.filename} className="w-full h-full object-cover opacity-70 group-hover:opacity-100" />
+                  <span className="absolute inset-x-0 bottom-0 bg-black/80 text-[7px] font-black text-primary-gold py-1 uppercase tracking-widest">
+                    Publish
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {products.length === 0 && (
+            <p className="col-span-full text-center text-slate-500 text-[10px] font-black uppercase tracking-widest py-12">
+              No database products yet — publish an image above or add a new product
+            </p>
+          )}
           {products.map((product, i) => {
             const status = getStatus(product.variants?.[0]?.stockQty || 0);
+            const categoryNames =
+              product.categories?.map((c: any) => c.category?.name).filter(Boolean).join(', ') ||
+              'Uncategorized';
+
             return (
               <motion.div
                 key={product.id}
@@ -139,48 +312,59 @@ export const ProductsView: React.FC = () => {
                 transition={{ delay: i * 0.05 }}
                 className="group bg-secondary-black rounded-[2.5rem] border border-white/5 overflow-hidden hover:border-primary-pink/30 transition-all duration-500 shadow-2xl relative"
               >
-                <div className="h-56 overflow-hidden relative">
-                  <img 
-                    src={product.images?.[0]?.url || "https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?w=400"} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 grayscale-[0.3] group-hover:grayscale-0"
+                <div className="h-56 overflow-hidden relative bg-primary-black flex items-center justify-center text-slate-700">
+                  <PublicImage
+                    src={product.images?.[0]?.url}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-secondary-black to-transparent opacity-60" />
+                  {!isPublicImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} />}
                   <div className="absolute top-4 right-4">
-                    <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
-                      status === 'Active' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 
-                      status === 'Low Stock' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
-                      'bg-red-500/10 text-red-500 border-red-500/20'
-                    }`}>
+                    <span
+                      className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
+                        status === 'Active'
+                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                          : status === 'Low Stock'
+                            ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                            : 'bg-red-500/10 text-red-500 border-red-500/20'
+                      }`}
+                    >
                       {status}
                     </span>
                   </div>
                 </div>
 
                 <div className="p-8">
-                  <p className="text-[9px] font-black text-primary-gold uppercase tracking-[0.2em] mb-2">
-                    {product.categories?.[0]?.category?.name || 'Luxury Collection'}
+                  <p className="text-[9px] font-black text-primary-gold uppercase tracking-[0.2em] mb-2 line-clamp-2">
+                    {categoryNames}
                   </p>
                   <h3 className="text-white font-black text-lg tracking-tight mb-4 group-hover:text-primary-pink transition-colors line-clamp-1">
                     {product.name}
                   </h3>
-                  
+
                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
                     <div>
-                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Price Point</p>
-                      <p className="text-white font-black text-sm mt-1">KES {Number(product.variants?.[0]?.priceKes).toLocaleString()}</p>
+                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Price</p>
+                      <p className="text-white font-black text-sm mt-1">
+                        KES {Number(product.variants?.[0]?.priceKes).toLocaleString()}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Stock</p>
-                      <p className={`font-black text-sm mt-1 ${product.variants?.[0]?.stockQty < 10 ? 'text-amber-500' : 'text-slate-300'}`}>
+                      <p
+                        className={`font-black text-sm mt-1 ${product.variants?.[0]?.stockQty < 10 ? 'text-amber-500' : 'text-slate-300'}`}
+                      >
                         {product.variants?.[0]?.stockQty || 0} units
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 mt-8">
-                    <button className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                      <Edit3 size={12} /> Edit Detail
+                    <button
+                      onClick={() => openEdit(product)}
+                      className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                    >
+                      <Edit3 size={12} /> Edit
                     </button>
                     {role === 'OWNER' && (
                       <button className="p-3 rounded-2xl bg-white/5 text-slate-400 hover:text-red-500 transition-all">
@@ -193,16 +377,18 @@ export const ProductsView: React.FC = () => {
             );
           })}
         </div>
+        </>
       )}
 
-      {/* Add Product Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -212,58 +398,131 @@ export const ProductsView: React.FC = () => {
             >
               <div className="flex justify-between items-start mb-8">
                 <div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">New Floral Product</h2>
-                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Register a new masterpiece in the catalog</p>
+                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                    {editingProduct ? 'Edit Product' : 'New Product'}
+                  </h2>
+                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">
+                    Select one or more categories — product can appear in multiple
+                  </p>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-500 hover:text-white"><X size={24} /></button>
+                <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-500 hover:text-white">
+                  <X size={24} />
+                </button>
               </div>
 
-              <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Product Name</label>
-                  <input required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50" placeholder="e.g., Midnight Rose Bouquet" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                    Product Name
+                  </label>
+                  <input
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50"
+                    placeholder="e.g., Golden Round Chandelier"
+                  />
                 </div>
-                
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Category</label>
-                  <select required value={formData.categoryId} onChange={(e) => setFormData({...formData, categoryId: e.target.value})} className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50 appearance-none">
-                    <option value="">Select Category</option>
-                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
+
+                <div className="space-y-3 md:col-span-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                    Categories (select all that apply)
+                  </label>
+                  <CategoryCheckboxes />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Price (KES)</label>
-                  <input required type="number" value={formData.priceKes} onChange={(e) => setFormData({...formData, priceKes: e.target.value})} className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50" placeholder="3500" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                    Price (KES)
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    value={formData.priceKes}
+                    onChange={(e) => setFormData({ ...formData, priceKes: e.target.value })}
+                    className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Stock Quantity</label>
-                  <input required type="number" value={formData.stockQty} onChange={(e) => setFormData({...formData, stockQty: e.target.value})} className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50" placeholder="50" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                    Stock Quantity
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    value={formData.stockQty}
+                    onChange={(e) => setFormData({ ...formData, stockQty: e.target.value })}
+                    className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50"
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Hero Image URL</label>
-                  <input value={formData.imageUrl} onChange={(e) => setFormData({...formData, imageUrl: e.target.value})} className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50" placeholder="https://..." />
+                <div className="space-y-3 md:col-span-2">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                    Product Image (from /public folder)
+                  </label>
+                  {formData.imageUrl && (
+                    <div className="flex items-center gap-4 p-3 rounded-xl border border-primary-gold/30 bg-primary-gold/5">
+                      <img src={formData.imageUrl} alt="Selected" className="w-16 h-16 object-cover rounded-lg" />
+                      <span className="text-[10px] text-slate-400 font-mono truncate">{formData.imageUrl}</span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 border border-white/10 rounded-2xl bg-primary-black">
+                    {publicAssets.map((asset) => (
+                      <button
+                        key={asset.filename}
+                        type="button"
+                        onClick={() => selectPublicImage(asset.url, asset.filename)}
+                        className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                          formData.imageUrl === asset.url
+                            ? 'border-primary-gold ring-2 ring-primary-gold/40'
+                            : 'border-white/10 hover:border-white/30'
+                        }`}
+                      >
+                        <img src={asset.url} alt={asset.filename} className="w-full h-full object-cover" />
+                        {asset.suggestedPrice && (
+                          <span className="absolute bottom-0 left-0 right-0 bg-black/80 text-[7px] font-black text-primary-gold py-0.5 text-center">
+                            {asset.suggestedPrice}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[9px] text-slate-600">Filename prices are suggestions — edit the KES field above anytime.</p>
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">Short Narrative</label>
-                  <input value={formData.shortDescription} onChange={(e) => setFormData({...formData, shortDescription: e.target.value})} className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50" placeholder="One line summary for catalog" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1">
+                    Short Description
+                  </label>
+                  <input
+                    value={formData.shortDescription}
+                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                    className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50"
+                    placeholder="One line summary"
+                  />
                 </div>
 
                 <div className="pt-6 md:col-span-2 flex items-center gap-4">
-                  <button type="submit" className="flex-1 bg-primary-pink text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary-pink/20 flex items-center justify-center gap-2">
-                    <Save size={14} /> Catalog New Masterpiece
+                  <button
+                    type="submit"
+                    className="flex-1 bg-primary-pink text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary-pink/20 flex items-center justify-center gap-2"
+                  >
+                    <Save size={14} /> {editingProduct ? 'Save Changes' : 'Add Product'}
                   </button>
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 bg-white/5 text-slate-500 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all">Abort</button>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-8 bg-white/5 text-slate-500 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </form>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
     </div>
   );
 };

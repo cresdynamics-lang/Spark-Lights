@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiTruck, FiCornerUpLeft, FiHelpCircle } from 'react-icons/fi';
 import { FAQS } from '../data/content';
+import { usePageSEO } from '../hooks/usePageSEO';
+import { BRAND } from '../data/brand';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -10,8 +12,27 @@ const fadeIn = {
   transition: { duration: 0.8, ease: "easeOut" as const }
 };
 
+const SEO: Record<string, { title: string; description: string; path: string }> = {
+  faq: {
+    title: `Lighting FAQ Nairobi | ${BRAND.name}`,
+    description: 'Frequently asked questions about buying chandeliers, ceiling lights & wall lights in Nairobi. Delivery, installation, WhatsApp ordering.',
+    path: '/faq',
+  },
+  delivery: {
+    title: `Lighting Delivery Nairobi | ${BRAND.name}`,
+    description: 'Same-day lighting delivery across Nairobi — Westlands, Kilimani, Karen, CBD & more. Order before 2 PM.',
+    path: '/delivery',
+  },
+  refund: {
+    title: `Returns Policy | ${BRAND.name}`,
+    description: 'Spark Lights 254 satisfaction guarantee. Replacement or refund for damaged or defective lighting products.',
+    path: '/refund-policy',
+  },
+};
+
 export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund' }) {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
+  usePageSEO(SEO[type]);
 
   return (
     <div className="min-h-screen pb-32">
@@ -22,7 +43,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
               <div className="text-center mb-24">
                 <FiHelpCircle className="text-primary-gold text-5xl mx-auto mb-8" />
                 <h1 className="text-4xl sm:text-6xl font-serif mb-6">Frequently Asked Questions</h1>
-                <p className="text-gray-500">Everything you need to know about our flowers and services.</p>
+                <p className="text-gray-500">Everything you need to know about buying lights in Nairobi.</p>
               </div>
               
               <div className="space-y-16">
@@ -67,7 +88,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
               <div className="text-center mb-24">
                 <FiTruck className="text-primary-gold text-5xl mx-auto mb-8" />
                 <h1 className="text-4xl sm:text-6xl font-serif mb-6">Delivery Information</h1>
-                <p className="text-gray-500">How we get our blooms to your door across Nairobi.</p>
+                <p className="text-gray-500">How we deliver lighting products across Nairobi.</p>
               </div>
               
               <div className="prose prose-invert max-w-none space-y-16">
@@ -79,7 +100,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm">
                     <div className="bg-primary-black p-6 border border-white/5">
                       <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Same-Day Delivery</h3>
-                      <p className="text-gray-500">Order by 1:00 PM for delivery before 6:00 PM same day. Cost: KES 500.</p>
+                      <p className="text-gray-500">Order by 2:00 PM for same-day delivery before 6:00 PM. Delivery fee from KES 500.</p>
                     </div>
                     <div className="bg-primary-black p-6 border border-white/5">
                       <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Scheduled Delivery</h3>
@@ -93,9 +114,9 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                   <ul className="space-y-4 text-gray-400 text-sm list-disc pl-6 leading-relaxed">
                     <li>Deliveries are made between 9:00 AM and 6:00 PM, Monday to Saturday.</li>
                     <li>Sunday delivery is available for pre-orders placed 24 hours in advance.</li>
-                    <li>Please ensure someone is available to receive the flowers, or provide a safe drop location.</li>
-                    <li>We will send the recipient a WhatsApp message before delivery to confirm.</li>
-                    <li>For large event or wedding orders, we require at least 72 hours notice.</li>
+                    <li>Please ensure someone is available to receive the lights, or provide a safe drop location.</li>
+                    <li>We will contact you via WhatsApp before delivery to confirm your Nairobi address.</li>
+                    <li>For large commercial or event lighting orders, we recommend 48–72 hours notice.</li>
                   </ul>
                 </div>
               </div>
@@ -114,7 +135,7 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                 <div className="bg-secondary-black p-12 border border-white/5">
                   <h2 className="text-2xl font-serif mb-8 text-white border-b border-white/5 pb-4">Satisfaction Guarantee</h2>
                   <p>
-                    We stand behind every bouquet we create. If your flowers arrive damaged, wilted, or significantly different from what was ordered — we will replace the arrangement free of charge or issue a full refund. No questions asked.
+                    We stand behind every light we sell. If your product arrives damaged, defective, or significantly different from what was ordered — we will replace it free of charge or issue a full refund. Contact us within 24 hours with photos.
                   </p>
                 </div>
 
@@ -122,8 +143,8 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                   <div className="space-y-6">
                     <h3 className="text-lg font-serif text-white">What Qualifies</h3>
                     <ul className="space-y-4 list-disc pl-6">
-                      <li>Flowers arrived visibly damaged or wilted.</li>
-                      <li>Arrangement significantly different from order.</li>
+                      <li>Light arrived visibly damaged or cracked.</li>
+                      <li>Product significantly different from what was ordered.</li>
                       <li>Order not delivered on promised date due to our error.</li>
                     </ul>
                     <p className="text-xs text-primary-gold italic">Issues must be reported within 24 hours with photos.</p>
@@ -131,10 +152,10 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                   <div className="space-y-6">
                     <h3 className="text-lg font-serif text-white">What Does Not Qualify</h3>
                     <ul className="space-y-4 list-disc pl-6">
-                      <li>Minor natural colour variations.</li>
-                      <li>Flowers wilted due to improper care after delivery.</li>
+                      <li>Minor colour or finish variations between batches.</li>
+                      <li>Damage caused by incorrect installation after delivery.</li>
                       <li>Incorrect delivery address provided by customer.</li>
-                      <li>Change of mind after arrangement has been prepared.</li>
+                      <li>Change of mind after the item has been opened and installed.</li>
                     </ul>
                   </div>
                 </div>

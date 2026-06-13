@@ -154,10 +154,7 @@ export const LogisticsView: React.FC = () => {
                   Open Control View
                 </button>
               </div>
-              {/* Pseudo Map Background */}
-              <div className="absolute inset-0 opacity-40 grayscale scale-110">
-                <img src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&q=80&w=600" alt="Map" className="w-full h-full object-cover" />
-              </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-black via-secondary-black to-primary-black opacity-80" />
             </motion.div>
 
             <div className="grid grid-cols-2 gap-4">

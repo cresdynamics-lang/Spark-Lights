@@ -70,7 +70,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: 'marigold-cart',
+      name: 'sparklights-cart',
     }
   )
 );

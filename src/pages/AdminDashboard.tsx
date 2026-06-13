@@ -25,6 +25,8 @@ import { DispatchView } from "@/components/admin/views/DispatchView"
 
 import { useAuthStore } from "@/store/authStore"
 import { ShieldAlertIcon, FlowerIcon } from "lucide-react"
+import AvatarInitials from "@/components/AvatarInitials"
+import { AdminErrorBoundary } from "@/components/admin/AdminErrorBoundary"
 
 export default function AdminDashboard() {
   const [activeView, setActiveView] = useState("Dashboard")
@@ -124,10 +126,11 @@ export default function AdminDashboard() {
   }
 
   return (
+    <AdminErrorBoundary>
     <TooltipProvider>
-      <SidebarProvider className="font-sans antialiased dark">
+      <SidebarProvider className="font-sans antialiased dark bg-primary-black text-white min-h-screen">
         <AppSidebar variant="floating" onNavigate={setActiveView} activeView={activeView} />
-        <SidebarInset className="bg-primary-black min-h-screen overflow-hidden">
+        <SidebarInset className="!bg-primary-black min-h-screen overflow-hidden text-white">
           <SiteHeader />
           <div className="flex flex-1 flex-col gap-12 pb-24">
 
@@ -145,14 +148,14 @@ export default function AdminDashboard() {
                     {activeView === "Dashboard" ? "Control Centre" : activeView}
                   </h1>
                   <p className="text-slate-400 mt-1 font-bold text-xs tracking-widest uppercase opacity-60">
-                    Marigold Flowers Ecommerce · {activeView === "Dashboard" ? "Administration" : "Module Management"}
+                    Spark Lights 254 · {activeView === "Dashboard" ? "Administration" : "Module Management"}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 bg-secondary-black backdrop-blur-md p-1.5 px-3 rounded-xl border border-white/5">
                   <div className="flex -space-x-2">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-8 w-8 rounded-full border-2 border-secondary-black bg-secondary-black flex items-center justify-center overflow-hidden shadow-sm">
-                        <img src={`https://i.pravatar.cc/150?u=${i + 20}`} alt="Staff" className="h-full w-full object-cover" />
+                    {['JK', 'GM', 'PO'].map((initials) => (
+                      <div key={initials} className="h-8 w-8 rounded-full border-2 border-secondary-black bg-secondary-black flex items-center justify-center overflow-hidden shadow-sm">
+                        <AvatarInitials name={initials} className="h-full w-full text-[10px] rounded-full" />
                       </div>
                     ))}
                   </div>
@@ -172,5 +175,6 @@ export default function AdminDashboard() {
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>
+    </AdminErrorBoundary>
   )
 }

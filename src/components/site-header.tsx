@@ -18,7 +18,7 @@ export function SiteHeader() {
               <FlowerIcon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <h1 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-slate-100">
-              Marigold <span className="text-emerald-500">Admin</span>
+              Spark Lights <span className="text-emerald-500">Admin</span>
             </h1>
           </div>
         </div>

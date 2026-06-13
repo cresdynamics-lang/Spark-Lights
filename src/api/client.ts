@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/v1';
+const API_URL = import.meta.env.VITE_API_URL || '/v1';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -9,32 +10,31 @@ const apiClient = axios.create({
   },
 });
 
-// Add a request interceptor to add the auth token to headers
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('marigold_admin_token');
+    const token = localStorage.getItem('sparklights_admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle token expiration
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('marigold_admin_token');
-      localStorage.removeItem('marigold_admin_user');
-      // Redirect to login if not already there
+    const status = error.response?.status;
+    const requestUrl = String(error.config?.url || '');
+    const isLoginRequest = requestUrl.includes('/auth/login');
+
+    if (status === 401 && !isLoginRequest) {
+      useAuthStore.getState().logout();
       if (!window.location.pathname.startsWith('/admin/login')) {
-        window.location.href = '/admin/login';
+        window.location.replace('/admin/login');
       }
     }
+
     return Promise.reject(error);
   }
 );

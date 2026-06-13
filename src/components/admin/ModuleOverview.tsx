@@ -15,6 +15,9 @@ import { getProducts } from '@/api/products';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { useAuthStore } from '@/store/authStore';
+import PublicImage from '@/components/PublicImage';
+import { isPublicImageUrl } from '@/lib/publicImages';
+import { ImageIcon } from 'lucide-react';
 
 export const ModuleOverview: React.FC = () => {
   const { user } = useAuthStore();
@@ -155,12 +158,13 @@ export const ModuleOverview: React.FC = () => {
                 transition={{ delay: 0.3 + (i * 0.1) }}
                 className="bg-secondary-black border border-white/5 p-4 rounded-3xl flex items-center gap-4 hover:border-white/10 transition-all group"
               >
-                <div className="h-12 w-12 rounded-2xl overflow-hidden bg-primary-black flex-shrink-0 border border-white/5">
-                  <img 
-                    src={product.images?.[0]?.url || "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=400"} 
-                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                    alt={product.name} 
+                <div className="h-12 w-12 rounded-2xl overflow-hidden bg-primary-black flex-shrink-0 border border-white/5 flex items-center justify-center text-slate-700">
+                  <PublicImage
+                    src={product.images?.[0]?.url}
+                    className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    alt={product.name}
                   />
+                  {!isPublicImageUrl(product.images?.[0]?.url) && <ImageIcon size={18} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xs font-black text-white uppercase truncate tracking-tight">{product.name}</h3>

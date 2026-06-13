@@ -119,7 +119,7 @@ export const SettingsView = () => {
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Store Name</label>
                 <input
                   type="text"
-                  defaultValue={settings?.storeName || "Marigold Flowers Nairobi"}
+                  defaultValue={settings?.storeName || "Spark Lights 254"}
                   className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-black text-white focus:outline-none focus:border-primary-gold transition-all"
                 />
               </div>
@@ -127,7 +127,7 @@ export const SettingsView = () => {
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Support Email</label>
                 <input
                   type="email"
-                  defaultValue="concierge@marigold.com"
+                  defaultValue="marykamaa548@gmail.com"
                   className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-black text-white focus:outline-none focus:border-primary-gold transition-all"
                 />
               </div>
