@@ -101,8 +101,22 @@ export default function Footer() {
           </motion.div>
         </div>
         
-        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gray-600">
-          <p>&copy; 2026 {BRAND.name}. All rights reserved.</p>
+        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-gray-600">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center md:text-left">
+            <p>&copy; 2026 {BRAND.name}. All rights reserved.</p>
+            <p className="normal-case tracking-normal font-medium text-gray-500">
+              Built by{' '}
+              <a
+                href="https://cresdynamics.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-gold hover:text-primary-pink transition-colors font-bold uppercase tracking-[0.15em]"
+                title="Cres Dynamics — Web design & development Kenya"
+              >
+                Cres Dynamics
+              </a>
+            </p>
+          </div>
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
             {['M-PESA', 'VISA', 'MASTERCARD', 'CASH ON DELIVERY'].map(item => (
               <span key={item} className="hover:text-white cursor-default transition-colors">{item}</span>
