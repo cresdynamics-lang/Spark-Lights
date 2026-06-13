@@ -4,12 +4,19 @@
   <url><loc>https://sparklights.co.ke/shop</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://sparklights.co.ke/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://sparklights.co.ke/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://sparklights.co.ke/light-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sparklights.co.ke/light-guide</loc><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://sparklights.co.ke/blog</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://sparklights.co.ke/blog/modern-gypsum-ceiling-lights-nairobi</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sparklights.co.ke/blog/chandeliers-nairobi-price-guide</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sparklights.co.ke/blog/solar-security-lights-nairobi</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sparklights.co.ke/blog/supply-and-fix-why-bundle</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sparklights.co.ke/installation</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://sparklights.co.ke/wholesale</loc><changefreq>monthly</changefreq><priority>0.75</priority></url>
   <url><loc>https://sparklights.co.ke/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://sparklights.co.ke/delivery</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://sparklights.co.ke/category/wall-lights</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://sparklights.co.ke/category/ceiling-lights</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://sparklights.co.ke/category/outdoor-lights</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://sparklights.co.ke/category/ceiling-lights</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://sparklights.co.ke/category/outdoor-lights</loc><changefreq>weekly</changefreq><priority>0.85</priority></url>
   <url><loc>https://sparklights.co.ke/category/bedroom-lights</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://sparklights.co.ke/category/dining-lights</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://sparklights.co.ke/category/kitchen-lights</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>

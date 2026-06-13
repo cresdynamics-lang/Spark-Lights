@@ -104,7 +104,7 @@ export default function CartOverlay({ isOpen, onClose }: CartOverlayProps) {
                     onClick={onClose}
                     className="btn-primary w-full py-6 flex items-center justify-center gap-4 shadow-xl shadow-primary-gold/10"
                   >
-                    Proceed to Checkout
+                    Complete Order Details
                   </Link>
                   <button onClick={onClose} className="w-full text-[9px] font-black uppercase tracking-[0.4em] text-gray-500 hover:text-white transition-colors py-2">
                     Continue Selection

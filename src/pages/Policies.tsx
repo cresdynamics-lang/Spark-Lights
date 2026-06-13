@@ -99,13 +99,17 @@ export default function Policies({ type }: { type: 'faq' | 'delivery' | 'refund'
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-sm">
                     <div className="bg-primary-black p-6 border border-white/5">
-                      <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Same-Day Delivery</h3>
-                      <p className="text-gray-500">Order by 2:00 PM for same-day delivery before 6:00 PM. Delivery fee from KES 500.</p>
+                      <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Same-Day Nairobi</h3>
+                      <p className="text-gray-500">Order by 2:00 PM · delivered by 6:00 PM via <strong className="text-gray-400">Moto/Bolt</strong> courier. Fee from <strong className="text-white">KES 500</strong>. Free over KES 3,000.</p>
                     </div>
                     <div className="bg-primary-black p-6 border border-white/5">
-                      <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Scheduled Delivery</h3>
-                      <p className="text-gray-500">Pick your date and window (Morning or Afternoon). Free over KES 3,000.</p>
+                      <h3 className="font-black text-primary-gold uppercase tracking-widest text-[10px] mb-4">Countrywide Kenya</h3>
+                      <p className="text-gray-500">Outside Nairobi via <strong className="text-gray-400">Wells Fargo</strong>, <strong className="text-gray-400">Easy Coach</strong>, or agreed courier. Freight quoted on WhatsApp before you pay.</p>
                     </div>
+                  </div>
+                  <div className="mt-8 p-6 border border-primary-gold/20 bg-primary-gold/5">
+                    <h3 className="font-black text-white uppercase tracking-widest text-[10px] mb-3">Nyamakima Pickup — Free</h3>
+                    <p className="text-gray-500 text-sm">Duruma Road, Shop 216, 2nd Floor. Mon–Sat 8 AM–6 PM, Sun 9 AM–2 PM.</p>
                   </div>
                 </div>
 

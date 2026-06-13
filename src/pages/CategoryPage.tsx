@@ -21,12 +21,10 @@ export default function CategoryPage() {
   );
 
   usePageSEO({
-    title: category ? `${category.seoTitle} | ${BRAND.name}` : `Lighting Categories | ${BRAND.name}`,
-    description: category
-      ? `Shop ${category.name.toLowerCase()} in Nairobi. ${category.description} Same-day delivery. Order on WhatsApp — ${BRAND.name}, Nyamakima.`
-      : `Browse lighting categories at ${BRAND.name}, Nairobi.`,
+    title: category ? category.seoTitle : `Lighting Categories | ${BRAND.name}`,
+    description: category?.metaDescription ?? `Browse lighting categories at ${BRAND.name}, Nairobi.`,
     path: slug ? `/category/${slug}` : '/shop',
-    keywords: category ? `${category.name} Nairobi, ${category.slug} Kenya, lighting shop Nyamakima` : undefined,
+    keywords: category?.seoKeywords,
   });
 
   if (!category) {
@@ -46,20 +44,20 @@ export default function CategoryPage() {
             to="/shop"
             className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-primary-gold transition-colors mb-10"
           >
-            <FiArrowLeft size={14} /> All Products
+            <FiArrowLeft size={14} /> All Products — Chandeliers Nairobi Price
           </Link>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <span className="text-primary-gold uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">
-              Category
-            </span>
-            <h1 className="text-5xl sm:text-8xl font-black uppercase leading-none tracking-tighter mb-8">
               {category.name}
+            </span>
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase leading-none tracking-tighter mb-8 text-white">
+              {category.seoH1}
             </h1>
-            <p className="text-gray-500 text-lg font-medium max-w-2xl leading-relaxed">
-              {category.description}
+            <p className="text-gray-400 text-lg font-medium max-w-3xl leading-relaxed mb-6">
+              {category.seoIntro}
             </p>
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-600 mt-6">
-              {products.length} product{products.length === 1 ? '' : 's'}
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">
+              {products.length} product{products.length === 1 ? '' : 's'} · prices shown on each listing · same-day Nairobi delivery
             </p>
           </motion.div>
         </div>
@@ -81,7 +79,7 @@ export default function CategoryPage() {
                   <div className="aspect-[3/4] overflow-hidden bg-tertiary-black border border-white/5 relative mb-8">
                     <img
                       src={product.img}
-                      alt={product.name}
+                      alt={`${product.name} — KES ${product.price} Nairobi`}
                       className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
                     />
                     <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
@@ -113,9 +111,12 @@ export default function CategoryPage() {
                     </div>
                   </div>
                   <div className="text-center px-4">
-                    <h3 className="text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-2">
+                    <h2 className="text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-2">
                       {product.name}
-                    </h3>
+                    </h2>
+                    <p className="text-[10px] text-primary-gold font-black uppercase tracking-widest">
+                      KES {product.price} · Nairobi
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -128,6 +129,33 @@ export default function CategoryPage() {
                 No products in this category yet.
               </h2>
               <Link to="/shop" className="btn-primary">Browse All Lights</Link>
+            </div>
+          )}
+
+          {category.relatedSlugs.length > 0 && (
+            <div className="mt-20 pt-12 border-t border-white/5">
+              <h2 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-6">Related Categories</h2>
+              <div className="flex flex-wrap gap-3">
+                {category.relatedSlugs.map((related) => {
+                  const rel = getCategoryBySlug(related);
+                  if (!rel) return null;
+                  return (
+                    <Link
+                      key={related}
+                      to={`/category/${related}`}
+                      className="text-[10px] font-black uppercase tracking-widest px-4 py-2 border border-white/10 text-gray-400 hover:border-primary-gold hover:text-primary-gold transition-colors"
+                    >
+                      {rel.seoH1}
+                    </Link>
+                  );
+                })}
+                <Link
+                  to="/installation"
+                  className="text-[10px] font-black uppercase tracking-widest px-4 py-2 border border-primary-gold/30 text-primary-gold hover:bg-primary-gold/10 transition-colors"
+                >
+                  Installation Services Nairobi
+                </Link>
+              </div>
             </div>
           )}
         </div>

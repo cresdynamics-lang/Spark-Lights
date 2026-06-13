@@ -1,27 +1,34 @@
 import { useState, useMemo } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiHeart, FiShoppingCart, FiMessageCircle, FiChevronRight, FiCheckCircle } from 'react-icons/fi';
+import { FiHeart, FiShoppingCart, FiChevronRight, FiCheckCircle, FiTruck } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa6';
 import { useProducts } from '../context/ProductContext';
 import { BRAND } from '../data/brand';
 import { getCategoryName } from '../data/categories';
+import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
+import {
+  buildProductSeoTitle,
+  buildProductSeoDescription,
+  buildProductSeoKeywords,
+} from '../lib/seo';
+import DeliveryBanner from '../components/DeliveryBanner';
 
 export default function ProductDetail() {
   const { slug } = useParams();
-  const navigate = useNavigate();
   const { products } = useProducts();
+  const addItem = useCartStore((s) => s.addItem);
   const product = useMemo(() => products.find(p => p.slug === slug), [products, slug]);
   
   const [selectedSize, setSelectedSize] = useState(product?.sizes[0]?.label || '');
   const [quantity, setQuantity] = useState(1);
 
   usePageSEO({
-    title: product ? `${product.name} Nairobi | Spark Lights 254` : 'Product | Spark Lights 254',
-    description: product
-      ? `Buy ${product.name} in Nairobi — KES ${product.price}. ${product.shortDesc} Same-day delivery. Order on WhatsApp.`
-      : 'Lighting product at Spark Lights 254, Nairobi.',
+    title: product ? buildProductSeoTitle(product) : 'Product | Spark Lights 254',
+    description: product ? buildProductSeoDescription(product) : 'Lighting product at Spark Lights 254, Nairobi.',
     path: slug ? `/product/${slug}` : '/shop',
+    keywords: product ? buildProductSeoKeywords(product) : undefined,
   });
 
   if (!product) {
@@ -84,12 +91,26 @@ export default function ProductDetail() {
                 </Link>
               ))}
             </div>
-            <h1 className="text-4xl sm:text-6xl font-serif mb-8 leading-tight">{product.name}</h1>
-            
-            <div className="flex items-center gap-6 mb-12">
+            <h1 className="text-4xl sm:text-6xl font-serif mb-4 leading-tight">{product.name}</h1>
+            <div className="flex items-center gap-6 mb-8">
               <span className="text-3xl font-bold text-primary-pink">KES {currentPrice}</span>
               {product.oldPrice && <span className="text-xl text-gray-600 line-through">KES {product.oldPrice}</span>}
             </div>
+            <p className="text-[11px] font-black uppercase tracking-widest text-primary-gold mb-4">
+              Public Nairobi price — no inbox quotes
+            </p>
+            <ul className="space-y-2 mb-8">
+              {[
+                'Same-day Nairobi delivery via Moto/Bolt from KES 500',
+                'Supply & Fix: light + delivery + fundi install',
+                'WhatsApp us to confirm stock before payment',
+              ].map((line) => (
+                <li key={line} className="flex gap-2 text-gray-500 text-xs">
+                  <FiCheckCircle className="text-primary-gold shrink-0 mt-0.5" size={14} />
+                  {line}
+                </li>
+              ))}
+            </ul>
 
             <p className="text-gray-400 text-lg leading-relaxed mb-12 whitespace-pre-line italic font-serif">
               "{product.shortDesc}"
@@ -118,9 +139,13 @@ export default function ProductDetail() {
                 <span className="flex-1 text-center font-bold">{quantity}</span>
                 <button onClick={() => setQuantity(q => q + 1)} className="flex-1 hover:text-primary-gold transition-colors text-xl">+</button>
               </div>
-              <button className="flex-[2] btn-primary h-16 flex items-center justify-center gap-3 group">
+              <button
+                type="button"
+                onClick={() => product && addItem(product)}
+                className="flex-[2] btn-primary h-16 flex items-center justify-center gap-3 group"
+              >
                 <FiShoppingCart size={20} className="group-hover:rotate-12 transition-transform" />
-                Add to Cart
+                Add to Cart — KES {currentPrice}
               </button>
               <button className="w-16 h-16 border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-gray-400 hover:text-primary-pink">
                 <FiHeart size={20} />
@@ -128,11 +153,19 @@ export default function ProductDetail() {
             </div>
 
             <a 
-              href={`${BRAND.whatsappUrl}?text=${encodeURIComponent(`Hi Spark Lights 254! I'd like to order the ${product.name} (${selectedSize})`)}`}
-              className="w-full border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all py-5 flex items-center justify-center gap-3 font-bold uppercase tracking-widest text-xs mb-16"
+              href={`${BRAND.whatsappUrl}?text=${encodeURIComponent(`Hi Spark Lights 254! I'd like to order:\n${product.name}\nKES ${currentPrice}\nQty: ${quantity}\nOption: ${selectedSize}\n\nPlease confirm stock & delivery to my area.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full border-2 border-[#25D366] bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all py-6 flex items-center justify-center gap-3 font-black uppercase tracking-widest text-xs mb-6"
             >
-              <FiMessageCircle size={20} /> Order via WhatsApp
+              <FaWhatsapp size={22} /> Chat on WhatsApp to Order
             </a>
+            <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-8 flex items-center justify-center gap-2">
+              <FiTruck size={12} /> Most Kenyans order via WhatsApp — ask about stock &amp; delivery first
+            </p>
+            <Link to="/installation" className="block text-center text-[10px] font-black uppercase tracking-widest text-primary-gold hover:underline mb-16">
+              Bundle Supply &amp; Fix (light + install) →
+            </Link>
 
             {/* Details Accordion Placeholder */}
             <div className="border-t border-white/5 py-10">
@@ -155,6 +188,7 @@ export default function ProductDetail() {
           </motion.div>
         </div>
       </div>
+      <DeliveryBanner />
     </div>
   );
 }

@@ -10,7 +10,11 @@ import { LIGHT_CATEGORIES } from '../data/categories';
 import { BRAND } from '../data/brand';
 import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { SITE_KEYWORDS } from '../lib/seo';
 import { useProducts } from '../context/ProductContext';
+import { BLOG_POSTS } from '../data/blogs';
+import InstallationGallery from '../components/InstallationGallery';
+import DeliveryBanner from '../components/DeliveryBanner';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -26,12 +30,11 @@ export default function Home() {
   const { products } = useProducts();
 
   usePageSEO({
-    title: 'Chandeliers & Ceiling Lights Nairobi | Spark Lights 254',
+    title: 'Chandeliers in Nairobi Price | Modern Ceiling Lights Kenya | Spark Lights 254',
     description:
-      'Buy chandeliers, ceiling lights, wall lights & pendants in Nairobi. Same-day delivery from KES 2,000. Expert installation. Visit Nyamakima or order on WhatsApp.',
+      'Chandeliers in Nairobi price from KES 2,000. Modern ceiling lights, pendant lights Kenya, gypsum board lighting & wall brackets. Lighting shop Nyamakima — same-day delivery Westlands, Kilimani, Karen & CBD.',
     path: '/',
-    keywords:
-      'chandeliers Nairobi, ceiling lights Kenya, wall lights Nairobi, lighting shop Nyamakima, bedroom lights, kitchen lights, outdoor lights',
+    keywords: SITE_KEYWORDS,
   });
 
   useEffect(() => {
@@ -136,13 +139,20 @@ export default function Home() {
         <div className="container mx-auto px-6 max-w-4xl text-center">
           <motion.div {...fadeIn}>
             <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white mb-6">
-              Welcome to Spark Lights 254
+              Lighting Shops in Nyamakima — Delivering Across Nairobi
             </h2>
-            <p className="text-gray-400 text-lg leading-relaxed">
-              At Spark Lights 254, we believe great lighting transforms any space — from a small apartment in Kilimani
-              to a dining room in Karen. We stock chandeliers, ceiling lights, pendant lights, wall lights, outdoor
-              lights, and bedroom lighting — all available to order via WhatsApp with same-day delivery across Nairobi.
-              Visit us at Nyamakima, Duruma Road, or browse and order from home.
+            <p className="text-gray-400 text-lg leading-relaxed mb-6">
+              At Spark Lights 254, Nairobi buyers find chandeliers in Nairobi price listings, modern ceiling
+              lights, pendant lights Kenya, gypsum board lighting fixtures, and wall brackets — with the KES
+              price shown on every product. We are a lighting shop in Nyamakima on Duruma Road, and we supply
+              and deliver modern chandeliers to Westlands, Kilimani, Karen, Lavington, and across Nairobi CBD.
+            </p>
+            <p className="text-gray-500 text-base leading-relaxed">
+              Need installation? See our{' '}
+              <Link to="/installation" className="text-primary-gold hover:underline">chandelier installation services in Nairobi</Link>
+              . Buying in bulk?{' '}
+              <Link to="/wholesale" className="text-primary-gold hover:underline">wholesale electrical lighting quotes</Link>
+              {' '}for developers and hotels.
             </p>
           </motion.div>
         </div>
@@ -156,8 +166,11 @@ export default function Home() {
               Shop by Room & Type
             </span>
             <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white">
-              Lighting Categories
+              Shop by Search Intent
             </h2>
+            <p className="text-gray-500 mt-4 max-w-2xl mx-auto text-sm">
+              Category pages match how Nairobi customers search — chandeliers price, pendant lights Kenya, gypsum lighting &amp; outdoor solar.
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -182,7 +195,7 @@ export default function Home() {
                     <h3 className="text-xl font-black uppercase text-white group-hover:text-primary-gold transition-colors">
                       {cat.name}
                     </h3>
-                    <p className="text-gray-400 text-sm mt-2 line-clamp-2">{cat.description}</p>
+                    <p className="text-gray-500 text-xs mt-2 line-clamp-2 font-medium">{cat.seoH1}</p>
                   </div>
                 </Link>
               </motion.div>
@@ -281,6 +294,35 @@ export default function Home() {
         </div>
       </section>
 
+      <InstallationGallery />
+
+      {/* Blog — SEO traffic */}
+      <section className="py-20 sm:py-28 border-y border-white/5">
+        <div className="container mx-auto px-6">
+          <motion.div {...fadeIn} className="text-center mb-12">
+            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">Lighting Blog</h2>
+            <p className="text-gray-500 mt-4 text-sm">Guides that match how Kenyans search — gypsum, chandeliers, solar outdoor</p>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {BLOG_POSTS.map((post, idx) => (
+              <motion.div key={post.slug} {...fadeIn} transition={{ delay: idx * 0.05 }}>
+                <Link to={`/blog/${post.slug}`} className="block p-6 border border-white/5 bg-secondary-black hover:border-primary-gold/30 transition-colors h-full">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-primary-gold">{post.category}</span>
+                  <h3 className="text-sm font-black uppercase text-white mt-3 leading-tight">{post.title}</h3>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link to="/blog" className="text-primary-gold text-[10px] font-black uppercase tracking-widest hover:underline">
+              View all articles →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <DeliveryBanner />
+
       {/* FAQ — SEO */}
       <section className="py-20 sm:py-28 bg-secondary-black">
         <div className="container mx-auto px-6 max-w-3xl">
@@ -321,8 +363,11 @@ export default function Home() {
             <Link to="/light-guide" className="text-primary-gold text-[10px] font-black uppercase tracking-widest hover:underline">
               Room-by-Room Lighting Guide →
             </Link>
-            <Link to="/faq" className="text-primary-gold text-[10px] font-black uppercase tracking-widest hover:underline">
-              View All FAQs →
+            <Link to="/installation" className="text-primary-gold text-[10px] font-black uppercase tracking-widest hover:underline">
+              Supply &amp; Fix Packages →
+            </Link>
+            <Link to="/blog" className="text-primary-gold text-[10px] font-black uppercase tracking-widest hover:underline">
+              Lighting Blog →
             </Link>
           </div>
         </div>

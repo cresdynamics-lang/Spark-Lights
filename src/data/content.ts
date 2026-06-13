@@ -2,25 +2,25 @@ import { HERO_IMAGES } from './publicCatalog';
 
 export const HERO_SLIDES = [
   {
-    title: 'Premium Chandeliers & Ceiling Lights in Nairobi',
-    subtitle: 'Gold, crystal & modern chandeliers delivered across Nairobi. From KES 2,000 — order on WhatsApp, delivered today.',
-    cta: 'Shop All Lights',
+    title: 'Chandeliers in Nairobi Price — From KES 2,000',
+    subtitle: 'Modern ceiling lights Nairobi, gold chandeliers & crystal designs. Price on every listing — order on WhatsApp, delivered today.',
+    cta: 'Shop Chandeliers',
     image: HERO_IMAGES[0],
     tagline: 'Sparklights · Nyamakima',
   },
   {
-    title: 'The Right Light Changes Everything',
-    subtitle: 'Ceiling lights, pendants & wall lights for every room — bedroom, kitchen, dining, outdoor & more.',
+    title: 'Modern Gypsum Ceiling Lights & Pendants',
+    subtitle: 'Gypsum board lighting fixtures, pendant lights Kenya & kitchen LED panels — browse by room or category.',
     cta: 'Browse Categories',
     image: HERO_IMAGES[1],
     tagline: 'Nairobi Lighting Experts',
   },
   {
-    title: 'Order on WhatsApp Delivered Today',
-    subtitle: 'Same-day delivery across Westlands, Kilimani, Karen, CBD & more. Professional installation available.',
-    cta: 'View Featured',
+    title: 'Outdoor & Solar Security Lights Nairobi',
+    subtitle: 'IP65 waterproof outdoor wall lights, solar security lights & automatic gate lights — same-day Nairobi delivery.',
+    cta: 'Outdoor Lighting',
     image: HERO_IMAGES[2],
-    tagline: 'Same-Day Nairobi Delivery',
+    tagline: 'Energy-Saving LED',
   },
 ];
 
@@ -144,6 +144,14 @@ export const FAQS = [
         a: 'Sparklights in Nyamakima stocks gold, crystal, and modern chandeliers starting from KES 2,000. Visit us at Duruma Road or order quickly on WhatsApp at +254 712 827 840.',
       },
       {
+        q: 'Where are lighting shops in Nyamakima?',
+        a: 'Spark Lights 254 is at Nyamakima, Duruma Road, New Nyamakima Electrical Point Building, Shop 216, 2nd Floor. We are one of the go-to lighting shops in Nyamakima for chandeliers, gypsum lights, and wall brackets — open Mon–Sat 8 AM–6 PM.',
+      },
+      {
+        q: 'Do you deliver chandeliers to Westlands and Karen?',
+        a: 'Yes — we supply and deliver modern chandeliers to Westlands, Kilimani, Karen, Lavington, CBD, Syokimau, Ruaka, and across Nairobi. Same-day delivery for orders before 2 PM.',
+      },
+      {
         q: 'How much do ceiling lights cost in Nairobi?',
         a: 'Ceiling lights at Sparklights range from KES 2,000 to KES 18,500 and above. We offer LED ceiling lights, modern designs, and professional installation. WhatsApp us for current pricing.',
       },
@@ -168,14 +176,26 @@ export const FAQS = [
         q: 'Can I visit your showroom?',
         a: 'Yes. Visit us at Nyamakima, Duruma Road, New Nyamakima Electrical Point Building, Shop 216, 2nd Floor, Nairobi. Open Monday–Saturday 8 AM–6 PM, Sunday 9 AM–2 PM.',
       },
+      {
+        q: 'Do you sell solar security lights and outdoor waterproof lights?',
+        a: 'Yes — our Outdoor & Solar Lighting category includes solar security lights Nairobi, IP65 waterproof outdoor wall lights, and automatic gate lights. Browse prices online or WhatsApp us for recommendations.',
+      },
+      {
+        q: 'Do you offer wholesale lighting for developers?',
+        a: 'Yes — we work with property developers, hotels, and contractors as a wholesale electrical lighting supplier in Nairobi. Visit our Wholesale page or WhatsApp for bulk chandelier and gypsum LED quotes.',
+      },
     ],
   },
   {
     category: 'Installation & Support',
     questions: [
       {
-        q: 'Do you provide lighting installation in Nairobi?',
-        a: 'Yes. Sparklights provides professional installation across Nairobi at competitive rates. WhatsApp us on +254 712 827 840 to get a quote before you commit.',
+        q: 'Do you provide chandelier installation services in Nairobi?',
+        a: 'Yes — professional chandelier installation in Nairobi, gypsum ceiling lights, wall brackets, and outdoor mounts. Book via our Installation Services page or WhatsApp +254 712 827 840 for a fundi quote before you buy.',
+      },
+      {
+        q: 'Can you help with gypsum lights and living room lighting design?',
+        a: 'Our team installs gypsum LED profile lights and advises on living room ceiling lighting design. See the Light Guide for modern gypsum ceiling ideas, then book installation on WhatsApp.',
       },
       {
         q: 'What if my light arrives damaged?',

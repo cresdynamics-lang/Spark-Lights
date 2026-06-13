@@ -33,12 +33,30 @@ function slugFromFilename(filename: string, index: number): string {
   return stem || `light-${index}`;
 }
 
-function defaultName(filename: string, price: number | null): string {
-  if (filename.startsWith('round')) return `Gold Crystal Chandelier ${filename.replace('.jpg', '').toUpperCase()}`;
-  if (filename === 'roomm3.png') return 'Bedroom Ceiling Light Set';
-  if (filename.startsWith('Screenshot')) return 'Designer Chandelier';
-  if (price) return `Modern Ceiling Light`;
-  return 'Lighting Fixture';
+function seoProductName(filename: string, price: number | null, categories: string[]): string {
+  if (filename.startsWith('round') || filename.startsWith('Screenshot')) {
+    return 'Modern Crystal Chandelier';
+  }
+  if (filename === 'roomm3.png') {
+    return 'Bedroom Ceiling Light Set';
+  }
+  if (categories.includes('kitchen-lights')) {
+    const watts = price && price <= 3000 ? '12W' : price && price <= 4500 ? '18W' : '24W';
+    return `${watts} LED Gypsum Ceiling Panel Lights Kenya`;
+  }
+  if (categories.includes('outdoor-lights') || categories.includes('parking-lights')) {
+    return 'Solar Security Outdoor Wall Light Nairobi';
+  }
+  if (categories.includes('corridor-lights') && price && price <= 3000) {
+    return 'LED Corridor Ceiling Panel Light Nairobi';
+  }
+  if (categories.includes('dining-lights') && price && price >= 5500) {
+    return 'Modern Pendant Chandelier Light Nairobi';
+  }
+  if (price) {
+    return 'Modern Ceiling Light Price in Nairobi';
+  }
+  return 'Modern Lighting Fixture Nairobi';
 }
 
 function defaultCategories(filename: string): string[] {
@@ -53,11 +71,26 @@ function defaultCategories(filename: string): string[] {
   return ['ceiling-lights'];
 }
 
+function seoShortDesc(name: string, price: number | null, categories: string[]): string {
+  const priceText = price ? `KES ${price.toLocaleString('en-KE')}` : 'competitive Nairobi price';
+  if (categories.includes('outdoor-lights') || categories.includes('parking-lights')) {
+    return `${name} — ${priceText}. IP65 waterproof / solar security lighting for Nairobi gates & driveways.`;
+  }
+  if (categories.includes('kitchen-lights')) {
+    return `${name} — ${priceText}. Gypsum board lighting fixture for Nairobi kitchens & ceilings.`;
+  }
+  if (categories.includes('dining-lights')) {
+    return `${name} — ${priceText}. Pendant light / chandelier for dining rooms in Nairobi.`;
+  }
+  return `${name} — ${priceText}. Modern ceiling light for homes & offices in Nairobi.`;
+}
+
 function buildCatalogEntry(filename: string, index: number): StoreProduct {
   const price = parsePriceFromFilename(filename);
   const priceStr = price ? price.toLocaleString('en-KE') : '5,000';
   const slug = slugFromFilename(filename, index);
-  const name = defaultName(filename, price);
+  const categories = defaultCategories(filename);
+  const name = seoProductName(filename, price, categories);
 
   return {
     id: `public-${slug}`,
@@ -67,9 +100,9 @@ function buildCatalogEntry(filename: string, index: number): StoreProduct {
     img: publicImageUrl(filename),
     imageFile: filename,
     tag: price && price >= 7000 ? 'Premium' : price && price <= 3000 ? 'Budget' : 'Popular',
-    categories: defaultCategories(filename),
-    shortDesc: `${name} — premium lighting for homes and offices in Nairobi.`,
-    longDesc: `${name} available at Spark Lights 254, Nyamakima. Same-day delivery across Nairobi. Professional installation available on request.`,
+    categories,
+    shortDesc: seoShortDesc(name, price, categories),
+    longDesc: `${name} available at Spark Lights 254, Nyamakima — chandeliers in Nairobi price listings with same-day delivery to Westlands, Kilimani, Karen & CBD. Professional installation available on WhatsApp.`,
     sizes: [{ label: 'Standard', price: priceStr }],
     badge: index < 3 ? 'Featured' : undefined,
   };

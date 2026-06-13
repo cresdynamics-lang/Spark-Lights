@@ -12,9 +12,10 @@ const fadeIn = {
 
 export default function Contact() {
   usePageSEO({
-    title: `Contact ${BRAND.name} | Order Lights Nairobi`,
-    description: `Contact Spark Lights 254 in Nyamakima. Call ${BRAND.phone}, WhatsApp, or visit our showroom. Same-day lighting delivery across Nairobi.`,
+    title: `Lighting Shops Nyamakima — Contact ${BRAND.name} Nairobi`,
+    description: `Visit our lighting shop in Nyamakima, Duruma Road. Call ${BRAND.phone} or WhatsApp for chandeliers, gypsum lights & installation. Deliver to Westlands, Karen, CBD.`,
     path: '/contact',
+    keywords: 'lighting shops in Nyamakima, electrical shops Nairobi CBD, chandeliers Westlands contact',
   });
 
   return (

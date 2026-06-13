@@ -12,9 +12,10 @@ const fadeIn = {
 
 export default function About() {
   usePageSEO({
-    title: `About ${BRAND.name} | Lighting Shop Nairobi`,
-    description: `Learn about ${BRAND.name} — Nairobi's trusted lighting shop in Nyamakima. Chandeliers, ceiling lights, installation & same-day delivery across Kenya.`,
+    title: `Lighting Shops Nyamakima Nairobi | About ${BRAND.name}`,
+    description: `Lighting shops in Nyamakima — ${BRAND.name} supplies chandeliers, ceiling lights & installation across Westlands, Kilimani, Karen, CBD & Nairobi. Visit Duruma Road showroom.`,
     path: '/about',
+    keywords: 'lighting shops in Nyamakima, best lighting shops along Mombasa Road, chandeliers Westlands, electrical shops Nairobi CBD',
   });
 
   return (
@@ -31,12 +32,16 @@ export default function About() {
               About Us
             </span>
             <h1 className="text-5xl sm:text-7xl font-black uppercase tracking-tighter leading-none mb-8 text-white">
-              Nairobi's Lighting <br /> Specialists
+              Lighting Shops in <br /> Nyamakima, Nairobi
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
-              Spark Lights 254 helps homes and businesses across Nairobi find the right light — from affordable
-              ceiling fixtures to statement chandeliers. Based in Nyamakima, we combine showroom quality with
-              WhatsApp convenience and same-day delivery.
+            <p className="text-xl text-gray-400 max-w-2xl leading-relaxed mb-6">
+              Spark Lights 254 is among the trusted lighting shops in Nyamakima — stocking chandeliers,
+              modern ceiling lights, gypsum fixtures, and outdoor solar lighting for homes and businesses.
+            </p>
+            <p className="text-base text-gray-500 max-w-2xl leading-relaxed">
+              We supply and deliver modern chandeliers to Westlands, Kilimani, Karen, Lavington, and across
+              Nairobi CBD, with our primary pickup location at Nyamakima, Duruma Road, Shop 216. Same-day delivery
+              to neighbourhoods along Mombasa Road, Syokimau, Ruaka, and Kitengela.
             </p>
           </motion.div>
         </div>
@@ -52,7 +57,7 @@ export default function About() {
               <div className="space-y-10">
                 {[
                   { icon: <FiStar />, title: 'Curated Range', text: 'Wall, ceiling, outdoor, bedroom, kitchen, dining, parking, event & corridor lighting — all under one roof in Nyamakima.' },
-                  { icon: <FiTool />, title: 'Installation You Can Trust', text: 'Our team handles wiring, mounting, and finishing so your lights look as good in person as they do online.' },
+                  { icon: <FiTool />, title: 'Installation You Can Trust', text: 'Professional chandelier installation in Nairobi — gypsum lights, wall brackets & outdoor IP65 mounts. Book a fundi via our installation page.' },
                   { icon: <FiShield />, title: 'Honest Pricing', text: 'Lights from KES 2,000. Clear quotes on WhatsApp before you pay. No hidden costs.' },
                   { icon: <FiMapPin />, title: 'Rooted in Nairobi', text: 'We know Nairobi neighbourhoods — Westlands to Syokimau — and deliver fast because we are local.' },
                 ].map((item, idx) => (

@@ -9,6 +9,10 @@ import Policies from './pages/Policies';
 import CategoryPage from './pages/CategoryPage';
 import Checkout from './pages/Checkout';
 import LightGuide from './pages/LightGuide';
+import InstallationServices from './pages/InstallationServices';
+import Wholesale from './pages/Wholesale';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import StorefrontLayout from './layouts/StorefrontLayout';
@@ -48,6 +52,10 @@ function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/light-guide" element={<LightGuide />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/installation" element={<InstallationServices />} />
+              <Route path="/wholesale" element={<Wholesale />} />
               <Route path="/faq" element={<Policies type="faq" />} />
               <Route path="/delivery" element={<Policies type="delivery" />} />
               <Route path="/refund-policy" element={<Policies type="refund" />} />

@@ -24,10 +24,11 @@ const PRICE_RANGES = [
 
 export default function Shop() {
   usePageSEO({
-    title: `Shop Lighting Nairobi | ${BRAND.name}`,
-    description: 'Browse chandeliers, ceiling lights, wall lights, pendants & outdoor lighting in Nairobi. Same-day delivery. Prices from KES 2,000.',
+    title: 'Chandeliers in Nairobi Price | Shop All Lighting | Spark Lights 254',
+    description:
+      'Browse chandeliers in Nairobi price listings, modern ceiling lights, pendant lights Kenya & outdoor solar lighting. Every product shows KES price. Nyamakima shop · same-day delivery.',
     path: '/shop',
-    keywords: 'buy lights Nairobi, lighting shop Kenya, chandeliers online Nairobi',
+    keywords: 'chandeliers in Nairobi price, modern ceiling lights Nairobi, pendant lights Kenya, buy lights Nairobi, lighting shop Nyamakima',
   });
 
   const [searchParams] = useSearchParams();
@@ -68,9 +69,12 @@ export default function Shop() {
               transition={{ duration: 1 }}
             >
               <span className="text-primary-pink uppercase tracking-[0.6em] text-[10px] font-black mb-6 block">Shop</span>
-              <h1 className="text-6xl sm:text-8xl font-black uppercase leading-none tracking-tighter mb-8">Premium <br/> Lighting</h1>
+              <h1 className="text-5xl sm:text-7xl font-black uppercase leading-none tracking-tighter mb-8 text-white">
+                Chandeliers in Nairobi <br /> Price &amp; Catalog
+              </h1>
               <p className="text-gray-500 text-lg font-medium max-w-2xl leading-relaxed">
-                Chandeliers, ceiling lights, wall lights, and more — browse by category or search our full catalog.
+                Modern ceiling lights Nairobi, pendant lights Kenya, gypsum board lighting fixtures, wall brackets,
+                and outdoor solar security lights — every listing shows the KES price. Filter by category or search.
               </p>
             </motion.div>
           </div>
@@ -196,12 +200,12 @@ export default function Shop() {
           <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-gold/5 blur-[120px] -z-10 group-hover:bg-primary-gold/10 transition-all duration-1000"></div>
           <div className="max-w-2xl text-center lg:text-left">
             <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-black mb-6 block">Bespoke Curation</span>
-            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white leading-none mb-8">Commercial <br/> & Bulk Orders</h2>
-            <p className="text-gray-500 font-medium leading-relaxed">Offices, hotels, restaurants, and event venues — we supply and install lighting across Nairobi. Volume pricing on WhatsApp.</p>
+            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white leading-none mb-8">Commercial <br/> &amp; Bulk Orders</h2>
+            <p className="text-gray-500 font-medium leading-relaxed">Wholesale electrical shops Nairobi — offices, hotels, restaurants, and developers. Volume pricing on chandeliers, gypsum LED profiles &amp; corridor panels.</p>
           </div>
-          <button className="btn-primary py-6 px-16 flex items-center gap-4 group">
-            Request Proposal <FiArrowRight className="group-hover:translate-x-2 transition-transform" />
-          </button>
+          <Link to="/wholesale" className="btn-primary py-6 px-16 flex items-center gap-4 group">
+            Wholesale Quote <FiArrowRight className="group-hover:translate-x-2 transition-transform" />
+          </Link>
         </div>
       </section>
     </div>

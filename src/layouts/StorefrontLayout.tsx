@@ -7,7 +7,7 @@ export default function StorefrontLayout() {
   return (
     <div className="min-h-screen bg-primary-black text-gray-200 selection:bg-primary-gold selection:text-black flex flex-col">
       <div className="bg-primary-gold text-black py-2 text-center text-[10px] font-bold uppercase tracking-widest relative z-[60]">
-        💡 Chandeliers & ceiling lights from KES 2,000 | 🚚 Same-day Nairobi delivery | 📲 Order on WhatsApp
+        💡 Prices in KES on every product | 🚚 Same-day Nairobi via Moto/Bolt from KES 500 | 📲 Chat on WhatsApp to Order
       </div>
 
       <Navbar />

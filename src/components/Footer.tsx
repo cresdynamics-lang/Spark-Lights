@@ -21,8 +21,12 @@ export default function Footer() {
             <div className="mb-8">
               <BrandLogo size="sm" showSubtitle={false} />
             </div>
-            <p className="text-gray-500 leading-relaxed mb-8 italic text-sm">
+            <p className="text-gray-500 leading-relaxed mb-4 italic text-sm">
               "{BRAND.tagline}. Same-day delivery across Nairobi — order via WhatsApp."
+            </p>
+            <p className="text-gray-600 text-xs leading-relaxed mb-8">
+              Lighting shops in Nyamakima · We supply chandeliers to Westlands, Kilimani, Karen, Lavington &amp; Nairobi CBD.
+              Pickup: {BRAND.fullAddress}
             </p>
             <div className="flex gap-4">
               {[FiInstagram, FiFacebook, FiMessageCircle].map((Icon, i) => (
@@ -47,6 +51,9 @@ export default function Footer() {
                 { name: 'About Us', path: '/about' },
                 { name: 'Contact', path: '/contact' },
                 { name: 'Lighting Guide', path: '/light-guide' },
+                { name: 'Blog', path: '/blog' },
+                { name: 'Installation / Supply & Fix', path: '/installation' },
+                { name: 'Wholesale / Bulk', path: '/wholesale' },
                 { name: 'FAQs', path: '/faq' },
                 { name: 'Delivery Info', path: '/delivery' },
                 { name: 'Refund Policy', path: '/refund-policy' }
@@ -62,7 +69,7 @@ export default function Footer() {
               {LIGHT_CATEGORIES.map((cat) => (
                 <li key={cat.slug}>
                   <Link to={`/category/${cat.slug}`} className="text-sm text-gray-500 hover:text-primary-pink transition-colors font-medium">
-                    {cat.name}
+                    {cat.seoH1}
                   </Link>
                 </li>
               ))}

@@ -128,6 +128,13 @@ export default function Navbar() {
             </li>
 
             <li className="h-full flex items-center">
+              <Link to="/installation" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
+                Install
+                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+
+            <li className="h-full flex items-center">
               <Link to="/light-guide" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
                 Light Guide
                 <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
@@ -188,6 +195,8 @@ export default function Navbar() {
               {[
                 { label: 'Home', to: '/' },
                 { label: 'Shop', to: '/shop' },
+                { label: 'Install', to: '/installation' },
+                { label: 'Blog', to: '/blog' },
                 { label: 'Light Guide', to: '/light-guide' },
                 { label: 'About', to: '/about' },
                 { label: 'Contact', to: '/contact' },

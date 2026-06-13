@@ -1,15 +1,19 @@
 -- =============================================================================
--- SPARK LIGHTS 254 — COMPLETE SUPABASE SETUP (single file)
+-- SPARK LIGHTS 254 — COMPLETE SUPABASE SETUP (single file — run once)
 -- =============================================================================
 --
 -- HOW TO RUN
 --   1. Open Supabase Dashboard → SQL Editor → New query
---   2. Paste this entire file and click Run
+--   2. Paste this ENTIRE file and click Run
 --
--- FRESH RE-INSTALL
---   Uncomment PART 0 (reset) below, run once, then comment it out again.
+-- FRESH INSTALL (empty database)
+--   Uncomment PART 1 (schema block) below, then run the whole file.
+--
+-- EXISTING DATABASE (tables already created — run this now)
+--   Leave PART 1 commented out. Run PART 1.5 → 4 only.
 --
 -- AFTER RUNNING
+--   RLS is disabled on every table (Prisma handles auth, not Supabase RLS).
 --   Admin login: mary@sparklights.co.ke / Mary@Admin254
 --   Manager:     sarah@sparklights.co.ke / manager123
 --   Staff:       john@sparklights.co.ke / florist123
@@ -70,8 +74,9 @@ DROP TYPE IF EXISTS "Role" CASCADE;
 
 -- =============================================================================
 -- PART 1 — SCHEMA (tables, enums, indexes, foreign keys)
--- Generated from prisma/schema.prisma
+-- COMMENTED OUT — database already exists. Uncomment for fresh install only.
 -- =============================================================================
+/*
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('OWNER', 'MANAGER', 'FLORIST', 'DRIVER');
 
@@ -820,6 +825,76 @@ ALTER TABLE "WhatsappLog" ADD CONSTRAINT "WhatsappLog_customerId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_staffId_fkey" FOREIGN KEY ("staffId") REFERENCES "Staff"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+*/
+
+
+-- =============================================================================
+-- PART 1.5 — DISABLE ROW LEVEL SECURITY
+-- Prisma + Express handle auth; RLS must stay off on every table.
+-- Safe to re-run. Drops all policies and disables RLS explicitly + via loop.
+-- =============================================================================
+
+-- Drop every RLS policy in public schema
+DO $$
+DECLARE
+  pol RECORD;
+BEGIN
+  FOR pol IN
+    SELECT schemaname, tablename, policyname
+    FROM pg_policies
+    WHERE schemaname = 'public'
+  LOOP
+    EXECUTE format(
+      'DROP POLICY IF EXISTS %I ON %I.%I',
+      pol.policyname, pol.schemaname, pol.tablename
+    );
+  END LOOP;
+END $$;
+
+-- Disable RLS on all app tables (explicit list)
+ALTER TABLE IF EXISTS "Staff"                  DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "RefreshToken"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Customer"               DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Address"                DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Occasion"               DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Category"               DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "FlowerTag"              DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Product"                DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "ProductCategory"        DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "ProductTag"             DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "ProductImage"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "ProductVariant"         DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "ProductAddon"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "FlowerInventory"        DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "InventoryMovement"      DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Supplier"               DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Order"                  DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "OrderItem"              DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "OrderAddon"             DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "OrderStatusHistory"     DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Payment"                DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "DeliveryZone"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "DeliverySlotConfig"     DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "BlockoutDate"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Coupon"                 DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "LoyaltyTransaction"     DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Subscription"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "NotificationLog"        DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "WhatsappLog"            DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "StoreSetting"           DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "AuditLog"               DISABLE ROW LEVEL SECURITY;
+
+-- Safety net: disable RLS on any other public tables
+DO $$
+DECLARE
+  tbl RECORD;
+BEGIN
+  FOR tbl IN
+    SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+  LOOP
+    EXECUTE format('ALTER TABLE %I.%I DISABLE ROW LEVEL SECURITY', 'public', tbl.tablename);
+  END LOOP;
+END $$;
 
 
 -- =============================================================================
@@ -983,9 +1058,20 @@ VALUES
 ON CONFLICT ("productId", "categoryId") DO NOTHING;
 
 -- =============================================================================
--- PART 3 — VERIFY (check results)
+-- PART 3 — VERIFY (RLS off + data readable)
 -- =============================================================================
 
+-- RLS check: should return 0 rows
+SELECT
+  c.relname AS table_with_rls_still_on
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+  AND c.relkind = 'r'
+  AND c.relrowsecurity = true
+ORDER BY c.relname;
+
+-- Row counts
 SELECT 'Staff' AS table_name, COUNT(*) AS rows FROM "Staff"
 UNION ALL SELECT 'Category', COUNT(*) FROM "Category"
 UNION ALL SELECT 'DeliveryZone', COUNT(*) FROM "DeliveryZone"
@@ -995,3 +1081,41 @@ UNION ALL SELECT 'StoreSetting', COUNT(*) FROM "StoreSetting";
 SELECT "email", "role", "isActive" FROM "Staff" ORDER BY "role";
 
 SELECT "name", "slug", "sortOrder" FROM "Category" ORDER BY "sortOrder";
+
+
+-- =============================================================================
+-- PART 4 — FINAL RLS LOCKOFF (run after seed; catches dashboard-enabled RLS)
+-- =============================================================================
+
+DO $$
+DECLARE
+  pol RECORD;
+  tbl RECORD;
+BEGIN
+  FOR pol IN
+    SELECT schemaname, tablename, policyname
+    FROM pg_policies
+    WHERE schemaname = 'public'
+  LOOP
+    EXECUTE format(
+      'DROP POLICY IF EXISTS %I ON %I.%I',
+      pol.policyname, pol.schemaname, pol.tablename
+    );
+  END LOOP;
+
+  FOR tbl IN
+    SELECT tablename FROM pg_tables WHERE schemaname = 'public'
+  LOOP
+    EXECUTE format('ALTER TABLE %I.%I DISABLE ROW LEVEL SECURITY', 'public', tbl.tablename);
+  END LOOP;
+END $$;
+
+-- Final RLS check: should return 0 rows
+SELECT
+  c.relname AS table_with_rls_still_on
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+  AND c.relkind = 'r'
+  AND c.relrowsecurity = true
+ORDER BY c.relname;
