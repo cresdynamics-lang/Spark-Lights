@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiSearch, FiShoppingCart, FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +16,15 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const getItemCount = useCartStore((state) => state.getItemCount());
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMobileMenuOpen]);
 
   const dropdownVariants = {
     hidden: { opacity: 0, y: 15, pointerEvents: 'none' as const },
@@ -182,52 +191,55 @@ export default function Navbar() {
       <CartOverlay isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — scrollable when categories overflow */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -100 }}
-            className="fixed inset-0 z-[90] bg-primary-black pt-32 px-10 lg:hidden"
+            className="fixed inset-0 z-[90] bg-primary-black lg:hidden flex flex-col"
           >
-            <ul className="space-y-8">
-              {[
-                { label: 'Home', to: '/' },
-                { label: 'Shop', to: '/shop' },
-                { label: 'Install', to: '/installation' },
-                { label: 'Blog', to: '/blog' },
-                { label: 'Light Guide', to: '/light-guide' },
-                { label: 'About', to: '/about' },
-                { label: 'Contact', to: '/contact' },
-              ].map((item) => (
-                <li key={item.label}>
-                  <Link 
-                    to={item.to}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-4xl font-black uppercase italic tracking-tighter text-white hover:text-primary-gold transition-colors"
-                  >
-                    {item.label}
-                  </Link>
+            <div className="h-20 sm:h-24 shrink-0" aria-hidden />
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-6 sm:px-10 pb-10 [-webkit-overflow-scrolling:touch]">
+              <ul className="space-y-6 sm:space-y-8 pb-6">
+                {[
+                  { label: 'Home', to: '/' },
+                  { label: 'Shop', to: '/shop' },
+                  { label: 'Install', to: '/installation' },
+                  { label: 'Blog', to: '/blog' },
+                  { label: 'Light Guide', to: '/light-guide' },
+                  { label: 'About', to: '/about' },
+                  { label: 'Contact', to: '/contact' },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <Link
+                      to={item.to}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter text-white hover:text-primary-gold transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+                <li className="pt-4 border-t border-white/10">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-4">Categories</span>
+                  <ul className="space-y-3 max-h-none">
+                    {LIGHT_CATEGORIES.map((cat) => (
+                      <li key={cat.slug}>
+                        <Link
+                          to={`/category/${cat.slug}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-base sm:text-lg font-black uppercase tracking-tight text-gray-400 hover:text-primary-gold transition-colors block py-0.5"
+                        >
+                          {cat.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
-              ))}
-              <li className="pt-4 border-t border-white/10">
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-4">Categories</span>
-                <ul className="space-y-3">
-                  {LIGHT_CATEGORIES.map((cat) => (
-                    <li key={cat.slug}>
-                      <Link
-                        to={`/category/${cat.slug}`}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-lg font-black uppercase tracking-tight text-gray-400 hover:text-primary-gold transition-colors"
-                      >
-                        {cat.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            </ul>
+              </ul>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
