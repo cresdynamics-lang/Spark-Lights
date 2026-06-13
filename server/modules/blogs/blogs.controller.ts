@@ -3,6 +3,11 @@ import prisma from "../../config/prisma.js";
 import { AuthRequest } from "../../middleware/auth.js";
 import { slugifyTitle } from "./blogs.schema.js";
 
+function routeParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
 function mapBlog(post: {
   id: string;
   slug: string;
@@ -55,9 +60,10 @@ export const listPublished = async (_req: Request, res: Response, next: NextFunc
 
 export const getBySlug = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const slug = routeParam(req.params.slug);
     const post = await prisma.blogPost.findFirst({
       where: {
-        slug: req.params.slug,
+        slug,
         isPublished: true,
       },
     });
@@ -116,7 +122,7 @@ export const create = async (req: AuthRequest, res: Response, next: NextFunction
 
 export const update = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.params;
+    const id = routeParam(req.params.id);
     const data: Record<string, unknown> = { ...req.body };
     if (typeof data.publishedAt === "string") {
       data.publishedAt = new Date(data.publishedAt);
@@ -143,8 +149,9 @@ export const update = async (req: Request, res: Response, next: NextFunction) =>
 
 export const remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await prisma.blogPost.delete({ where: { id: req.params.id } });
-    res.json({ success: true, data: { id: req.params.id } });
+    const id = routeParam(req.params.id);
+    await prisma.blogPost.delete({ where: { id } });
+    res.json({ success: true, data: { id } });
   } catch (error) {
     next(error);
   }

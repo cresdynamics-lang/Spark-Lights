@@ -25,10 +25,24 @@ Run **`setup.sql`** in Supabase Dashboard → SQL Editor:
 
 ### App connection (Vercel / local `.env`)
 
+**Do not use** `db.xvllxzcjjleronqneftg.supabase.co:5432` on Vercel — that host is IPv6-only and serverless cannot reach it.
+
+Use the **Supavisor pooler** (region `eu-west-1` for this project):
+
 ```env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.xvllxzcjjleronqneftg.supabase.co:5432/postgres
-DIRECT_URL=postgresql://postgres:YOUR_PASSWORD@db.xvllxzcjjleronqneftg.supabase.co:5432/postgres
+# Runtime (Vercel API, serverless) — port 6543 + pgbouncer
+DATABASE_URL=postgresql://postgres.xvllxzcjjleronqneftg:YOUR_PASSWORD@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+
+# Prisma directUrl (migrations) — session pooler port 5432
+DIRECT_URL=postgresql://postgres.xvllxzcjjleronqneftg:YOUR_PASSWORD@aws-0-eu-west-1.pooler.supabase.com:5432/postgres
+
 NEXT_PUBLIC_SUPABASE_URL=https://xvllxzcjjleronqneftg.supabase.co
+JWT_ACCESS_SECRET=your-access-secret
+JWT_REFRESH_SECRET=your-refresh-secret
+NODE_ENV=production
+FRONTEND_URL=https://your-domain.vercel.app
 ```
 
-Use the **pooler** URI from Supabase Dashboard for `DATABASE_URL` on Vercel (port 6543).
+URL-encode `@` in passwords as `%40` (e.g. `SparkLights@254` → `SparkLights%40254`).
+
+Copy connection strings from Supabase Dashboard → **Project Settings → Database → Connection string → URI** (Transaction pooler for `DATABASE_URL`).
