@@ -29,11 +29,18 @@ export default function Footer() {
               Pickup: {BRAND.fullAddress}
             </p>
             <div className="flex gap-4">
-              {[FiInstagram, FiFacebook, FiMessageCircle].map((Icon, i) => (
-                <motion.a 
-                  key={i}
-                  whileHover={{ scale: 1.2, color: "#DB2777", borderColor: "#DB2777" }}
-                  href="#" 
+              {[
+                { Icon: FiInstagram, label: 'Instagram' },
+                { Icon: FiFacebook, label: 'Facebook' },
+                { Icon: FiMessageCircle, label: 'Social' },
+              ].map(({ Icon, label }) => (
+                <motion.a
+                  key={label}
+                  whileHover={{ scale: 1.2, color: '#DB2777', borderColor: '#DB2777' }}
+                  href={BRAND.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${label} — Spark Lights 254 on Instagram`}
                   className="w-10 h-10 border border-white/10 flex items-center justify-center rounded-full transition-all text-gray-500"
                 >
                   <Icon size={18} />
