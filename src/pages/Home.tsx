@@ -429,9 +429,12 @@ export default function Home() {
               <a href={BRAND.whatsappUrl} className="bg-black text-white px-10 py-4 font-black uppercase text-[11px] tracking-widest hover:bg-white hover:text-black transition-colors">
                 Chat on WhatsApp
               </a>
-              <Link to="/contact" className="border-2 border-black px-10 py-4 font-black uppercase text-[11px] tracking-widest hover:bg-black hover:text-white transition-colors">
+              <a
+                href={`tel:${BRAND.phone.replace(/\s/g, '')}`}
+                className="border-2 border-black px-10 py-4 font-black uppercase text-[11px] tracking-widest hover:bg-black hover:text-white transition-colors"
+              >
                 Contact Us
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
