@@ -11,9 +11,11 @@
 --
 -- EXISTING DATABASE (tables already created — run this now)
 --   Leave PART 1 commented out. Run PART 1.5 → 4 only.
+--   Then run supabase/blogs.sql for blog CRUD table + seed.
 --
 -- AFTER RUNNING
 --   RLS is disabled on every table (Prisma handles auth, not Supabase RLS).
+--   BLOGS: also run supabase/blogs.sql for BlogPost table + admin CRUD.
 --   Admin login: mary@sparklights.co.ke / Mary@Admin254
 --   Manager:     sarah@sparklights.co.ke / manager123
 --   Staff:       john@sparklights.co.ke / florist123

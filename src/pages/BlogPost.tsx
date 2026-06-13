@@ -2,14 +2,16 @@ import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiArrowLeft, FiClock } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa6';
-import { getBlogBySlug, BLOG_POSTS } from '../data/blogs';
 import { usePageSEO } from '../hooks/usePageSEO';
+import { useBlogPost, usePublishedBlogs } from '../hooks/useBlogs';
 import { BRAND } from '../data/brand';
 import DeliveryBanner from '../components/DeliveryBanner';
+import type { BlogSection, BlogRelatedLink } from '../types/blog';
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const post = slug ? getBlogBySlug(slug) : undefined;
+  const { post, loading } = useBlogPost(slug);
+  const { posts: allPosts } = usePublishedBlogs();
 
   usePageSEO({
     title: post?.seoTitle ?? `Blog | ${BRAND.name}`,
@@ -17,6 +19,14 @@ export default function BlogPost() {
     path: slug ? `/blog/${slug}` : '/blog',
     keywords: post?.seoKeywords,
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading article...
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -27,7 +37,9 @@ export default function BlogPost() {
     );
   }
 
-  const others = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 2);
+  const sections = (post.sections ?? []) as BlogSection[];
+  const relatedLinks = (post.relatedLinks ?? []) as BlogRelatedLink[];
+  const others = allPosts.filter((p) => p.slug !== post.slug).slice(0, 2);
 
   return (
     <div className="min-h-screen pb-32">
@@ -57,7 +69,7 @@ export default function BlogPost() {
         </div>
 
         <div className="container mx-auto px-6 max-w-3xl py-16 space-y-12">
-          {post.sections.map((section) => (
+          {sections.map((section) => (
             <motion.section
               key={section.heading}
               initial={{ opacity: 0, y: 20 }}
@@ -86,20 +98,22 @@ export default function BlogPost() {
             </a>
           </div>
 
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4">Related pages</h3>
-            <div className="flex flex-wrap gap-3">
-              {post.relatedLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className="text-[10px] font-black uppercase tracking-widest px-4 py-2 border border-primary-gold/30 text-primary-gold hover:bg-primary-gold hover:text-black transition-all"
-                >
-                  {link.label}
-                </Link>
-              ))}
+          {relatedLinks.length > 0 && (
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-4">Related pages</h3>
+              <div className="flex flex-wrap gap-3">
+                {relatedLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className="text-[10px] font-black uppercase tracking-widest px-4 py-2 border border-primary-gold/30 text-primary-gold hover:bg-primary-gold hover:text-black transition-all"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </article>
 

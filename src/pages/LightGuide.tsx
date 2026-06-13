@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiArrowRight, FiSun } from 'react-icons/fi';
 import { LIGHT_GUIDE } from '../data/content';
 import { LIGHT_CATEGORIES } from '../data/categories';
-import { BLOG_POSTS } from '../data/blogs';
+import { usePublishedBlogs } from '../hooks/useBlogs';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { BRAND } from '../data/brand';
 import PublicImage from '../components/PublicImage';
@@ -26,6 +26,8 @@ export default function LightGuide() {
     keywords:
       'modern gypsum ceiling lights, living room ceiling lighting design Kenya, how to fix gypsum lights, bedroom ceiling lights Nairobi',
   });
+
+  const { posts: blogPosts } = usePublishedBlogs();
 
   const categoryName = (slug: string) =>
     LIGHT_CATEGORIES.find((c) => c.slug === slug)?.name ?? slug;
@@ -113,7 +115,7 @@ export default function LightGuide() {
         <div className="container mx-auto px-6">
           <h2 className="text-2xl font-black uppercase text-white mb-8 text-center">From the Blog</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {BLOG_POSTS.slice(0, 3).map((post) => (
+            {blogPosts.slice(0, 3).map((post) => (
               <Link key={post.slug} to={`/blog/${post.slug}`} className="p-6 border border-white/5 hover:border-primary-gold/30 transition-colors">
                 <span className="text-[10px] text-primary-gold font-black uppercase tracking-widest">{post.category}</span>
                 <h3 className="text-sm font-black uppercase text-white mt-2 leading-tight">{post.title}</h3>

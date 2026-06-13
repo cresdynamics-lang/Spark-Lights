@@ -115,6 +115,7 @@ model Staff {
   assignedOrders Order[]        @relation("AssignedFlorist")
   deliveries     Order[]        @relation("AssignedDriver")
   auditLogs      AuditLog[]
+  blogPosts      BlogPost[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   @@index([role])
@@ -606,6 +607,31 @@ model StoreSetting {
   value     Json
   updatedBy String?
   updatedAt DateTime @updatedAt
+}
+
+// ── BLOG / SEO CONTENT ─────────────────────────────────────────────
+
+model BlogPost {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String
+  excerpt         String
+  category        String
+  readMinutes     Int      @default(5)
+  publishedAt     DateTime @default(now())
+  image           String
+  seoTitle        String
+  metaDescription String
+  seoKeywords     String
+  sections        Json     @default("[]")
+  relatedLinks    Json     @default("[]")
+  isPublished     Boolean  @default(true)
+  authorId        String?
+  author          Staff?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([isPublished, publishedAt])
+  @@index([category])
 }
 
 // ── AUDIT ──────────────────────────────────────────────────────────

@@ -14,6 +14,7 @@ import deliveryRoutes from "./modules/delivery/delivery.routes.js";
 import settingsRoutes from "./modules/settings/settings.routes.js";
 import discountsRoutes from "./modules/discounts/discounts.routes.js";
 import subscriptionsRoutes from "./modules/subscriptions/subscriptions.routes.js";
+import blogRoutes from "./modules/blogs/blogs.routes.js";
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use("/v1/delivery", deliveryRoutes);
 app.use("/v1/settings", settingsRoutes);
 app.use("/v1/discounts", discountsRoutes);
 app.use("/v1/subscriptions", subscriptionsRoutes);
+app.use("/v1/blogs", blogRoutes);
 
 app.get("/", (_req, res) => {
   res.json({ success: true, message: "Spark Lights 254 Admin API v1" });

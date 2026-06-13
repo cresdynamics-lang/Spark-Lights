@@ -12,7 +12,7 @@ import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { SITE_KEYWORDS } from '../lib/seo';
 import { useProducts } from '../context/ProductContext';
-import { BLOG_POSTS } from '../data/blogs';
+import { usePublishedBlogs } from '../hooks/useBlogs';
 import InstallationGallery from '../components/InstallationGallery';
 import DeliveryBanner from '../components/DeliveryBanner';
 
@@ -28,6 +28,7 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
   const addItem = useCartStore((state) => state.addItem);
   const { products } = useProducts();
+  const { posts: blogPosts } = usePublishedBlogs();
 
   usePageSEO({
     title: 'Chandeliers in Nairobi Price | Modern Ceiling Lights Kenya | Spark Lights 254',
@@ -304,7 +305,7 @@ export default function Home() {
             <p className="text-gray-500 mt-4 text-sm">Guides that match how Kenyans search — gypsum, chandeliers, solar outdoor</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {BLOG_POSTS.map((post, idx) => (
+            {blogPosts.map((post, idx) => (
               <motion.div key={post.slug} {...fadeIn} transition={{ delay: idx * 0.05 }}>
                 <Link to={`/blog/${post.slug}`} className="block p-6 border border-white/5 bg-secondary-black hover:border-primary-gold/30 transition-colors h-full">
                   <span className="text-[9px] font-black uppercase tracking-widest text-primary-gold">{post.category}</span>

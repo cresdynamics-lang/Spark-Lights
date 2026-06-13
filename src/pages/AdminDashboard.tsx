@@ -21,6 +21,7 @@ import { DiscountsView } from "@/components/admin/views/DiscountsView"
 import { SubscriptionsView } from "@/components/admin/views/SubscriptionsView"
 import { SettingsView } from "@/components/admin/views/SettingsView"
 import { CategoriesView } from "@/components/admin/views/CategoriesView"
+import { BlogView } from "@/components/admin/views/BlogView"
 import { DispatchView } from "@/components/admin/views/DispatchView"
 
 import { useAuthStore } from "@/store/authStore"
@@ -88,6 +89,8 @@ export default function AdminDashboard() {
         return <InventoryView />
       case "Categories":
         return <CategoriesView />
+      case "Blog & SEO":
+        return <BlogView />
       case "Customer List":
       case "CRM Dashboard":
         return <CustomersView />
