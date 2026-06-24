@@ -63,7 +63,8 @@ export default function Footer() {
                 { name: 'Wholesale / Bulk', path: '/wholesale' },
                 { name: 'FAQs', path: '/faq' },
                 { name: 'Delivery Info', path: '/delivery' },
-                { name: 'Refund Policy', path: '/refund-policy' }
+                { name: 'Refund Policy', path: '/refund-policy' },
+                { name: 'Staff', path: '/admin/login' }
               ].map(item => (
                 <li key={item.name}><Link to={item.path} className="text-sm text-gray-500 hover:text-primary-pink transition-colors font-medium">{item.name}</Link></li>
               ))}
