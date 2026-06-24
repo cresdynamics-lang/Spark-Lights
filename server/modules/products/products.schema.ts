@@ -16,7 +16,7 @@ export const createProductSchema = z.object({
       label: z.string(),
       priceKes: z.number(),
       stockQty: z.number(),
-      stemsUsed: z.number(),
+      stemsUsed: z.number().optional(),
     })).optional(),
   }),
 });
