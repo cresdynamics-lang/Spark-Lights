@@ -8,7 +8,6 @@ import {
   AlertCircle,
   X,
   Save,
-  Upload,
   Smartphone,
 } from 'lucide-react';
 import { updateProduct, uploadProductImage } from '@/api/products';
@@ -16,9 +15,7 @@ import apiClient from '@/api/client';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
-import { parsePriceFromFilename } from '@/data/publicCatalog';
 import PublicImage from '@/components/PublicImage';
-import { isPublicImageUrl } from '@/lib/publicImages';
 import { isAllowedProductImageUrl } from '@/lib/productImages';
 import { compressImageFile } from '@/lib/compressImage';
 import { slugFromImageUrl } from '@/lib/slugFromImage';
@@ -183,16 +180,6 @@ export const ProductsView: React.FC = () => {
     if (stock === 0) return 'Out of Stock';
     if (stock < 10) return 'Low Stock';
     return 'Active';
-  };
-
-  const selectPublicImage = (url: string, filename: string) => {
-    const suggested = parsePriceFromFilename(filename);
-    setFormData((prev) => ({
-      ...prev,
-      imageUrl: url,
-      ...(suggested && !prev.priceKes ? { priceKes: String(suggested) } : {}),
-      ...(suggested && !prev.name ? { name: `Modern Ceiling Light — KES ${suggested.toLocaleString()}` } : {}),
-    }));
   };
 
   const handleDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -505,12 +492,11 @@ export const ProductsView: React.FC = () => {
                     Product Image
                   </label>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-primary-gold/10 border border-dashed border-primary-gold/40 rounded-2xl py-4 px-4 hover:bg-primary-gold/20 transition-all">
+                  <div>
+                    <label className="flex items-center justify-center gap-2 cursor-pointer bg-primary-gold/10 border border-dashed border-primary-gold/40 rounded-2xl py-4 px-4 hover:bg-primary-gold/20 transition-all">
                       <input
                         type="file"
                         accept="image/*"
-                        capture="environment"
                         className="hidden"
                         disabled={uploadingImage}
                         onChange={handleDeviceUpload}
@@ -521,20 +507,7 @@ export const ProductsView: React.FC = () => {
                         <Smartphone className="h-4 w-4 text-primary-gold" />
                       )}
                       <span className="text-[10px] font-black uppercase tracking-widest text-white">
-                        {uploadingImage ? 'Compressing & uploading…' : 'Upload from phone / device'}
-                      </span>
-                    </label>
-                    <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer bg-white/5 border border-dashed border-white/20 rounded-2xl py-4 px-4 hover:border-white/40 transition-all">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        disabled={uploadingImage}
-                        onChange={handleDeviceUpload}
-                      />
-                      <Upload className="h-4 w-4 text-slate-400" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
-                        Choose from storage
+                        {uploadingImage ? 'Compressing & uploading…' : 'Upload from device'}
                       </span>
                     </label>
                   </div>
@@ -545,31 +518,6 @@ export const ProductsView: React.FC = () => {
                       <span className="text-[10px] text-slate-400 font-mono truncate">{formData.imageUrl}</span>
                     </div>
                   )}
-                  <p className="text-[9px] text-slate-600">
-                    Photos are compressed before upload. Or pick from the gallery below.
-                  </p>
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 border border-white/10 rounded-2xl bg-primary-black">
-                    {publicAssets.map((asset) => (
-                      <button
-                        key={asset.filename}
-                        type="button"
-                        onClick={() => selectPublicImage(asset.url, asset.filename)}
-                        className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                          formData.imageUrl === asset.url
-                            ? 'border-primary-gold ring-2 ring-primary-gold/40'
-                            : 'border-white/10 hover:border-white/30'
-                        }`}
-                      >
-                        <img src={asset.url} alt={asset.filename} className="w-full h-full object-cover" />
-                        {asset.suggestedPrice && (
-                          <span className="absolute bottom-0 left-0 right-0 bg-black/80 text-[7px] font-black text-primary-gold py-0.5 text-center">
-                            {asset.suggestedPrice}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-[9px] text-slate-600">Filename prices are suggestions — edit the KES field above anytime.</p>
                 </div>
 
                 <div className="space-y-2 md:col-span-2">

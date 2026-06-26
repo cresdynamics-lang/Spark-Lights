@@ -62,10 +62,10 @@ export const uploadProductImage = async (req: Request, res: Response, next: Next
       return res.status(400).json({ success: false, error: { message: "Invalid image data" } });
     }
 
-    if (buffer.length > 2_500_000) {
+    if (buffer.length > 5_000_000) {
       return res.status(400).json({
         success: false,
-        error: { message: "Image too large after compression (max ~2.5MB)" },
+        error: { message: "Image too large after compression (max ~5MB)" },
       });
     }
 
