@@ -52,3 +52,5 @@ Copy connection strings from Supabase Dashboard → **Project Settings → Datab
 Run **`storage.sql`** once to create the public `product-images` bucket.
 
 Admin → Products → **Upload from phone / device** compresses JPEGs client-side and stores them in Supabase Storage. URLs are saved on `ProductImage` records in Postgres.
+
+Admin → **Blog & SEO** → new/edit post: default cover is `/round1.jpg`, pick another showroom image, type a custom path/URL, or **upload from phone/device** (stored under `product-images/blogs/`).

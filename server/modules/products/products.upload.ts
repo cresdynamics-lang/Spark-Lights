@@ -17,10 +17,11 @@ function serviceRoleKey(): string {
 export async function uploadToSupabaseStorage(
   buffer: Buffer,
   filename: string,
+  folder: "products" | "blogs" = "products",
   contentType = "image/jpeg"
 ): Promise<string> {
   const base = supabaseBaseUrl();
-  const path = `products/${Date.now()}-${filename.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
+  const path = `${folder}/${Date.now()}-${filename.replace(/[^a-zA-Z0-9._-]/g, "-")}`;
   const endpoint = `${base}/storage/v1/object/${BUCKET}/${path}`;
 
   const response = await fetch(endpoint, {
@@ -43,9 +44,10 @@ export async function uploadToSupabaseStorage(
 
 export const uploadProductImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { imageData, filename = "product.jpg" } = req.body as {
+    const { imageData, filename = "product.jpg", folder } = req.body as {
       imageData?: string;
       filename?: string;
+      folder?: string;
     };
 
     if (!imageData || typeof imageData !== "string") {
@@ -69,7 +71,8 @@ export const uploadProductImage = async (req: Request, res: Response, next: Next
       });
     }
 
-    const url = await uploadToSupabaseStorage(buffer, filename);
+    const storageFolder = folder === "blogs" ? "blogs" : "products";
+    const url = await uploadToSupabaseStorage(buffer, filename, storageFolder);
 
     res.status(201).json({ success: true, data: { url } });
   } catch (error) {

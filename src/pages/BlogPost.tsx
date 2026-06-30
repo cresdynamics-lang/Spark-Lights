@@ -5,6 +5,7 @@ import { FaWhatsapp } from 'react-icons/fa6';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { useBlogPost, usePublishedBlogs } from '../hooks/useBlogs';
 import { BRAND } from '../data/brand';
+import ProductImage from '../components/ProductImage';
 import DeliveryBanner from '../components/DeliveryBanner';
 import type { BlogSection, BlogRelatedLink } from '../types/blog';
 
@@ -64,8 +65,8 @@ export default function BlogPost() {
           </div>
         </header>
 
-        <div className="aspect-[21/9] max-h-[420px] overflow-hidden border-b border-white/5">
-          <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+        <div className="aspect-[21/9] max-h-[420px] overflow-hidden border-b border-white/5 bg-black">
+          <ProductImage src={post.image} alt={post.title} className="w-full h-full object-cover" loading="eager" />
         </div>
 
         <div className="container mx-auto px-6 max-w-3xl py-16 space-y-12">

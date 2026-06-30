@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FiArrowRight, FiClock } from 'react-icons/fi';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { usePublishedBlogs } from '../hooks/useBlogs';
+import ProductImage from '../components/ProductImage';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -52,12 +53,11 @@ export default function Blog() {
                   transition={{ ...fadeIn.transition, delay: i * 0.06 }}
                 >
                   <Link to={`/blog/${post.slug}`} className="group block border border-white/5 bg-tertiary-black overflow-hidden hover:border-primary-gold/30 transition-colors">
-                    <div className="aspect-[16/9] overflow-hidden">
-                      <img
+                    <div className="aspect-[16/9] overflow-hidden bg-black">
+                      <ProductImage
                         src={post.image}
                         alt={post.title}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
                       />
                     </div>
                     <div className="p-8">

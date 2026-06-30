@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
   Plus, Search, Edit2, Trash2, FileText, Loader2, ExternalLink, Eye, EyeOff,
+  Upload, Smartphone, ImageIcon,
 } from 'lucide-react';
 import { getAdminBlogs, createBlog, updateBlog, deleteBlog } from '@/api/blogs';
+import { uploadBlogImage } from '@/api/products';
 import type { BlogPost, BlogSection } from '@/types/blog';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import PublicImage from '@/components/PublicImage';
-import { isPublicImageUrl } from '@/lib/publicImages';
+import { isAllowedProductImageUrl } from '@/lib/productImages';
+import { BLOG_DEFAULT_IMAGE, BLOG_IMAGE_PRESETS } from '@/data/blogDefaults';
+import { compressImageFile } from '@/lib/compressImage';
+import apiClient from '@/api/client';
 
 const emptySection = (): BlogSection => ({ heading: '', paragraphs: [''] });
 
@@ -18,7 +23,7 @@ const emptyForm = {
   category: 'Buying Guide',
   readMinutes: 5,
   publishedAt: new Date().toISOString().slice(0, 10),
-  image: '/round1.jpg',
+  image: BLOG_DEFAULT_IMAGE,
   seoTitle: '',
   metaDescription: '',
   seoKeywords: '',
@@ -35,6 +40,14 @@ export const BlogView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [publicAssets, setPublicAssets] = useState<{ filename: string; url: string }[]>([]);
+
+  useEffect(() => {
+    apiClient.get('/products/public-assets').then((res) => {
+      if (res.data.success) setPublicAssets(res.data.data);
+    }).catch(() => {});
+  }, []);
 
   const fetchPosts = async () => {
     setIsLoading(true);
@@ -83,6 +96,7 @@ export const BlogView: React.FC = () => {
     setSaving(true);
     const payload = {
       ...form,
+      image: form.image.trim() || BLOG_DEFAULT_IMAGE,
       readMinutes: Number(form.readMinutes),
       sections: form.sections.map((s) => ({
         heading: s.heading,
@@ -107,6 +121,35 @@ export const BlogView: React.FC = () => {
       toast.error('Save failed — check slug is unique');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeviceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image file');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const { base64 } = await compressImageFile(file);
+      const response = await uploadBlogImage(base64, file.name);
+      if (!response.success || !response.data?.url) {
+        throw new Error(response.error?.message || 'Upload failed');
+      }
+      setForm((prev) => ({ ...prev, image: response.data.url }));
+      toast.success('Blog cover uploaded');
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message ||
+        (err as Error)?.message ||
+        'Image upload failed';
+      toast.error(message);
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -177,10 +220,14 @@ export const BlogView: React.FC = () => {
               className="bg-secondary-black border border-white/5 rounded-3xl overflow-hidden flex flex-col"
             >
               <div className="aspect-[16/9] bg-black relative">
-                {isPublicImageUrl(post.image) ? (
+                {isAllowedProductImageUrl(post.image) ? (
                   <PublicImage src={post.image} alt={post.title} className="w-full h-full object-cover" />
-                ) : (
+                ) : post.image ? (
                   <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-600">
+                    <ImageIcon size={32} />
+                  </div>
                 )}
                 <span className={`absolute top-4 right-4 text-[9px] font-black uppercase px-3 py-1 ${post.isPublished ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-500/20 text-slate-400'}`}>
                   {post.isPublished ? 'Published' : 'Draft'}
@@ -247,14 +294,13 @@ export const BlogView: React.FC = () => {
                   { key: 'title', label: 'Title' },
                   { key: 'slug', label: 'Slug (URL)' },
                   { key: 'category', label: 'Category' },
-                  { key: 'image', label: 'Image path (/round1.jpg)' },
                   { key: 'seoTitle', label: 'SEO Title' },
                   { key: 'seoKeywords', label: 'SEO Keywords' },
                 ].map(({ key, label }) => (
                   <div key={key}>
                     <label className="text-[9px] font-black uppercase text-slate-500 block mb-2">{label}</label>
                     <input
-                      required={key === 'title' || key === 'image'}
+                      required={key === 'title'}
                       value={(form as Record<string, string>)[key]}
                       onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                       className="w-full bg-primary-black border border-white/10 rounded-xl py-3 px-4 text-sm text-white"
@@ -280,6 +326,89 @@ export const BlogView: React.FC = () => {
                     className="w-full bg-primary-black border border-white/10 rounded-xl py-3 px-4 text-sm text-white"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-3 border border-white/10 rounded-2xl p-4 bg-primary-black/50">
+                <label className="text-[9px] font-black uppercase text-slate-500 block">Cover Image</label>
+
+                <div className="aspect-[16/9] max-w-md overflow-hidden rounded-xl border border-white/10 bg-black relative">
+                  {isAllowedProductImageUrl(form.image) ? (
+                    <PublicImage src={form.image} alt="Blog cover preview" className="w-full h-full object-cover" />
+                  ) : form.image ? (
+                    <img src={form.image} alt="Blog cover preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-600 text-xs">No image</div>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer border border-dashed border-primary-gold/40 rounded-xl py-3 px-3 hover:bg-primary-gold/10 transition-all">
+                    <input type="file" accept="image/*" capture="environment" className="hidden" disabled={uploadingImage} onChange={handleDeviceUpload} />
+                    {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin text-primary-gold" /> : <Smartphone className="h-4 w-4 text-primary-gold" />}
+                    <span className="text-[9px] font-black uppercase tracking-widest text-white">
+                      {uploadingImage ? 'Uploading…' : 'Upload from phone'}
+                    </span>
+                  </label>
+                  <label className="flex-1 flex items-center justify-center gap-2 cursor-pointer border border-dashed border-white/20 rounded-xl py-3 px-3 hover:border-white/40 transition-all">
+                    <input type="file" accept="image/*" className="hidden" disabled={uploadingImage} onChange={handleDeviceUpload} />
+                    <Upload className="h-4 w-4 text-slate-400" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">From device storage</span>
+                  </label>
+                </div>
+
+                <div>
+                  <label className="text-[9px] font-black uppercase text-slate-500 block mb-2">Image path or URL</label>
+                  <input
+                    required
+                    value={form.image}
+                    onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    placeholder={BLOG_DEFAULT_IMAGE}
+                    className="w-full bg-primary-black border border-white/10 rounded-xl py-3 px-4 text-sm text-white font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, image: BLOG_DEFAULT_IMAGE })}
+                    className="mt-2 text-[9px] font-black uppercase text-primary-gold hover:underline"
+                  >
+                    Reset to default ({BLOG_DEFAULT_IMAGE})
+                  </button>
+                </div>
+
+                <p className="text-[9px] text-slate-600 uppercase tracking-widest">Quick picks</p>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {BLOG_IMAGE_PRESETS.map((url) => (
+                    <button
+                      key={url}
+                      type="button"
+                      onClick={() => setForm({ ...form, image: url })}
+                      className={`relative aspect-video overflow-hidden rounded-lg border-2 transition-all ${
+                        form.image === url ? 'border-primary-gold ring-2 ring-primary-gold/40' : 'border-white/10 hover:border-white/30'
+                      }`}
+                    >
+                      <PublicImage src={url} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+
+                {publicAssets.length > 0 && (
+                  <>
+                    <p className="text-[9px] text-slate-600 uppercase tracking-widest">All showroom images</p>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-40 overflow-y-auto p-1 border border-white/5 rounded-xl">
+                      {publicAssets.map((asset) => (
+                        <button
+                          key={asset.filename}
+                          type="button"
+                          onClick={() => setForm({ ...form, image: asset.url })}
+                          className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                            form.image === asset.url ? 'border-primary-gold' : 'border-white/10 hover:border-white/30'
+                          }`}
+                        >
+                          <img src={asset.url} alt={asset.filename} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               <div>

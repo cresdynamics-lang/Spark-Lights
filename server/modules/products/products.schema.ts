@@ -29,5 +29,6 @@ export const uploadImageSchema = z.object({
   body: z.object({
     imageData: z.string().min(100),
     filename: z.string().optional(),
+    folder: z.enum(["products", "blogs"]).optional(),
   }),
 });
