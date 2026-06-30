@@ -63,6 +63,56 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+export const refresh = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { refreshToken } = req.body;
+
+    let payload: { sub: string };
+    try {
+      payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as { sub: string };
+    } catch {
+      return res.status(401).json({
+        success: false,
+        error: { code: "INVALID_TOKEN", message: "Invalid or expired refresh token" },
+      });
+    }
+
+    const stored = await prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+      include: { staff: true },
+    });
+
+    if (!stored || stored.expiresAt < new Date() || stored.staffId !== payload.sub) {
+      if (stored) {
+        await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+      }
+      return res.status(401).json({
+        success: false,
+        error: { code: "INVALID_TOKEN", message: "Invalid or expired refresh token" },
+      });
+    }
+
+    const staff = stored.staff;
+    if (!staff.isActive) {
+      return res.status(401).json({
+        success: false,
+        error: { code: "INVALID_TOKEN", message: "Invalid or inactive staff" },
+      });
+    }
+
+    const accessToken = jwt.sign({ sub: staff.id, role: staff.role }, JWT_ACCESS_SECRET, {
+      expiresIn: JWT_ACCESS_EXPIRES_IN as jwt.SignOptions["expiresIn"],
+    });
+
+    res.json({
+      success: true,
+      data: { accessToken },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { refreshToken } = req.body;

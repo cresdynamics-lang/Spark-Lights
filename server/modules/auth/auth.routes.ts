@@ -8,6 +8,7 @@ import { loginSchema, refreshSchema } from "./auth.schema.js";
 const router = Router();
 
 router.post("/login", validate(loginSchema), AuthController.login);
+router.post("/refresh", validate(refreshSchema), AuthController.refresh);
 router.post("/logout", validate(refreshSchema), AuthController.logout);
 router.get("/me", authenticate, AuthController.getMe);
 

@@ -21,8 +21,16 @@ export const authenticate = async (
       .json({ success: false, error: { code: "NO_TOKEN", message: "No token provided" } });
   }
 
+  let payload: { sub: string; role?: string };
   try {
-    const payload = jwt.verify(token, JWT_ACCESS_SECRET) as any;
+    payload = jwt.verify(token, JWT_ACCESS_SECRET) as { sub: string; role?: string };
+  } catch {
+    return res
+      .status(401)
+      .json({ success: false, error: { code: "INVALID_TOKEN", message: "Invalid or expired token" } });
+  }
+
+  try {
     const staff = await prisma.staff.findUnique({
       where: { id: payload.sub },
     });
@@ -36,9 +44,7 @@ export const authenticate = async (
     req.user = staff;
     next();
   } catch (error) {
-    return res
-      .status(401)
-      .json({ success: false, error: { code: "INVALID_TOKEN", message: "Invalid token" } });
+    next(error);
   }
 };
 

@@ -19,6 +19,7 @@ interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   login: (user: Record<string, unknown>, token: string, refreshToken: string) => void;
+  setAccessToken: (token: string) => void;
   logout: () => void;
 }
 
@@ -32,6 +33,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.setItem('sparklights_admin_token', token);
     localStorage.setItem('sparklights_admin_refresh_token', refreshToken);
     set({ user, token, refreshToken, isAuthenticated: true });
+  },
+  setAccessToken: (token) => {
+    localStorage.setItem('sparklights_admin_token', token);
+    set({ token, isAuthenticated: true });
   },
   logout: () => {
     localStorage.removeItem('sparklights_admin_user');

@@ -105,7 +105,15 @@ export const BlogView: React.FC = () => {
       relatedLinks: form.relatedLinks.filter((l) => l.label && l.path),
       publishedAt: new Date(form.publishedAt).toISOString(),
       seoTitle: form.seoTitle || `${form.title} | Spark Lights 254`,
+      metaDescription: form.metaDescription || form.excerpt,
+      seoKeywords: form.seoKeywords || 'flowers, nairobi, spark lights 254',
     };
+
+    if (!payload.sections.length) {
+      toast.error('Add at least one section with a heading and paragraph');
+      setSaving(false);
+      return;
+    }
 
     try {
       if (editingId) {
@@ -117,8 +125,12 @@ export const BlogView: React.FC = () => {
       }
       setIsModalOpen(false);
       fetchPosts();
-    } catch {
-      toast.error('Save failed — check slug is unique');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: { message?: string } } } };
+      const message =
+        err.response?.data?.error?.message ||
+        'Save failed — check slug is unique and all required fields are filled';
+      toast.error(message);
     } finally {
       setSaving(false);
     }
