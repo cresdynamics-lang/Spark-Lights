@@ -38,7 +38,7 @@ export default function Shop() {
   const [activePrice, setActivePrice] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const addItem = useCartStore((state) => state.addItem);
-  const { products } = useProducts();
+  const { products, loading } = useProducts();
 
   useEffect(() => {
     const cat = searchParams.get('category');
@@ -50,13 +50,21 @@ export default function Shop() {
     list = searchProducts(list, searchQuery);
 
     return list.filter((product) => {
-      const priceValue = parseInt(product.price.replace(/,/g, ''));
+      const priceValue = parseInt(product.price.replace(/,/g, ''), 10);
       if (activePrice === 'under-5k') return priceValue < 5000;
       if (activePrice === '5k-10k') return priceValue >= 5000 && priceValue <= 10000;
       if (activePrice === 'over-10k') return priceValue > 10000;
       return true;
     });
   }, [activeCategory, activePrice, searchQuery, products]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500">Loading products…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-32">
@@ -201,13 +209,21 @@ export default function Shop() {
           {filteredProducts.length === 0 && (
             <div className="py-48 text-center">
               <span className="text-gray-700 font-black uppercase tracking-[0.5em] text-[10px] block mb-6">No matches found</span>
-              <h2 className="text-4xl font-black uppercase tracking-tighter text-white mb-10">We couldn't find your selection.</h2>
-              <button 
-                onClick={() => { setActiveCategory('all'); setActivePrice('all'); setSearchQuery(''); }}
-                className="btn-primary"
-              >
-                Reset All Filters
-              </button>
+              <h2 className="text-4xl font-black uppercase tracking-tighter text-white mb-10">
+                {products.length === 0
+                  ? 'No products in the database yet.'
+                  : "We couldn't find your selection."}
+              </h2>
+              {products.length > 0 ? (
+                <button 
+                  onClick={() => { setActiveCategory('all'); setActivePrice('all'); setSearchQuery(''); }}
+                  className="btn-primary"
+                >
+                  Reset All Filters
+                </button>
+              ) : (
+                <Link to="/" className="btn-primary">Back Home</Link>
+              )}
             </div>
           )}
         </div>

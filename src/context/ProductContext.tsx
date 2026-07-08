@@ -1,47 +1,42 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { getProducts } from '../api/products';
-import { PUBLIC_CATALOG } from '../data/publicCatalog';
 import { mapApiProduct } from '../lib/mapApiProduct';
-import { mergePublicCatalogWithApi } from '../lib/mergeCatalog';
+import { dedupeStoreProducts } from '../lib/mergeCatalog';
 import type { StoreProduct } from '../types/product';
 
 interface ProductContextValue {
   products: StoreProduct[];
   loading: boolean;
-  source: 'api' | 'public';
+  source: 'api' | 'none';
   refresh: () => void;
 }
 
 const ProductContext = createContext<ProductContextValue>({
-  products: PUBLIC_CATALOG,
+  products: [],
   loading: true,
-  source: 'public',
+  source: 'none',
   refresh: () => {},
 });
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [products, setProducts] = useState<StoreProduct[]>(PUBLIC_CATALOG);
+  const [products, setProducts] = useState<StoreProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [source, setSource] = useState<'api' | 'public'>('public');
+  const [source, setSource] = useState<'api' | 'none'>('none');
 
   const load = async () => {
     setLoading(true);
     try {
-      const res = await getProducts({ limit: 100 });
+      const res = await getProducts({ limit: 200 });
       const apiProducts = (res.success && Array.isArray(res.data) ? res.data : [])
         .map((p: Record<string, unknown>) => mapApiProduct(p))
         .filter((p: StoreProduct | null): p is StoreProduct => p !== null);
 
-      if (apiProducts.length > 0) {
-        setProducts(mergePublicCatalogWithApi(apiProducts));
-        setSource('api');
-      } else {
-        setProducts(PUBLIC_CATALOG);
-        setSource('public');
-      }
+      // Storefront shows database products only — no static public catalog merge.
+      setProducts(dedupeStoreProducts(apiProducts));
+      setSource(apiProducts.length > 0 ? 'api' : 'none');
     } catch {
-      setProducts(PUBLIC_CATALOG);
-      setSource('public');
+      setProducts([]);
+      setSource('none');
     } finally {
       setLoading(false);
     }

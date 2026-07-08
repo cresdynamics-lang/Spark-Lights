@@ -46,8 +46,12 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const featured = products.filter((p) => p.badge).slice(0, 4);
-  const topProducts = products.slice(0, 8);
+  // Database only — use featured badges when present, otherwise first active products
+  const featured = (products.filter((p) => p.badge).length
+    ? products.filter((p) => p.badge)
+    : products
+  ).slice(0, 4);
+  const topProducts = products;
 
   return (
     <div className="overflow-x-hidden">
@@ -275,12 +279,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Product scroll */}
+      {/* Product scroll — database products only */}
       <section className="py-20 sm:py-28 overflow-hidden">
         <div className="container mx-auto px-6">
           <motion.div {...fadeIn} className="mb-12">
             <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">All Products</h2>
+            <p className="text-gray-500 text-sm mt-3 font-medium">
+              {products.length} listing{products.length === 1 ? '' : 's'} from our Nairobi showroom
+            </p>
           </motion.div>
+          {topProducts.length === 0 ? (
+            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest py-16 text-center">
+              Products will appear here once published from admin.
+            </p>
+          ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
             {topProducts.map((prod) => (
               <div key={prod.id} className="group">
@@ -305,6 +317,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          )}
         </div>
       </section>
 
