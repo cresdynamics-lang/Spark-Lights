@@ -38,7 +38,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+// Large enough for compressed base64 product/blog uploads (no rate limiter in this app).
+app.use(express.json({ limit: "12mb" }));
 app.use(cookieParser());
 
 app.use("/v1/auth", authRoutes);

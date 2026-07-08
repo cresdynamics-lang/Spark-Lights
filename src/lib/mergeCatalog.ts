@@ -2,7 +2,7 @@ import { PUBLIC_CATALOG } from '../data/publicCatalog';
 import type { StoreProduct } from '../types/product';
 import { resolveProductPrice } from './productPrice';
 
-/** Storefront merges /public catalog with API products; API-only uploads are appended. */
+/** Storefront merges /public catalog with API products; new API uploads appear first. */
 export function mergePublicCatalogWithApi(apiProducts: StoreProduct[]): StoreProduct[] {
   const bySlug = new Map(apiProducts.map((p) => [p.slug, p]));
   const byImg = new Map(apiProducts.map((p) => [p.img, p]));
@@ -30,6 +30,7 @@ export function mergePublicCatalogWithApi(apiProducts: StoreProduct[]): StorePro
     };
   });
 
+  // Uploaded / DB-only products first so they are visible on home + shop
   const apiOnly = apiProducts.filter((p) => !matchedApiIds.has(p.id));
-  return [...merged, ...apiOnly];
+  return [...apiOnly, ...merged];
 }

@@ -44,7 +44,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
         },
         skip,
         take: Number(limit),
-        orderBy: { sortOrder: "asc" },
+        orderBy: [{ updatedAt: "desc" }, { sortOrder: "asc" }],
       }),
       prisma.product.count({ where }),
     ]);

@@ -348,7 +348,7 @@ export const ProductsView: React.FC = () => {
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  {!isPublicImageUrl(product.images?.[0]?.url) && !isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} />}
+                  {!isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} />}
                   <div className="absolute top-4 right-4">
                     <span
                       className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${

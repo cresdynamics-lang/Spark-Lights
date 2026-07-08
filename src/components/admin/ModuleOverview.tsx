@@ -16,7 +16,7 @@ import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { useAuthStore } from '@/store/authStore';
 import PublicImage from '@/components/PublicImage';
-import { isPublicImageUrl } from '@/lib/publicImages';
+import { isAllowedProductImageUrl } from '@/lib/productImages';
 import { ImageIcon } from 'lucide-react';
 
 export const ModuleOverview: React.FC = () => {
@@ -164,7 +164,7 @@ export const ModuleOverview: React.FC = () => {
                     className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500"
                     alt={product.name}
                   />
-                  {!isPublicImageUrl(product.images?.[0]?.url) && <ImageIcon size={18} />}
+                  {!isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={18} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-xs font-black text-white uppercase truncate tracking-tight">{product.name}</h3>

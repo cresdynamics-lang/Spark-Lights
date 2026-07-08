@@ -4,9 +4,16 @@ import { PUBLIC_IMAGE_FILES, publicImageUrl } from '../data/publicCatalog';
 
 const PUBLIC_URLS = new Set(PUBLIC_IMAGE_FILES.map((f) => publicImageUrl(f)));
 
-const SUPABASE_PROJECT_HOST =
-  import.meta.env.VITE_SUPABASE_URL?.replace(/^https?:\/\//, '').replace(/\/$/, '') ??
-  'xvllxzcjjleronqneftg.supabase.co';
+/** Always resolve a usable host — empty VITE_SUPABASE_URL must not wipe the allowlist. */
+const DEFAULT_SUPABASE_HOST = 'xvllxzcjjleronqneftg.supabase.co';
+
+function supabaseProjectHost(): string {
+  const fromEnv = (import.meta.env.VITE_SUPABASE_URL as string | undefined)
+    ?.replace(/^https?:\/\//, '')
+    .replace(/\/$/, '')
+    .trim();
+  return fromEnv || DEFAULT_SUPABASE_HOST;
+}
 
 export function isPublicImageUrl(url?: string | null): boolean {
   if (!url || typeof url !== 'string') return false;
@@ -17,7 +24,11 @@ export function isPublicImageUrl(url?: string | null): boolean {
 
 export function isUploadedProductImageUrl(url?: string | null): boolean {
   if (!url || typeof url !== 'string') return false;
-  return url.includes(`${SUPABASE_PROJECT_HOST}/storage/v1/object/public/product-images/`);
+  // Accept any public product-images object URL for this project (env or default host).
+  if (url.includes(`${supabaseProjectHost()}/storage/v1/object/public/product-images/`)) {
+    return true;
+  }
+  return url.includes(`${DEFAULT_SUPABASE_HOST}/storage/v1/object/public/product-images/`);
 }
 
 export function isAllowedProductImageUrl(url?: string | null): boolean {

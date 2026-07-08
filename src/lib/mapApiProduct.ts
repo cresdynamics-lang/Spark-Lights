@@ -3,7 +3,7 @@ import { sanitizeProductImageUrl } from './productImages';
 import { parsePriceFromFilename } from '../data/publicCatalog';
 
 export function mapApiProduct(p: Record<string, unknown>): StoreProduct | null {
-  const variants = p.variants as { priceKes: number; label: string }[] | undefined;
+  const variants = p.variants as { priceKes: number | string; label: string }[] | undefined;
   const images = p.images as { url: string }[] | undefined;
   const categories = p.categories as { category?: { slug: string } }[] | undefined;
   const img = sanitizeProductImageUrl(images?.[0]?.url);
@@ -12,9 +12,10 @@ export function mapApiProduct(p: Record<string, unknown>): StoreProduct | null {
 
   const filename = decodeURIComponent(img.split('/').pop() ?? '');
   const filenamePrice = parsePriceFromFilename(filename);
-  const variantPrice = variants?.[0]?.priceKes;
+  const rawVariantPrice = variants?.[0]?.priceKes;
+  const variantPrice = rawVariantPrice == null ? 0 : Number(rawVariantPrice);
   const priceKes =
-    variantPrice && variantPrice > 0
+    variantPrice > 0
       ? variantPrice
       : filenamePrice && filenamePrice > 0
         ? filenamePrice

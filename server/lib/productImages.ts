@@ -13,9 +13,12 @@ const PUBLIC_IMAGE_FILES = new Set([
   "Screenshot_20251008_142229_1.jpg", "Screenshot_2025_1008_135432.png",
 ]);
 
+const DEFAULT_SUPABASE_HOST = "xvllxzcjjleronqneftg.supabase.co";
+
 function supabaseHost(): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "";
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL ?? "";
+  const host = url.replace(/^https?:\/\//, "").replace(/\/$/, "").trim();
+  return host || DEFAULT_SUPABASE_HOST;
 }
 
 export function isPublicImageUrl(url?: string | null): boolean {
@@ -29,8 +32,8 @@ export function isPublicImageUrl(url?: string | null): boolean {
 export function isUploadedProductImageUrl(url?: string | null): boolean {
   if (!url || typeof url !== "string") return false;
   const host = supabaseHost();
-  if (!host) return false;
-  return url.includes(`${host}/storage/v1/object/public/product-images/`);
+  if (url.includes(`${host}/storage/v1/object/public/product-images/`)) return true;
+  return url.includes(`${DEFAULT_SUPABASE_HOST}/storage/v1/object/public/product-images/`);
 }
 
 export function isAllowedProductImageUrl(url?: string | null): boolean {
