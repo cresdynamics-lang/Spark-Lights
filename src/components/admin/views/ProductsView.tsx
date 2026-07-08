@@ -301,7 +301,7 @@ export const ProductsView: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-3 gap-3 sm:gap-8">
           {products.length === 0 && (
             <p className="col-span-full text-center text-slate-500 text-[10px] font-black uppercase tracking-widest py-12">
               {syncing ? 'Publishing showroom images as products…' : 'No products yet — add a new product'}
