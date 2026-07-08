@@ -2,8 +2,9 @@ import { z } from "zod";
 
 export const createProductSchema = z.object({
   body: z.object({
-    name: z.string(),
-    slug: z.string(),
+    name: z.string().min(1),
+    /** Optional — server generates a unique slug from the name when omitted or colliding. */
+    slug: z.string().optional(),
     shortDescription: z.string(),
     longDescription: z.string(),
     careInstructions: z.string().optional(),

@@ -2,6 +2,36 @@ import { Request, Response, NextFunction } from "express";
 import prisma from "../../config/prisma.js";
 import { isAllowedProductImageUrl } from "../../lib/productImages.js";
 
+function slugifyProduct(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 80);
+}
+
+/** Ensure Product.slug stays unique — append -2, -3… or a short timestamp if needed. */
+async function ensureUniqueProductSlug(raw: string, excludeId?: string): Promise<string> {
+  const base = slugifyProduct(raw) || `light-${Date.now().toString(36)}`;
+  let candidate = base;
+  let n = 2;
+
+  while (true) {
+    const existing = await prisma.product.findUnique({
+      where: { slug: candidate },
+      select: { id: true },
+    });
+    if (!existing || (excludeId && existing.id === excludeId)) {
+      return candidate;
+    }
+    candidate = `${base}-${n}`;
+    n += 1;
+    if (n > 50) {
+      return `${base}-${Date.now().toString(36)}`;
+    }
+  }
+}
+
 /** Admin catalog — all products including inactive, no storefront filters */
 export const getAdminProducts = async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -91,7 +121,7 @@ export const getProductBySlug = async (req: Request, res: Response, next: NextFu
 
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { categoryIds, tagIds, variants, imageUrl, images, ...data } = req.body;
+    const { categoryIds, tagIds, variants, imageUrl, images, slug, name, ...data } = req.body;
 
     const rawImages =
       images?.map((img: { url: string; isPrimary?: boolean }, i: number) => ({
@@ -109,9 +139,13 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
       });
     }
 
+    const uniqueSlug = await ensureUniqueProductSlug(slug || name || `light-${Date.now()}`);
+
     const product = await prisma.product.create({
       data: {
         ...data,
+        name,
+        slug: uniqueSlug,
         categories: {
           create: categoryIds?.map((id: string) => ({ categoryId: id })),
         },
@@ -133,7 +167,16 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
     });
 
     res.status(201).json({ success: true, data: product });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === "P2002") {
+      return res.status(409).json({
+        success: false,
+        error: {
+          code: "DUPLICATE_SLUG",
+          message: "A product with this name/slug already exists. Rename it slightly and try again.",
+        },
+      });
+    }
     next(error);
   }
 };

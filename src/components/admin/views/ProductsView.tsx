@@ -155,12 +155,15 @@ export const ProductsView: React.FC = () => {
           fetchData();
         }
       } else {
-      const response = await apiClient.post('/products', {
-          ...payload,
-          slug: formData.name
+        // Server will uniquify the slug if this name already exists
+        const baseSlug =
+          formData.name
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '') || slugFromImageUrl(formData.imageUrl),
+            .replace(/(^-|-$)/g, '') || slugFromImageUrl(formData.imageUrl);
+        const response = await apiClient.post('/products', {
+          ...payload,
+          slug: baseSlug,
         });
         if (response.data.success) {
           toast.success('Product published to storefront');
