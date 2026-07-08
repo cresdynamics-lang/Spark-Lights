@@ -196,7 +196,7 @@ const PUBLIC_IMAGE_FILES = [
   "Screenshot_20251008_142229_1.jpg", "Screenshot_2025_1008_135432.png",
 ];
 
-/** One gallery tile per price — keep 3500.jpeg, hide 3500.. / 3500... duplicates */
+/** One listing image per price stem — keep 3500.jpeg, skip 3500.. / 3500... */
 function isPrimaryListingImage(filename: string): boolean {
   const stem = filename.replace(/\.[^.]+$/, "");
   return !/^\d+\.+$/.test(stem);
@@ -208,15 +208,140 @@ function parsePriceFromFilename(filename: string): number | null {
   return match ? parseInt(match[1], 10) : null;
 }
 
+/** Custom showroom prices when the filename is not a KES amount (editable later in admin). */
+const CUSTOM_SHOWROOM_PRICES: Record<string, number> = {
+  "round1.jpg": 12500,
+  "round2.jpg": 9800,
+  "round3.jpg": 14500,
+  "roomm3.png": 4200,
+  "Screenshot_20251008_134500_1.jpg": 8900,
+  "Screenshot_20251008_134652_1.jpg": 7600,
+  "Screenshot_20251008_134753_1.jpg": 11200,
+  "Screenshot_20251008_134810_1.jpg": 6800,
+  "Screenshot_20251008_134900_1.jpg": 9400,
+  "Screenshot_20251008_135721_1.jpg": 15800,
+  "Screenshot_20251008_135838_2.jpg": 7200,
+  "Screenshot_20251008_135854_1.jpg": 10500,
+  "Screenshot_20251008_142202_1.jpg": 13200,
+  "Screenshot_20251008_142223_1.jpg": 8100,
+  "Screenshot_20251008_142229_1.jpg": 11900,
+  "Screenshot_2025_1008_135432.png": 5600,
+};
+
+function resolveListingPrice(filename: string): number | null {
+  return parsePriceFromFilename(filename) ?? CUSTOM_SHOWROOM_PRICES[filename] ?? null;
+}
+
+function categoryIdsForFilename(filename: string, bySlug: Map<string, string>): string[] {
+  const pick = (...slugs: string[]) =>
+    slugs.map((s) => bySlug.get(s)).filter((id): id is string => Boolean(id));
+
+  if (filename === "roomm3.png") return pick("bedroom-lights", "ceiling-lights");
+  if (filename.startsWith("round") || filename.startsWith("Screenshot")) {
+    return pick("ceiling-lights", "dining-lights", "events-lights");
+  }
+  const price = parsePriceFromFilename(filename);
+  if (price && price <= 3000) return pick("corridor-lights", "ceiling-lights", "wall-lights");
+  if (price && price <= 4000) return pick("kitchen-lights", "ceiling-lights", "dining-lights");
+  if (price && price >= 7000) return pick("ceiling-lights", "dining-lights", "parking-lights");
+  if (price && price >= 5500) return pick("ceiling-lights", "dining-lights", "outdoor-lights");
+  return pick("ceiling-lights");
+}
+
+function productNameForFilename(filename: string, price: number | null): string {
+  if (filename === "roomm3.png") return "Bedroom Ceiling Light Set";
+  if (filename.startsWith("round")) return "Modern Crystal Chandelier";
+  if (filename.startsWith("Screenshot") || filename.startsWith("Screenshot_")) {
+    return "Showroom Crystal Chandelier";
+  }
+  if (price != null) return `Modern Ceiling Light`;
+  return "Modern Lighting Fixture";
+}
+
 export const getPublicAssets = async (_req: Request, res: Response) => {
   res.json({
     success: true,
     data: PUBLIC_IMAGE_FILES.filter(isPrimaryListingImage).map((filename) => ({
       filename,
       url: `/${encodeURI(filename)}`,
-      suggestedPrice: parsePriceFromFilename(filename),
+      suggestedPrice: resolveListingPrice(filename),
     })),
   });
+};
+
+/**
+ * Promote every unique /public showroom image into a Product row when missing.
+ * Price = amount from filename (3500.jpeg → 3500) or a custom showroom map (editable after).
+ */
+export const syncPublicImagesAsProducts = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const cats = await prisma.category.findMany({ select: { id: true, slug: true } });
+    const bySlug = new Map(cats.map((c) => [c.slug, c.id]));
+    const fallbackCat = cats[0]?.id;
+
+    const existing = await prisma.product.findMany({
+      select: {
+        id: true,
+        slug: true,
+        images: { select: { url: true }, take: 3 },
+      },
+    });
+    const usedUrls = new Set(existing.flatMap((p) => p.images.map((i) => decodeURIComponent(i.url))));
+    const usedSlugs = new Set(existing.map((p) => p.slug));
+
+    const created: { id: string; slug: string; priceKes: number; image: string }[] = [];
+    const skipped: string[] = [];
+
+    for (const filename of PUBLIC_IMAGE_FILES.filter(isPrimaryListingImage)) {
+      const imageUrl = `/${encodeURI(filename)}`;
+      if (usedUrls.has(imageUrl) || usedUrls.has(`/${filename}`)) {
+        skipped.push(filename);
+        continue;
+      }
+
+      const priceKes = resolveListingPrice(filename);
+      if (priceKes == null || priceKes <= 0) {
+        skipped.push(filename);
+        continue;
+      }
+
+      let slug = slugifyProduct(filename.replace(/\.[^.]+$/, "")) || `light-${Date.now().toString(36)}`;
+      if (usedSlugs.has(slug)) {
+        slug = await ensureUniqueProductSlug(slug);
+      }
+
+      const categoryIds = categoryIdsForFilename(filename, bySlug);
+      const ids = categoryIds.length ? categoryIds : fallbackCat ? [fallbackCat] : [];
+      const name = productNameForFilename(filename, parsePriceFromFilename(filename));
+
+      const product = await prisma.product.create({
+        data: {
+          name,
+          slug,
+          shortDescription: `${name} available at Spark Lights 254, Nyamakima. Price editable in admin.`,
+          longDescription: `${name} — showroom fixture from Spark Lights 254. Same-day Nairobi delivery. Price can be edited anytime in Products.`,
+          isActive: true,
+          isFeatured: false,
+          categories: { create: ids.map((categoryId) => ({ categoryId })) },
+          images: { create: [{ url: imageUrl, isPrimary: true, sortOrder: 0 }] },
+          variants: {
+            create: [{ label: "Default", priceKes, stockQty: 12, stemsUsed: 1 }],
+          },
+        },
+      });
+
+      usedUrls.add(imageUrl);
+      usedSlugs.add(slug);
+      created.push({ id: product.id, slug, priceKes, image: imageUrl });
+    }
+
+    res.json({
+      success: true,
+      data: { created: created.length, skipped: skipped.length, products: created },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getCategories = async (req: Request, res: Response, next: NextFunction) => {

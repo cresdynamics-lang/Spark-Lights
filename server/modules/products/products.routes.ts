@@ -10,6 +10,12 @@ const router = Router();
 router.get("/", ProductController.getProducts);
 router.get("/admin/list", authenticate, requireRole("OWNER", "MANAGER", "FLORIST"), ProductController.getAdminProducts);
 router.get("/public-assets", ProductController.getPublicAssets);
+router.post(
+  "/sync-public-images",
+  authenticate,
+  requireRole("OWNER", "MANAGER"),
+  ProductController.syncPublicImagesAsProducts
+);
 router.get("/categories", ProductController.getCategories);
 router.post(
   "/upload-image",

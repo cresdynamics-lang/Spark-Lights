@@ -19,7 +19,6 @@ import PublicImage from '@/components/PublicImage';
 import { isAllowedProductImageUrl } from '@/lib/productImages';
 import { compressImageFile } from '@/lib/compressImage';
 import { slugFromImageUrl } from '@/lib/slugFromImage';
-import { parsePriceFromFilename } from '@/data/publicCatalog';
 import { ImageIcon } from 'lucide-react';
 
 const emptyForm = {
@@ -44,14 +43,8 @@ export const ProductsView: React.FC = () => {
   const { user } = useAuthStore();
   const role = user?.role || 'FLORIST';
   const [formData, setFormData] = useState(emptyForm);
-  const [publicAssets, setPublicAssets] = useState<{ filename: string; url: string; suggestedPrice: number | null }[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
-
-  useEffect(() => {
-    apiClient.get('/products/public-assets').then((res) => {
-      if (res.data.success) setPublicAssets(res.data.data);
-    }).catch(() => {});
-  }, []);
+  const [syncing, setSyncing] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -84,9 +77,34 @@ export const ProductsView: React.FC = () => {
     }
   };
 
+  const syncShowroomImages = async () => {
+    if (!['OWNER', 'MANAGER'].includes(String(role))) return;
+    setSyncing(true);
+    try {
+      const res = await apiClient.post('/products/sync-public-images');
+      const n = res.data?.data?.created ?? 0;
+      if (n > 0) {
+        toast.success(`${n} showroom images added as products`);
+        await fetchData();
+      }
+    } catch {
+      /* ignore — route may not be live yet or already synced */
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   useEffect(() => {
-    fetchData();
+    void (async () => {
+      await fetchData();
+    })();
   }, [searchQuery]);
+
+  useEffect(() => {
+    void syncShowroomImages();
+    // Run once on mount so showroom images become editable products
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleCategory = (categoryId: string) => {
     setFormData((prev) => ({
@@ -221,25 +239,6 @@ export const ProductsView: React.FC = () => {
     }
   };
 
-  const configuredImageUrls = new Set(
-    products.flatMap((p) => p.images?.map((img: { url: string }) => img.url) ?? [])
-  );
-  const unpublishedAssets = publicAssets.filter((a) => !configuredImageUrls.has(a.url));
-
-  const publishAsset = (url: string, filename: string) => {
-    const suggested = parsePriceFromFilename(filename);
-    setEditingProduct(null);
-    setFormData({
-      ...emptyForm,
-      imageUrl: url,
-      priceKes: suggested ? String(suggested) : '',
-      name: suggested ? `Modern Ceiling Light — KES ${suggested.toLocaleString()}` : '',
-      stockQty: '10',
-      shortDescription: 'Premium lighting for homes and offices in Nairobi.',
-    });
-    setIsModalOpen(true);
-  };
-
   const CategoryCheckboxes = () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
       {categories.map((cat) => (
@@ -302,34 +301,10 @@ export const ProductsView: React.FC = () => {
           </button>
         </div>
       ) : (
-        <>
-        {unpublishedAssets.length > 0 && (
-          <div className="space-y-4">
-            <h3 className="text-sm font-black text-white uppercase tracking-tight px-1">
-              Public images not yet in catalog ({unpublishedAssets.length})
-            </h3>
-            <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-8 gap-3">
-              {unpublishedAssets.map((asset) => (
-                <button
-                  key={asset.filename}
-                  type="button"
-                  onClick={() => publishAsset(asset.url, asset.filename)}
-                  className="relative aspect-square overflow-hidden rounded-xl border border-dashed border-white/20 hover:border-primary-gold/50 transition-all group"
-                >
-                  <img src={asset.url} alt={asset.filename} className="w-full h-full object-cover opacity-70 group-hover:opacity-100" />
-                  <span className="absolute inset-x-0 bottom-0 bg-black/80 text-[7px] font-black text-primary-gold py-1 uppercase tracking-widest">
-                    Publish
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {products.length === 0 && (
             <p className="col-span-full text-center text-slate-500 text-[10px] font-black uppercase tracking-widest py-12">
-              No database products yet — publish an image above or add a new product
+              {syncing ? 'Publishing showroom images as products…' : 'No products yet — add a new product'}
             </p>
           )}
           {products.map((product, i) => {
@@ -411,7 +386,6 @@ export const ProductsView: React.FC = () => {
             );
           })}
         </div>
-        </>
       )}
 
       <AnimatePresence>
@@ -475,7 +449,11 @@ export const ProductsView: React.FC = () => {
                     value={formData.priceKes}
                     onChange={(e) => setFormData({ ...formData, priceKes: e.target.value })}
                     className="w-full bg-primary-black border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold text-white outline-none focus:border-primary-gold/50"
+                    placeholder="From filename (e.g. 3500) or custom"
                   />
+                  <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest ml-1">
+                    Editable anytime — use the amount from the image name or set a custom price
+                  </p>
                 </div>
 
                 <div className="space-y-2">
