@@ -265,7 +265,7 @@ export const ProductsView: React.FC = () => {
   );
 
   return (
-    <div className="space-y-8 px-8 pb-12">
+    <div className="space-y-8 px-3 sm:px-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="bg-secondary-black p-2 rounded-2xl border border-white/5 flex items-center gap-3 px-4 shadow-xl focus-within:border-primary-gold/30 transition-all">
@@ -301,7 +301,7 @@ export const ProductsView: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3 sm:gap-8">
+        <div className="grid grid-cols-3 gap-2 sm:gap-8">
           {products.length === 0 && (
             <p className="col-span-full text-center text-slate-500 text-[10px] font-black uppercase tracking-widest py-12">
               {syncing ? 'Publishing showroom images as products…' : 'No products yet — add a new product'}
@@ -319,18 +319,19 @@ export const ProductsView: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.05 }}
-                className="group bg-secondary-black rounded-[2.5rem] border border-white/5 overflow-hidden hover:border-primary-pink/30 transition-all duration-500 shadow-2xl relative"
+                className="group bg-secondary-black rounded-2xl sm:rounded-[2.5rem] border border-white/5 overflow-hidden hover:border-primary-pink/30 transition-all duration-500 shadow-2xl relative min-w-0"
               >
-                <div className="h-56 overflow-hidden relative bg-primary-black flex items-center justify-center text-slate-700">
+                <div className="h-24 sm:h-56 overflow-hidden relative bg-primary-black flex items-center justify-center text-slate-700">
                   <PublicImage
                     src={product.images?.[0]?.url}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
-                  {!isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} />}
-                  <div className="absolute top-4 right-4">
+                  {!isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={20} className="sm:hidden" />}
+                  {!isAllowedProductImageUrl(product.images?.[0]?.url) && <ImageIcon size={32} className="hidden sm:block" />}
+                  <div className="absolute top-1 right-1 sm:top-4 sm:right-4">
                     <span
-                      className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
+                      className={`text-[6px] sm:text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full border ${
                         status === 'Active'
                           ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                           : status === 'Low Stock'
@@ -343,41 +344,45 @@ export const ProductsView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-8">
-                  <p className="text-[9px] font-black text-primary-gold uppercase tracking-[0.2em] mb-2 line-clamp-2">
+                <div className="p-2 sm:p-8">
+                  <p className="text-[7px] sm:text-[9px] font-black text-primary-gold uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-1 sm:mb-2 line-clamp-2">
                     {categoryNames}
                   </p>
-                  <h3 className="text-white font-black text-lg tracking-tight mb-4 group-hover:text-primary-pink transition-colors line-clamp-1">
+                  <h3 className="text-white font-black text-[10px] sm:text-lg tracking-tight mb-2 sm:mb-4 group-hover:text-primary-pink transition-colors line-clamp-2 sm:line-clamp-1">
                     {product.name}
                   </h3>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-2 sm:pt-4 border-t border-white/5">
                     <div>
-                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Price</p>
-                      <p className="text-white font-black text-sm mt-1">
+                      <p className="text-[6px] sm:text-[8px] font-black text-slate-500 uppercase tracking-widest">Price</p>
+                      <p className="text-white font-black text-[9px] sm:text-sm mt-0.5 sm:mt-1">
                         KES {Number(product.variants?.[0]?.priceKes).toLocaleString()}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Stock</p>
+                      <p className="text-[6px] sm:text-[8px] font-black text-slate-500 uppercase tracking-widest">Stock</p>
                       <p
-                        className={`font-black text-sm mt-1 ${product.variants?.[0]?.stockQty < 10 ? 'text-amber-500' : 'text-slate-300'}`}
+                        className={`font-black text-[9px] sm:text-sm mt-0.5 sm:mt-1 ${product.variants?.[0]?.stockQty < 10 ? 'text-amber-500' : 'text-slate-300'}`}
                       >
-                        {product.variants?.[0]?.stockQty || 0} units
+                        {product.variants?.[0]?.stockQty || 0}
+                        <span className="hidden sm:inline"> units</span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-8">
+                  <div className="flex items-center gap-1 sm:gap-2 mt-3 sm:mt-8">
                     <button
                       onClick={() => openEdit(product)}
-                      className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                      className="flex-1 bg-white/5 hover:bg-white/10 text-white py-2 sm:py-3 rounded-xl sm:rounded-2xl text-[7px] sm:text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-1 sm:gap-2"
                     >
-                      <Edit3 size={12} /> Edit
+                      <Edit3 size={10} className="sm:hidden" />
+                      <Edit3 size={12} className="hidden sm:block" />
+                      Edit
                     </button>
                     {role === 'OWNER' && (
-                      <button className="p-3 rounded-2xl bg-white/5 text-slate-400 hover:text-red-500 transition-all">
-                        <Trash2 size={16} />
+                      <button className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white/5 text-slate-400 hover:text-red-500 transition-all">
+                        <Trash2 size={14} className="sm:hidden" />
+                        <Trash2 size={16} className="hidden sm:block" />
                       </button>
                     )}
                   </div>
