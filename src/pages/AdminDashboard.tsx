@@ -14,7 +14,6 @@ import { OrdersView } from "@/components/admin/views/OrdersView"
 import { ProductsView } from "@/components/admin/views/ProductsView"
 import { CustomersView } from "@/components/admin/views/CustomersView"
 import { StaffView } from "@/components/admin/views/StaffView"
-import { LogisticsView } from "@/components/admin/views/LogisticsView"
 import { AnalyticsView } from "@/components/admin/views/AnalyticsView"
 import { InventoryView } from "@/components/admin/views/InventoryView"
 import { DiscountsView } from "@/components/admin/views/DiscountsView"
@@ -52,7 +51,6 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeView) {
-      case "Main Dashboard":
       case "Dashboard":
         return (
           <>
@@ -74,38 +72,29 @@ export default function AdminDashboard() {
             </motion.div>
           </>
         )
-      case "Live Orders":
-      case "Order List & Details":
-      case "Order History":
+      case "Orders":
         return <OrdersView />
-      case "Dispatch Board":
+      case "Dispatch":
         return <DispatchView />
-      case "Delivery Logistics":
-        return <LogisticsView />
-      case "Product Catalog":
-      case "Flower Management":
+      case "Products":
         return <ProductsView />
-      case "Inventory Tracking":
+      case "Inventory":
         return <InventoryView />
       case "Categories":
         return <CategoriesView />
       case "Blog & SEO":
         return <BlogView />
-      case "Customer List":
-      case "CRM Dashboard":
+      case "Customers":
         return <CustomersView />
-      case "Analytics Hub":
-      case "Financial Reports":
-      case "Analytics Dashboard":
+      case "Analytics":
         return ['OWNER', 'MANAGER'].includes(role) ? <AnalyticsView /> : <AccessDenied />
-      case "Staff & Permissions":
-      case "Team Management":
+      case "Staff":
         return role === 'OWNER' ? <StaffView /> : <AccessDenied />
-      case "Discounts & Promo":
+      case "Discounts":
         return <DiscountsView />
       case "Subscriptions":
         return <SubscriptionsView />
-      case "System Settings":
+      case "Settings":
         return role === 'OWNER' ? <SettingsView /> : <AccessDenied />
       default:
         return (

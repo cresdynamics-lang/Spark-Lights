@@ -12,196 +12,76 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { 
-  LayoutDashboardIcon, 
-  ShoppingCartIcon, 
-  UsersIcon, 
-  FileTextIcon, 
-  Settings2Icon, 
+import {
+  LayoutDashboardIcon,
+  ShoppingCartIcon,
+  UsersIcon,
+  FileTextIcon,
+  Settings2Icon,
   CommandIcon,
   PackageIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  TruckIcon,
+  BoxesIcon,
+  TagsIcon,
+  PercentIcon,
+  BarChart3Icon,
+  RepeatIcon,
 } from "lucide-react"
-
-const data = {
-  user: {
-    name: "Admin User",
-    email: "admin@sparklights.co.ke",
-    avatar: "",
-  },
-  navMain: [
-    {
-      title: "Overview",
-      url: "/admin",
-      icon: <LayoutDashboardIcon />,
-      isActive: true,
-      items: [
-        {
-          title: "Main Dashboard",
-          url: "/admin",
-        },
-        {
-          title: "Analytics Hub",
-          url: "/admin/analytics",
-        },
-      ],
-    },
-    {
-      title: "Order Flow",
-      url: "#",
-      icon: <ShoppingCartIcon />,
-      items: [
-        {
-          title: "Live Orders",
-          url: "/admin/orders",
-        },
-        {
-          title: "Dispatch Board",
-          url: "/admin/deliveries",
-        },
-        {
-          title: "Order History",
-          url: "/admin/orders/history",
-        },
-      ],
-    },
-    {
-      title: "Store Management",
-      url: "#",
-      icon: <PackageIcon />,
-      items: [
-        {
-          title: "Product Catalog",
-          url: "/admin/products",
-        },
-        {
-          title: "Inventory Tracking",
-          url: "/admin/inventory",
-        },
-        {
-          title: "Categories",
-          url: "/admin/categories",
-        },
-        {
-          title: "Discounts & Promo",
-          url: "/admin/discounts",
-        },
-      ],
-    },
-    {
-      title: "CRM & Social",
-      url: "#",
-      icon: <UsersIcon />,
-      items: [
-        {
-          title: "Customer List",
-          url: "/admin/customers",
-        },
-        {
-          title: "Subscriptions",
-          url: "/admin/subscriptions",
-        },
-        {
-          title: "Reviews & Feedback",
-          url: "/admin/reviews",
-        },
-        {
-          title: "WhatsApp Logs",
-          url: "/admin/whatsapp",
-        },
-      ],
-    },
-    {
-      title: "Business Content",
-      url: "#",
-      icon: <FileTextIcon />,
-      items: [
-        {
-          title: "Media Library",
-          url: "/admin/media",
-        },
-        {
-          title: "Blog & SEO",
-          url: "/admin/blog",
-        },
-        {
-          title: "Email Templates",
-          url: "/admin/emails",
-        },
-        {
-          title: "Financial Reports",
-          url: "/admin/reports",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "System Settings",
-      url: "/admin/settings",
-      icon: <Settings2Icon />,
-    },
-    {
-      title: "Staff & Permissions",
-      url: "/admin/staff",
-      icon: <ShieldCheckIcon />,
-    },
-  ],
-}
-
 import { useAuthStore } from "@/store/authStore"
 
-export function AppSidebar({ 
-  onNavigate, 
-  activeView, 
-  ...props 
-}: React.ComponentProps<typeof Sidebar> & { 
-  onNavigate?: (view: string) => void,
+const navItems = [
+  { title: "Dashboard", icon: <LayoutDashboardIcon /> },
+  { title: "Orders", icon: <ShoppingCartIcon /> },
+  { title: "Dispatch", icon: <TruckIcon /> },
+  { title: "Products", icon: <PackageIcon /> },
+  { title: "Inventory", icon: <BoxesIcon /> },
+  { title: "Categories", icon: <TagsIcon /> },
+  { title: "Discounts", icon: <PercentIcon /> },
+  { title: "Customers", icon: <UsersIcon /> },
+  { title: "Subscriptions", icon: <RepeatIcon /> },
+  { title: "Blog & SEO", icon: <FileTextIcon /> },
+  { title: "Analytics", icon: <BarChart3Icon /> },
+]
+
+const secondaryItems = [
+  { title: "Settings", url: "/admin/settings", icon: <Settings2Icon /> },
+  { title: "Staff", url: "/admin/staff", icon: <ShieldCheckIcon /> },
+]
+
+export function AppSidebar({
+  onNavigate,
+  activeView,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  onNavigate?: (view: string) => void
   activeView?: string
 }) {
   const { user } = useAuthStore()
-  const role = user?.role || 'FLORIST'
+  const role = user?.role || "FLORIST"
 
-  // Helper to check if a navigation item or sub-item should be visible
   const isVisible = (title: string) => {
-    // Universal access
-    if (["Main Dashboard", "Dashboard"].includes(title)) return true;
+    if (["Dashboard"].includes(title)) return true
 
-    // Driver specific
-    if (role === 'DRIVER') {
-      return ["Dispatch Board"].includes(title);
+    if (role === "DRIVER") {
+      return ["Dispatch"].includes(title)
     }
 
-    // Florist/Staff specific
-    if (role === 'FLORIST') {
-      const restricted = ["Analytics Hub", "Financial Reports", "System Settings", "Staff & Permissions", "Discounts & Promo", "WhatsApp Logs"];
-      return !restricted.includes(title);
+    if (role === "FLORIST") {
+      const restricted = ["Analytics", "Settings", "Staff", "Discounts"]
+      return !restricted.includes(title)
     }
 
-    // Manager specific
-    if (role === 'MANAGER') {
-      const restricted = ["System Settings", "Staff & Permissions"];
-      return !restricted.includes(title);
+    if (role === "MANAGER") {
+      const restricted = ["Settings", "Staff"]
+      return !restricted.includes(title)
     }
 
-    // Owner sees everything
-    return true;
+    return true
   }
 
-  // Filter main navigation
-  const filteredNavMain = data.navMain.map(section => {
-    // If the section title itself isn't allowed (e.g. Driver shouldn't see Store Management)
-    const items = section.items?.filter(item => isVisible(item.title)) || [];
-    return { ...section, items };
-  }).filter(section => {
-    if (role === 'DRIVER') {
-      return section.title === 'Overview' || section.title === 'Order Flow';
-    }
-    return section.items && section.items.length > 0;
-  });
-
-  // Filter secondary navigation
-  const filteredNavSecondary = data.navSecondary.filter(item => isVisible(item.title))
+  const filteredNav = navItems.filter((item) => isVisible(item.title))
+  const filteredSecondary = secondaryItems.filter((item) => isVisible(item.title))
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -212,24 +92,39 @@ export function AppSidebar({
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#" onClick={(e) => { e.preventDefault(); onNavigate?.("Dashboard") }}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  onNavigate?.("Dashboard")
+                }}
+              >
                 <CommandIcon className="size-5!" />
-                <span className="text-base font-black tracking-tight text-slate-900 dark:text-slate-100">Spark Lights Admin</span>
+                <span className="text-base font-black tracking-tight text-slate-900 dark:text-slate-100">
+                  Spark Lights Admin
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={filteredNavMain} onNavigate={onNavigate} activeView={activeView} />
-        <NavSecondary items={filteredNavSecondary} className="mt-auto" onNavigate={onNavigate} activeView={activeView} />
+      <SidebarContent className="overflow-y-auto">
+        <NavMain items={filteredNav} onNavigate={onNavigate} activeView={activeView} />
+        <NavSecondary
+          items={filteredSecondary}
+          className="mt-auto"
+          onNavigate={onNavigate}
+          activeView={activeView}
+        />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{
-          name: user?.name || "Staff Member",
-          email: user?.email || "staff@sparklights.co.ke",
-          avatar: user?.avatarUrl || ''
-        }} />
+        <NavUser
+          user={{
+            name: user?.name || "Staff Member",
+            email: user?.email || "staff@sparklights.co.ke",
+            avatar: user?.avatarUrl || "",
+          }}
+        />
       </SidebarFooter>
     </Sidebar>
   )

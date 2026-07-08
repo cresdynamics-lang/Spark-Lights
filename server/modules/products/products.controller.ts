@@ -153,6 +153,12 @@ const PUBLIC_IMAGE_FILES = [
   "Screenshot_20251008_142229_1.jpg", "Screenshot_2025_1008_135432.png",
 ];
 
+/** One gallery tile per price — keep 3500.jpeg, hide 3500.. / 3500... duplicates */
+function isPrimaryListingImage(filename: string): boolean {
+  const stem = filename.replace(/\.[^.]+$/, "");
+  return !/^\d+\.+$/.test(stem);
+}
+
 function parsePriceFromFilename(filename: string): number | null {
   const stem = filename.replace(/\.[^.]+$/, "").replace(/\./g, "");
   const match = stem.match(/^(\d{3,5})$/);
@@ -162,7 +168,7 @@ function parsePriceFromFilename(filename: string): number | null {
 export const getPublicAssets = async (_req: Request, res: Response) => {
   res.json({
     success: true,
-    data: PUBLIC_IMAGE_FILES.map((filename) => ({
+    data: PUBLIC_IMAGE_FILES.filter(isPrimaryListingImage).map((filename) => ({
       filename,
       url: `/${encodeURI(filename)}`,
       suggestedPrice: parsePriceFromFilename(filename),

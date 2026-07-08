@@ -2,7 +2,10 @@ import type { StoreProduct } from '../types/product';
 
 export const LOGO_IMAGE = '/round1.jpg';
 
-/** All product image filenames in /public — prices parsed from names like 3500.jpeg */
+/**
+ * Allowed /public image filenames (validation + galleries).
+ * Includes legacy dotted variants (3500..jpeg) used by categories/blogs.
+ */
 export const PUBLIC_IMAGE_FILES = [
   '2500.jpeg', '2500..jpeg', '2999.jpeg', '3000.jpeg', '3000..jpeg',
   '3500.jpeg', '3500..jpeg', '3500...jpeg', '3999.jpeg',
@@ -17,6 +20,16 @@ export const PUBLIC_IMAGE_FILES = [
   'Screenshot_20251008_142202_1.jpg', 'Screenshot_20251008_142223_1.jpg',
   'Screenshot_20251008_142229_1.jpg', 'Screenshot_2025_1008_135432.png',
 ] as const;
+
+/** Storefront catalog: one listing per price (keep 3500.jpeg, drop 3500.. / 3500...). */
+function isStorefrontListingImage(filename: string): boolean {
+  const stem = filename.replace(/\.[^.]+$/, '');
+  // Dotted price variants like "3500." / "3500.." are gallery duplicates — hide from All Products
+  if (/^\d+\.+$/.test(stem)) return false;
+  return true;
+}
+
+export const STOREFRONT_IMAGE_FILES = PUBLIC_IMAGE_FILES.filter(isStorefrontListingImage);
 
 export function publicImageUrl(filename: string): string {
   return `/${encodeURI(filename)}`;
@@ -108,7 +121,7 @@ function buildCatalogEntry(filename: string, index: number): StoreProduct {
   };
 }
 
-export const PUBLIC_CATALOG: StoreProduct[] = PUBLIC_IMAGE_FILES.map(buildCatalogEntry);
+export const PUBLIC_CATALOG: StoreProduct[] = STOREFRONT_IMAGE_FILES.map(buildCatalogEntry);
 
 export const HERO_IMAGES = [
   publicImageUrl('round1.jpg'),
