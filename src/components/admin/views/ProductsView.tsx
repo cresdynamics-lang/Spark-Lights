@@ -19,6 +19,7 @@ import PublicImage from '@/components/PublicImage';
 import { isAllowedProductImageUrl } from '@/lib/productImages';
 import { compressImageFile } from '@/lib/compressImage';
 import { slugFromImageUrl } from '@/lib/slugFromImage';
+import { parsePriceFromFilename } from '@/data/publicCatalog';
 import { ImageIcon } from 'lucide-react';
 
 const emptyForm = {

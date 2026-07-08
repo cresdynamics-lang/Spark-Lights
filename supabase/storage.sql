@@ -6,7 +6,7 @@ VALUES (
   'product-images',
   'product-images',
   true,
-  2621440,
+  5242880,
   ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 )
 ON CONFLICT (id) DO UPDATE SET
