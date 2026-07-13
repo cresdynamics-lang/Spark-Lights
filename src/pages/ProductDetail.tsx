@@ -42,6 +42,20 @@ export default function ProductDetail() {
   }
 
   const currentPrice = product.sizes.find(s => s.label === selectedSize)?.price || product.price;
+  const hasSizeOptions = product.sizes.length > 1 && !!selectedSize;
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    addItem(
+      {
+        ...product,
+        id: hasSizeOptions ? `${product.id}-${selectedSize}` : product.id,
+        name: hasSizeOptions ? `${product.name} (${selectedSize})` : product.name,
+        price: currentPrice,
+      },
+      quantity
+    );
+  };
 
   return (
     <div className="min-h-screen pb-32">
@@ -142,7 +156,7 @@ export default function ProductDetail() {
               </div>
               <button
                 type="button"
-                onClick={() => product && addItem(product)}
+                onClick={handleAddToCart}
                 className="flex-[2] btn-primary h-12 sm:h-16 flex items-center justify-center gap-2 sm:gap-3 group text-[10px] sm:text-sm"
               >
                 <FiShoppingCart size={18} className="group-hover:rotate-12 transition-transform sm:w-5 sm:h-5" />

@@ -11,10 +11,12 @@ import BrandLogo from './BrandLogo';
 export default function Navbar() {
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
+
+  const isCartOpen = useCartStore((state) => state.isOpen);
+  const openCart = useCartStore((state) => state.openCart);
+  const closeCart = useCartStore((state) => state.closeCart);
   const getItemCount = useCartStore((state) => state.getItemCount());
 
   useEffect(() => {
@@ -174,7 +176,7 @@ export default function Navbar() {
               <FiSearch size={20} />
             </button>
             <button 
-              onClick={() => setIsCartOpen(true)}
+              onClick={openCart}
               className="hover:text-primary-gold transition-all hover:scale-110 relative"
             >
               <FiShoppingCart size={20} />
@@ -188,7 +190,7 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      <CartOverlay isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <CartOverlay isOpen={isCartOpen} onClose={closeCart} />
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Menu — scrollable when categories overflow */}
