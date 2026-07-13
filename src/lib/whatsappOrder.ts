@@ -16,6 +16,26 @@ function parsePrice(price: string): number {
   return parseInt(price.replace(/,/g, ''), 10) || 0;
 }
 
+function siteBaseUrl(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin.replace(/\/$/, '');
+  }
+  return `https://${BRAND.domain}`;
+}
+
+/** Absolute link to the product page, so the team can open the exact item ordered. */
+export function productPageUrl(slug: string): string {
+  const clean = (slug || '').replace(/^\//, '');
+  return `${siteBaseUrl()}/product/${clean}`;
+}
+
+/** Absolute link to the product image (Supabase URLs pass through; public paths get the site host). */
+export function productImageUrl(img: string): string {
+  if (!img) return '';
+  if (/^https?:\/\//i.test(img)) return img;
+  return `${siteBaseUrl()}/${img.replace(/^\//, '')}`;
+}
+
 export function buildOrderWhatsAppMessage(
   items: CartItem[],
   details: CheckoutDetails,
@@ -57,8 +77,16 @@ export function buildOrderWhatsAppMessage(
     const lineTotal = parsePrice(item.price) * item.quantity;
     lines.push(
       `${index + 1}. ${item.name}`,
-      `   KES ${item.price} × ${item.quantity} = KES ${lineTotal.toLocaleString()}`
+      `   KES ${item.price} × ${item.quantity} = KES ${lineTotal.toLocaleString()}`,
+      `   Product: ${productPageUrl(item.slug)}`
     );
+    const imageUrl = productImageUrl(item.img);
+    if (imageUrl) {
+      lines.push(`   Image: ${imageUrl}`);
+    }
+    if (index < items.length - 1) {
+      lines.push('');
+    }
   });
 
   lines.push(
