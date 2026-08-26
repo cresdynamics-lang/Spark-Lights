@@ -1,19 +1,17 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiArrowLeft, FiPlus } from 'react-icons/fi';
+import { FiArrowLeft } from 'react-icons/fi';
 import { useProducts } from '../context/ProductContext';
 import { getCategoryBySlug } from '../data/categories';
 import { filterByCategory } from '../lib/searchProducts';
-import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { BRAND } from '../data/brand';
-import ProductImage from '../components/ProductImage';
+import ProductCard from '../components/ProductCard';
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const category = slug ? getCategoryBySlug(slug) : undefined;
-  const addItem = useCartStore((state) => state.addItem);
   const { products: allProducts } = useProducts();
 
   const products = useMemo(
@@ -77,62 +75,7 @@ export default function CategoryPage() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="group"
                 >
-                  <div className="product-image-frame mb-3 sm:mb-8">
-                    <ProductImage
-                      src={product.img}
-                      alt={`${product.name} — KES ${product.price} Nairobi`}
-                    />
-                    <div className="absolute top-2 left-2 sm:top-6 sm:left-6 z-10 flex flex-col gap-1.5 sm:gap-2">
-                      {product.badge && (
-                        <span className="bg-primary-gold text-white text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-4 sm:py-1 uppercase tracking-widest">
-                          {product.badge}
-                        </span>
-                      )}
-                    </div>
-                    <span className="product-price-badge">KES {product.price}</span>
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden sm:flex flex-col justify-center items-center p-6 lg:p-12 text-center gap-4 lg:gap-6">
-                      <p className="text-gray-300 text-sm font-medium leading-relaxed line-clamp-4">{product.shortDesc}</p>
-                      <div className="flex flex-col gap-3 w-full max-w-xs">
-                        <button
-                          onClick={() => addItem(product)}
-                          className="btn-primary w-full text-[10px] flex items-center justify-center gap-2"
-                        >
-                          <FiPlus /> Add to Cart
-                        </button>
-                        <Link
-                          to={`/product/${product.slug}`}
-                          className="btn-secondary w-full text-[10px] flex items-center justify-center"
-                        >
-                          View Details
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:hidden mb-3">
-                    <button
-                      onClick={() => addItem(product)}
-                      className="btn-primary w-full text-[9px] flex items-center justify-center gap-1.5"
-                    >
-                      <FiPlus size={12} /> Add to Cart
-                    </button>
-                    <Link
-                      to={`/product/${product.slug}`}
-                      className="btn-secondary w-full text-[9px] text-center"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-
-                  <div className="text-center px-1 sm:px-4">
-                    <h2 className="text-sm sm:text-xl font-black uppercase tracking-tighter text-white group-hover:text-primary-pink transition-colors mb-1 sm:mb-2 line-clamp-2">
-                      {product.name}
-                    </h2>
-                    <p className="product-price-label">KES {product.price}</p>
-                    <p className="text-[8px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
-                      Nairobi · same-day delivery
-                    </p>
-                  </div>
+                  <ProductCard product={product} />
                 </motion.div>
               ))}
             </AnimatePresence>

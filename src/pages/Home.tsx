@@ -3,19 +3,18 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiChevronLeft, FiChevronRight, FiTruck, FiTool, FiStar,
-  FiMapPin, FiChevronDown, FiPlus,
+  FiMapPin, FiChevronDown,
 } from 'react-icons/fi';
 import { HERO_SLIDES, TESTIMONIALS, WHY_CHOOSE_US, FAQS, DELIVERY_AREAS } from '../data/content';
 import { LIGHT_CATEGORIES } from '../data/categories';
 import { BRAND } from '../data/brand';
-import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { SITE_KEYWORDS } from '../lib/seo';
 import { useProducts } from '../context/ProductContext';
 import { usePublishedBlogs } from '../hooks/useBlogs';
 import InstallationGallery from '../components/InstallationGallery';
 import DeliveryBanner from '../components/DeliveryBanner';
-import ProductImage from '../components/ProductImage';
+import ProductCard from '../components/ProductCard';
 import SaleSection from '../components/SaleSection';
 
 const fadeIn = {
@@ -28,7 +27,6 @@ const fadeIn = {
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<string | null>(null);
-  const addItem = useCartStore((state) => state.addItem);
   const { products } = useProducts();
   const { posts: blogPosts } = usePublishedBlogs();
 
@@ -234,22 +232,7 @@ export default function Home() {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {featured.map((prod) => (
-              <motion.div key={prod.id} {...fadeIn} className="group">
-                <Link to={`/product/${prod.slug}`} className="block product-image-frame mb-3 sm:mb-5">
-                  <ProductImage src={prod.img} alt={prod.name} loading="lazy" />
-                  {prod.badge && (
-                    <span className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-primary-gold text-black text-[8px] sm:text-[9px] font-black px-2 py-0.5 sm:px-3 sm:py-1 uppercase z-10">
-                      {prod.badge}
-                    </span>
-                  )}
-                  <span className="product-price-badge">KES {prod.price}</span>
-                </Link>
-                <h3 className="text-sm sm:text-base font-black uppercase tracking-tight text-white group-hover:text-primary-gold transition-colors line-clamp-2">
-                  {prod.name}
-                </h3>
-                <p className="product-price-label">KES {prod.price}</p>
-                <p className="text-gray-500 text-xs sm:text-sm mt-1 sm:mt-2 line-clamp-2">{prod.shortDesc}</p>
-              </motion.div>
+              <ProductCard key={prod.id} product={prod} />
             ))}
           </div>
         </div>
@@ -299,26 +282,7 @@ export default function Home() {
           ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
             {topProducts.map((prod) => (
-              <div key={prod.id} className="group">
-                <div className="product-image-frame mb-3 sm:mb-5">
-                  <ProductImage src={prod.img} alt={prod.name} loading="lazy" />
-                  <span className="product-price-badge">KES {prod.price}</span>
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex flex-col justify-center items-center gap-3 p-4">
-                    <button onClick={() => addItem(prod)} className="btn-primary w-full text-[10px] flex items-center justify-center gap-2">
-                      <FiPlus size={14} /> Add to Cart
-                    </button>
-                    <Link to={`/product/${prod.slug}`} className="btn-secondary w-full text-[10px] text-center">View Details</Link>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 sm:hidden mb-2">
-                  <button onClick={() => addItem(prod)} className="btn-primary w-full text-[9px] flex items-center justify-center gap-1.5">
-                    <FiPlus size={12} /> Add to Cart
-                  </button>
-                  <Link to={`/product/${prod.slug}`} className="btn-secondary w-full text-[9px] text-center">View Details</Link>
-                </div>
-                <h3 className="font-black uppercase text-white text-xs sm:text-sm line-clamp-2">{prod.name}</h3>
-                <p className="product-price-label">KES {prod.price}</p>
-              </div>
+              <ProductCard key={prod.id} product={prod} />
             ))}
           </div>
           )}
