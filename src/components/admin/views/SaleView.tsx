@@ -31,7 +31,7 @@ export const SaleView: React.FC = () => {
 
   useEffect(() => {
     void fetchData();
-    setCsvUrl(`${window.location.origin}/v1/products/sale/csv`);
+    setCsvUrl(`${window.location.origin}/v1/products/sale.csv`);
   }, []);
 
   const toggle = async (product: any) => {
