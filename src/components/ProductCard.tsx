@@ -67,7 +67,7 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
           href={waHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 bg-white/10 text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest py-1.5 sm:py-2 px-2 hover:bg-primary-pink hover:text-white transition-colors text-center flex items-center justify-center gap-1"
+          className="flex-1 bg-[#25D366] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest py-1.5 sm:py-2 px-2 hover:bg-[#1ebe5a] transition-colors text-center flex items-center justify-center gap-1"
         >
           <FiMessageCircle size={11} className="sm:hidden" />
           Order via WhatsApp
