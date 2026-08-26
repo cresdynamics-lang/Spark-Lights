@@ -1,9 +1,19 @@
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useSaleProducts } from '@/hooks/useSaleProducts';
 import SaleCarousel from './SaleCarousel';
 
 export default function SaleSection() {
   const { products, loading } = useSaleProducts();
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const scrollBy = (direction: 1 | -1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const amount = Math.min(track.clientWidth * 0.85, 640);
+    track.scrollBy({ left: direction * amount, behavior: 'smooth' });
+  };
 
   if (loading || products.length === 0) return null;
 
@@ -19,16 +29,32 @@ export default function SaleSection() {
               On Sale
             </h2>
           </div>
-          <Link
-            to="/shop"
-            className="btn-secondary btn-compact shrink-0 self-end text-[8px] sm:text-[10px] px-2 py-1.5 sm:px-5 sm:py-3 whitespace-nowrap"
-          >
-            <span className="sm:hidden">Shop Sale →</span>
-            <span className="hidden sm:inline">Shop the Sale →</span>
-          </Link>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 self-end">
+            <button
+              onClick={() => scrollBy(-1)}
+              className="w-10 h-10 sm:w-12 sm:h-12 border border-white/15 flex items-center justify-center hover:bg-primary-gold hover:border-primary-gold transition-all text-white"
+              aria-label="Previous sale item"
+            >
+              <FiChevronLeft size={20} />
+            </button>
+            <button
+              onClick={() => scrollBy(1)}
+              className="w-10 h-10 sm:w-12 sm:h-12 border border-white/15 flex items-center justify-center hover:bg-primary-gold hover:border-primary-gold transition-all text-white"
+              aria-label="Next sale item"
+            >
+              <FiChevronRight size={20} />
+            </button>
+            <Link
+              to="/shop"
+              className="btn-secondary btn-compact text-[8px] sm:text-[10px] px-2 py-2 sm:px-5 sm:py-3 whitespace-nowrap ml-1 sm:ml-2"
+            >
+              <span className="sm:hidden">Sale →</span>
+              <span className="hidden sm:inline">Shop the Sale →</span>
+            </Link>
+          </div>
         </div>
 
-        <SaleCarousel products={products} />
+        <SaleCarousel products={products} trackRef={trackRef} />
       </div>
     </section>
   );

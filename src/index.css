@@ -139,6 +139,25 @@
   .border-pink {
     @apply border-primary-pink;
   }
+
+  /* Product image frame — fixed aspect ratio + relative context so
+     absolutely-positioned price badges & hover overlays stay inside the card. */
+  .product-image-frame {
+    @apply relative overflow-hidden bg-secondary-black;
+    aspect-ratio: 1 / 1;
+  }
+
+  .product-image-frame img {
+    @apply block w-full h-full object-cover;
+  }
+
+  .product-price-badge {
+    @apply absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 z-10 bg-black/75 text-white px-2.5 py-1 sm:px-3 sm:py-1 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] pointer-events-none;
+  }
+
+  .product-price-label {
+    @apply text-primary-gold font-black text-sm mt-1;
+  }
 }
 
 .animate-marquee {

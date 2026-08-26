@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { FiSearch, FiShoppingCart, FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LIGHT_CATEGORIES } from '../data/categories';
@@ -8,16 +8,31 @@ import CartOverlay from './CartOverlay';
 import SearchOverlay from './SearchOverlay';
 import BrandLogo from './BrandLogo';
 
+const NAV_LINK =
+  'text-[11px] font-black uppercase tracking-[0.2em] transition-colors relative group';
+const NAV_UNDERLINE =
+  'absolute -bottom-1 left-0 h-[1.5px] bg-primary-gold transition-all duration-300';
+
 export default function Navbar() {
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const { pathname } = useLocation();
 
   const isCartOpen = useCartStore((state) => state.isOpen);
   const openCart = useCartStore((state) => state.openCart);
   const closeCart = useCartStore((state) => state.closeCart);
   const getItemCount = useCartStore((state) => state.getItemCount());
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -28,107 +43,142 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  const isShopActive =
+    pathname.startsWith('/shop') ||
+    pathname.startsWith('/category') ||
+    pathname.startsWith('/product');
+  const isCatActive = pathname.startsWith('/category');
+
   const dropdownVariants = {
-    hidden: { opacity: 0, y: 15, pointerEvents: 'none' as const },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    hidden: { opacity: 0, y: 12, pointerEvents: 'none' as const },
+    visible: {
+      opacity: 1,
+      y: 0,
       pointerEvents: 'auto' as const,
-      transition: { duration: 0.3, ease: "easeOut" as const } 
-    }
+      transition: { duration: 0.25, ease: 'easeOut' as const },
+    },
   };
+
+  const linkClass = (active: boolean) =>
+    `${NAV_LINK} ${active ? 'text-primary-gold' : 'text-white hover:text-primary-gold'}`;
+  const underlineClass = (active: boolean) =>
+    `${NAV_UNDERLINE} ${active ? 'w-full' : 'w-0 group-hover:w-full'}`;
 
   return (
     <>
-      <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="fixed top-0 left-0 right-0 z-[100] bg-black/80 border-b border-white/5 backdrop-blur-2xl transition-all duration-500"
+      <motion.nav
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className={`bg-black/85 border-b backdrop-blur-2xl transition-all duration-500 ${
+          scrolled
+            ? 'border-white/10 shadow-lg shadow-black/40'
+            : 'border-white/5'
+        }`}
       >
         <div className="container mx-auto px-6 h-20 sm:h-24 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden text-white hover:text-primary-gold transition-colors"
+              aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
             <BrandLogo size="md" />
           </div>
 
-          <ul className="hidden lg:flex items-center gap-12 h-full">
+          <ul className="hidden lg:flex items-center gap-10 h-full">
             <li className="h-full flex items-center">
-              <Link to="/" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors relative group">
+              <NavLink to="/" className={({ isActive }) => linkClass(isActive)}>
                 Home
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-pink transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+                <span className={underlineClass(pathname === '/')} />
+              </NavLink>
             </li>
 
             {/* Shop Dropdown */}
-            <li 
+            <li
               className="h-full flex items-center relative"
               onMouseEnter={() => setIsShopOpen(true)}
               onMouseLeave={() => setIsShopOpen(false)}
             >
-              <Link to="/shop" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors flex items-center gap-2 group">
-                Shop
-                <FiChevronDown className={`transition-transform duration-300 ${isShopOpen ? 'rotate-180' : ''}`} />
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-pink transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-              
+              <NavLink
+                to="/shop"
+                className={linkClass(isShopActive)}
+                onMouseEnter={() => setIsShopOpen(true)}
+              >
+                <span className="flex items-center gap-2">
+                  Shop
+                  <FiChevronDown
+                    className={`transition-transform duration-300 ${isShopOpen ? 'rotate-180' : ''}`}
+                  />
+                </span>
+                <span className={underlineClass(isShopActive)} />
+              </NavLink>
+
               <AnimatePresence>
                 {isShopOpen && (
-                  <motion.div 
+                  <motion.div
                     variants={dropdownVariants}
                     initial="hidden"
                     animate="visible"
                     exit="hidden"
-                    className="absolute top-full left-0 w-64 bg-secondary-black border border-white/5 p-6 shadow-2xl"
+                    className="absolute top-full left-0 w-64 bg-secondary-black border border-white/10 border-t-2 border-t-primary-gold rounded-b-2xl p-3 shadow-2xl"
                   >
-                    <ul className="space-y-4">
-                      <li>
-                        <Link to="/shop" className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors block">
-                          All Products
-                        </Link>
-                      </li>
-                      {LIGHT_CATEGORIES.slice(0, 5).map((cat) => (
-                        <li key={cat.slug}>
-                          <Link to={`/category/${cat.slug}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors block">
-                            {cat.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                    <Link
+                      to="/shop"
+                      className="block px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white hover:text-primary-gold hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      All Products
+                    </Link>
+                    <div className="my-1 h-px bg-white/5" />
+                    {LIGHT_CATEGORIES.slice(0, 6).map((cat) => (
+                      <Link
+                        key={cat.slug}
+                        to={`/category/${cat.slug}`}
+                        className="block px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
             </li>
 
             {/* Categories Dropdown */}
-            <li 
+            <li
               className="h-full flex items-center relative"
               onMouseEnter={() => setIsCategoriesOpen(true)}
               onMouseLeave={() => setIsCategoriesOpen(false)}
             >
-              <span className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-pink transition-colors flex items-center gap-2 group cursor-default">
+              <span
+                className={`${linkClass(isCatActive)} cursor-default flex items-center gap-2`}
+              >
                 Categories
-                <FiChevronDown className={`transition-transform duration-300 ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                <FiChevronDown
+                  className={`transition-transform duration-300 ${isCategoriesOpen ? 'rotate-180' : ''}`}
+                />
+                <span className={underlineClass(isCatActive)} />
               </span>
-              
+
               <AnimatePresence>
                 {isCategoriesOpen && (
-                  <motion.div 
+                  <motion.div
                     variants={dropdownVariants}
                     initial="hidden"
                     animate="visible"
                     exit="hidden"
-                    className="absolute top-full left-0 w-72 bg-secondary-black border border-white/5 p-6 shadow-2xl"
+                    className="absolute top-full left-0 w-72 bg-secondary-black border border-white/10 border-t-2 border-t-primary-gold rounded-b-2xl p-3 shadow-2xl"
                   >
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-0.5">
                       {LIGHT_CATEGORIES.map((cat) => (
-                        <Link key={cat.slug} to={`/category/${cat.slug}`} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold transition-colors flex items-center gap-3">
-                          <span className="w-1.5 h-1.5 bg-primary-gold/30 rounded-full"></span>
+                        <Link
+                          key={cat.slug}
+                          to={`/category/${cat.slug}`}
+                          className="flex items-center gap-3 px-3 py-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-primary-gold hover:bg-white/5 rounded-lg transition-colors"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary-gold/40" />
                           {cat.name}
                         </Link>
                       ))}
@@ -139,45 +189,53 @@ export default function Navbar() {
             </li>
 
             <li className="h-full flex items-center">
-              <Link to="/installation" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
+              <NavLink to="/installation" className={({ isActive }) => linkClass(isActive)}>
                 Install
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+                <span className={underlineClass(pathname.startsWith('/installation'))} />
+              </NavLink>
             </li>
 
             <li className="h-full flex items-center">
-              <Link to="/light-guide" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
+              <NavLink to="/light-guide" className={({ isActive }) => linkClass(isActive)}>
                 Light Guide
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+                <span className={underlineClass(pathname.startsWith('/light-guide'))} />
+              </NavLink>
             </li>
 
             <li className="h-full flex items-center">
-              <Link to="/about" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
+              <NavLink to="/blog" className={({ isActive }) => linkClass(isActive)}>
+                Blog
+                <span className={underlineClass(pathname.startsWith('/blog'))} />
+              </NavLink>
+            </li>
+
+            <li className="h-full flex items-center">
+              <NavLink to="/about" className={({ isActive }) => linkClass(isActive)}>
                 About
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+                <span className={underlineClass(pathname.startsWith('/about'))} />
+              </NavLink>
             </li>
 
             <li className="h-full flex items-center">
-              <Link to="/contact" className="text-[11px] font-black uppercase tracking-[0.2em] hover:text-primary-gold transition-colors relative group">
+              <NavLink to="/contact" className={({ isActive }) => linkClass(isActive)}>
                 Contact
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary-gold transition-all duration-300 group-hover:w-full"></span>
-              </Link>
+                <span className={underlineClass(pathname.startsWith('/contact'))} />
+              </NavLink>
             </li>
           </ul>
 
-          <div className="flex items-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-4 sm:gap-7">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="hover:text-primary-gold transition-all hover:scale-110"
+              className="text-white/80 hover:text-primary-gold transition-all hover:scale-110"
               aria-label="Search products"
             >
               <FiSearch size={20} />
             </button>
-            <button 
+            <button
               onClick={openCart}
-              className="hover:text-primary-gold transition-all hover:scale-110 relative"
+              className="text-white/80 hover:text-primary-gold transition-all hover:scale-110 relative"
+              aria-label="Open cart"
             >
               <FiShoppingCart size={20} />
               {getItemCount > 0 && (
@@ -193,7 +251,7 @@ export default function Navbar() {
       <CartOverlay isOpen={isCartOpen} onClose={closeCart} />
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      {/* Mobile Menu — scrollable when categories overflow */}
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -202,9 +260,9 @@ export default function Navbar() {
             exit={{ opacity: 0, x: -100 }}
             className="fixed inset-0 z-[90] bg-primary-black lg:hidden flex flex-col"
           >
-            <div className="h-20 sm:h-24 shrink-0" aria-hidden />
+            <div className="h-28 sm:h-32 shrink-0" aria-hidden />
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-6 sm:px-10 pb-10 [-webkit-overflow-scrolling:touch]">
-              <ul className="space-y-6 sm:space-y-8 pb-6">
+              <ul className="space-y-5 sm:space-y-7 pb-6">
                 {[
                   { label: 'Home', to: '/' },
                   { label: 'Shop', to: '/shop' },
@@ -215,18 +273,24 @@ export default function Navbar() {
                   { label: 'Contact', to: '/contact' },
                 ].map((item) => (
                   <li key={item.label}>
-                    <Link
+                    <NavLink
                       to={item.to}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter text-white hover:text-primary-gold transition-colors"
+                      className={({ isActive }) =>
+                        `text-3xl sm:text-4xl font-black uppercase italic tracking-tighter transition-colors ${
+                          isActive ? 'text-primary-gold' : 'text-white hover:text-primary-gold'
+                        }`
+                      }
                     >
                       {item.label}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
                 <li className="pt-4 border-t border-white/10">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-4">Categories</span>
-                  <ul className="space-y-3 max-h-none">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-4">
+                    Categories
+                  </span>
+                  <ul className="space-y-2.5">
                     {LIGHT_CATEGORIES.map((cat) => (
                       <li key={cat.slug}>
                         <Link
