@@ -9,6 +9,10 @@ export const BRAND = {
   whatsappUrl: 'https://wa.me/254712827840',
   instagram: 'spark_lights254',
   instagramUrl: 'https://www.instagram.com/spark_lights254/',
+  facebook: 'sparklights254',
+  facebookUrl: 'https://www.facebook.com/sparklights254',
+  tiktok: 'sparklights254',
+  tiktokUrl: 'https://www.tiktok.com/@sparklights254',
   address: 'Nyamakima, Duruma Road, Nairobi, Kenya',
   fullAddress:
     'Nyamakima, Duruma Road, New Nyamakima Electrical Point Building, Shop 216, 2nd Floor, Nairobi, Kenya',

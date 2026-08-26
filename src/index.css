@@ -109,11 +109,11 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-gold text-black px-8 py-4 font-bold uppercase tracking-[0.2em] text-[11px] transition-all duration-300 hover:bg-white hover:text-black hover:shadow-[0_0_30px_rgba(202,138,4,0.4)] cursor-pointer;
+    @apply bg-primary-gold text-black px-6 py-3 font-bold uppercase tracking-[0.15em] text-[10px] sm:text-[11px] rounded-sm transition-all duration-300 hover:bg-white hover:text-black hover:shadow-[0_0_24px_rgba(202,138,4,0.4)] hover:-translate-y-0.5 cursor-pointer;
   }
   
   .btn-secondary {
-    @apply border-2 border-white text-white px-8 py-4 font-bold uppercase tracking-[0.2em] text-[11px] transition-all duration-300 hover:bg-white hover:text-black cursor-pointer;
+    @apply border border-white/70 text-white px-6 py-3 font-bold uppercase tracking-[0.15em] text-[10px] sm:text-[11px] rounded-sm transition-all duration-300 hover:bg-white hover:text-black hover:-translate-y-0.5 cursor-pointer;
   }
 
   .glass-card {

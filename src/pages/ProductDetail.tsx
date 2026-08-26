@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiHeart, FiShoppingCart, FiChevronRight, FiCheckCircle, FiTruck } from 'react-icons/fi';
@@ -13,8 +13,10 @@ import {
   buildProductSeoDescription,
   buildProductSeoKeywords,
 } from '../lib/seo';
+import { productPageUrl } from '@/lib/whatsappOrder';
 import DeliveryBanner from '../components/DeliveryBanner';
 import ProductImage from '../components/ProductImage';
+import ProductCard from '@/components/ProductCard';
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -56,6 +58,33 @@ export default function ProductDetail() {
       quantity
     );
   };
+
+  const waHref = `${BRAND.whatsappUrl}?text=${encodeURIComponent(
+    `Hi ${BRAND.name}, I'm interested in ${product.name} (KES ${currentPrice}). ${productPageUrl(product.slug)}`
+  )}`;
+
+  // Sticky action bar — appears once the main product view is scrolled past.
+  const stickSentinelRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+  useEffect(() => {
+    const el = stickSentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setShowSticky(entry.boundingClientRect.bottom < 0),
+      { threshold: [0] }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [product?.id]);
+
+  // "You may also like" — same category first, then any other products.
+  const related = useMemo(() => {
+    const others = products.filter((p) => p.id !== product.id);
+    const sameCat = others.filter((p) =>
+      (p.categories ?? []).some((c) => (product.categories ?? []).includes(c))
+    );
+    return (sameCat.length ? sameCat : others).slice(0, 8);
+  }, [products, product]);
 
   return (
     <div className="min-h-screen pb-32">
@@ -178,6 +207,7 @@ export default function ProductDetail() {
             <p className="text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-8 flex items-center justify-center gap-2">
               <FiTruck size={12} /> Most Kenyans order via WhatsApp — ask about stock &amp; delivery first
             </p>
+            <div ref={stickSentinelRef} aria-hidden />
             <Link to="/installation" className="block text-center text-[10px] font-black uppercase tracking-widest text-primary-gold hover:underline mb-16">
               Bundle Supply &amp; Fix (light + install) →
             </Link>

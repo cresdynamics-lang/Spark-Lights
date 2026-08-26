@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppFloatButton from '../components/WhatsAppFloatButton';
+import SocialFloat from '../components/SocialFloat';
 import { BRAND } from '../data/brand';
 
 export default function StorefrontLayout() {
@@ -34,6 +35,7 @@ export default function StorefrontLayout() {
 
       <Footer />
       <WhatsAppFloatButton />
+      <SocialFloat />
     </div>
   );
 }
