@@ -225,6 +225,8 @@ model Product {
   isFeatured       Boolean           @default(false)
   isActive         Boolean           @default(true)
   sortOrder        Int               @default(0)
+  isOnSale         Boolean           @default(false) // curated for the Meta sale catalog / carousel
+  saleSortOrder    Int               @default(0)
   seoTitle         String?
   seoDescription   String?
   categories       ProductCategory[]
@@ -238,6 +240,7 @@ model Product {
   updatedAt        DateTime          @updatedAt
   @@index([slug])
   @@index([isActive, isFeatured])
+  @@index([isOnSale])
 }
 
 model ProductCategory {

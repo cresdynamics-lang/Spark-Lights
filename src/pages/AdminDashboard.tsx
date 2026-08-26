@@ -22,6 +22,7 @@ import { SettingsView } from "@/components/admin/views/SettingsView"
 import { CategoriesView } from "@/components/admin/views/CategoriesView"
 import { BlogView } from "@/components/admin/views/BlogView"
 import { DispatchView } from "@/components/admin/views/DispatchView"
+import { SaleView } from "@/components/admin/views/SaleView"
 
 import { useAuthStore } from "@/store/authStore"
 import { ShieldAlertIcon, FlowerIcon } from "lucide-react"
@@ -82,6 +83,8 @@ export default function AdminDashboard() {
         return <InventoryView />
       case "Categories":
         return <CategoriesView />
+      case "Sale":
+        return <SaleView />
       case "Blog & SEO":
         return <BlogView />
       case "Customers":

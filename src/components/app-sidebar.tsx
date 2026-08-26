@@ -25,6 +25,7 @@ import {
   BoxesIcon,
   TagsIcon,
   PercentIcon,
+  BadgePercentIcon,
   BarChart3Icon,
   RepeatIcon,
 } from "lucide-react"
@@ -37,6 +38,7 @@ const navItems = [
   { title: "Products", icon: <PackageIcon /> },
   { title: "Inventory", icon: <BoxesIcon /> },
   { title: "Categories", icon: <TagsIcon /> },
+  { title: "Sale", icon: <BadgePercentIcon /> },
   { title: "Discounts", icon: <PercentIcon /> },
   { title: "Customers", icon: <UsersIcon /> },
   { title: "Subscriptions", icon: <RepeatIcon /> },
@@ -68,7 +70,7 @@ export function AppSidebar({
     }
 
     if (role === "FLORIST") {
-      const restricted = ["Analytics", "Settings", "Staff", "Discounts"]
+      const restricted = ["Analytics", "Settings", "Staff", "Discounts", "Sale"]
       return !restricted.includes(title)
     }
 

@@ -10,6 +10,7 @@ import { useCartStore } from '../store/useCartStore';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { BRAND } from '../data/brand';
 import ProductImage from '../components/ProductImage';
+import SaleSection from '../components/SaleSection';
 
 const CATEGORIES = [
   { id: 'all', name: 'All Lights' },
@@ -89,6 +90,8 @@ export default function Shop() {
           </div>
         </div>
       </section>
+
+      <SaleSection />
 
       {/* Filters Bar */}
       <section className="sticky top-[80px] sm:top-[96px] z-50 bg-black/95 border-b border-white/5 backdrop-blur-xl">

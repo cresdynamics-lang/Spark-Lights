@@ -17,6 +17,9 @@ router.post(
   ProductController.syncPublicImagesAsProducts
 );
 router.get("/categories", ProductController.getCategories);
+router.get("/sale", ProductController.getSaleProducts);
+router.get("/sale/csv", ProductController.getSaleCsv);
+router.patch("/:id/sale", authenticate, requireRole("OWNER", "MANAGER"), ProductController.toggleSale);
 router.post(
   "/upload-image",
   authenticate,

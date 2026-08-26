@@ -16,6 +16,7 @@ import { usePublishedBlogs } from '../hooks/useBlogs';
 import InstallationGallery from '../components/InstallationGallery';
 import DeliveryBanner from '../components/DeliveryBanner';
 import ProductImage from '../components/ProductImage';
+import SaleSection from '../components/SaleSection';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -253,6 +254,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Sale — curated Meta catalog carousel */}
+      <SaleSection />
 
       {/* Why choose us */}
       <section className="py-20 sm:py-28 bg-secondary-black">

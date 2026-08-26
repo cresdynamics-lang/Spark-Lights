@@ -29,3 +29,13 @@ export const updateProduct = async (id: string, data: any) => {
   const response = await apiClient.patch(`/products/${id}`, data);
   return response.data;
 };
+
+export const getSaleProducts = async () => {
+  const response = await apiClient.get('/products/sale');
+  return response.data;
+};
+
+export const toggleProductSale = async (id: string, data: { isOnSale?: boolean; saleSortOrder?: number }) => {
+  const response = await apiClient.patch(`/products/${id}/sale`, data);
+  return response.data;
+};

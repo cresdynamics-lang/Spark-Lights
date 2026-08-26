@@ -439,3 +439,158 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+// ─────────────────────────────────────────────────────────────
+// SALE / META CATALOG
+// ─────────────────────────────────────────────────────────────
+
+/** Public storefront domain used to build absolute product & image URLs for feeds. */
+function getSiteDomain(): string {
+  const raw =
+    process.env.PUBLIC_SITE_URL ||
+    process.env.FRONTEND_URL ||
+    "https://sparklights.co.ke";
+  try {
+    const u = new URL(raw);
+    return `${u.protocol}//${u.host}`;
+  } catch {
+    return raw.replace(/\/$/, "");
+  }
+}
+
+function absoluteImageUrl(url: string | null | undefined, domain: string): string {
+  if (!url) return domain;
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${domain}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
+function csvEscape(value: string): string {
+  if (/[",\n\r]/.test(value)) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+/** Public — up to 10 curated sale products for the storefront carousel. */
+export const getSaleProducts = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const products = await prisma.product.findMany({
+      where: { isOnSale: true, isActive: true },
+      include: {
+        images: true,
+        variants: true,
+        categories: { include: { category: true } },
+      },
+      orderBy: [{ saleSortOrder: "asc" }, { updatedAt: "desc" }],
+      take: 10,
+    });
+
+    res.json({ success: true, data: products });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/** Admin (OWNER/MANAGER) — toggle a product on/off the sale and set its order. */
+export const toggleSale = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { isOnSale, saleSortOrder } = req.body as {
+      isOnSale?: boolean;
+      saleSortOrder?: number;
+    };
+
+    const existing = await prisma.product.findUnique({ where: { id: id as string } });
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        error: { code: "PRODUCT_NOT_FOUND", message: "Product not found" },
+      });
+    }
+
+    const product = await prisma.product.update({
+      where: { id: id as string },
+      data: {
+        ...(typeof isOnSale === "boolean" ? { isOnSale } : {}),
+        ...(typeof saleSortOrder === "number" ? { saleSortOrder } : {}),
+      },
+      include: {
+        images: true,
+        variants: true,
+        categories: { include: { category: true } },
+      },
+    });
+
+    res.json({ success: true, data: product });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Public Meta/facebook product feed (CSV) of the curated sale products.
+ * Returns text/csv with absolute product + image links so it can be pasted
+ * straight into a Meta catalog scheduled-feed URL.
+ */
+export const getSaleCsv = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const domain = getSiteDomain();
+    const currency = process.env.DEFAULT_CURRENCY || "KES";
+    const brand = process.env.STORE_NAME || "Spark Lights 254";
+
+    const products = await prisma.product.findMany({
+      where: { isOnSale: true, isActive: true },
+      include: {
+        images: true,
+        variants: true,
+        categories: { include: { category: true } },
+      },
+      orderBy: [{ saleSortOrder: "asc" }, { updatedAt: "desc" }],
+      take: 10,
+    });
+
+    const headers = [
+      "id",
+      "title",
+      "description",
+      "availability",
+      "condition",
+      "price",
+      "link",
+      "image_link",
+      "brand",
+    ];
+
+    const rows = products.map((p) => {
+      const rawPrice = p.variants?.[0]?.salePriceKes ?? p.variants?.[0]?.priceKes;
+      const priceNum = rawPrice == null ? 0 : Number(rawPrice);
+      const image = absoluteImageUrl(p.images?.[0]?.url, domain);
+      const description = (p.shortDescription || p.name || "").replace(/\s+/g, " ").trim();
+
+      return [
+        p.id,
+        p.name,
+        description,
+        "in stock",
+        "new",
+        `${priceNum.toFixed(2)} ${currency}`,
+        `${domain}/product/${p.slug}`,
+        image,
+        brand,
+      ]
+        .map((v) => csvEscape(String(v)))
+        .join(",");
+    });
+
+    const csv = [headers.join(","), ...rows].join("\n");
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="meta-sale-catalog.csv"'
+    );
+    res.send(csv);
+  } catch (error) {
+    next(error);
+  }
+};
