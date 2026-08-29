@@ -11,6 +11,7 @@ import {
   sendOrderToWhatsApp,
   type CheckoutDetails,
 } from '../lib/whatsappOrder';
+import { trackPurchase, trackWhatsAppOrder } from '../lib/metaPixel';
 
 const SHIPPING_FEE = 500;
 
@@ -44,6 +45,14 @@ export default function Checkout() {
 
     const message = buildOrderWhatsAppMessage(items, details, SHIPPING_FEE);
     sendOrderToWhatsApp(message);
+
+    // Meta Pixel — order placed (WhatsApp checkout) + Purchase conversion.
+    trackWhatsAppOrder({
+      name: items.map((i) => i.name).join(', '),
+      price: String(grandTotal),
+    });
+    trackPurchase(grandTotal, items.map((i) => i.id), items.map((i) => i.name).join(', '));
+
     clearCart();
 
     setTimeout(() => {

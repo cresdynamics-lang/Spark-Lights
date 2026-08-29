@@ -21,6 +21,7 @@ import { Toaster } from 'react-hot-toast';
 import { TooltipProvider } from './components/ui/tooltip';
 import LocalBusinessJsonLd from './components/LocalBusinessJsonLd';
 import { ProductProvider } from './context/ProductContext';
+import MetaPixel from './components/MetaPixel';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -37,6 +38,7 @@ function App() {
       <Router>
         <ProductProvider>
           <ScrollToTop />
+          <MetaPixel />
           <Toaster position="bottom-right" />
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />

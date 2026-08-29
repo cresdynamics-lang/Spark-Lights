@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import toast from 'react-hot-toast';
+import { trackAddToCart } from '@/lib/metaPixel';
 
 export interface CartItem {
   id: string;
@@ -68,6 +69,7 @@ export const useCartStore = create<CartState>()(
 
         set({ isOpen: true });
         toast.success(`${product?.name ?? 'Item'} added to cart`);
+        trackAddToCart({ id, name: String(product?.name ?? 'Item'), price: String(product?.price ?? '0') });
       },
       removeItem: (id) => {
         set({

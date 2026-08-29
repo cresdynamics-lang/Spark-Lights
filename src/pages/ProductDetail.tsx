@@ -14,6 +14,7 @@ import {
   buildProductSeoKeywords,
 } from '../lib/seo';
 import { productPageUrl } from '@/lib/whatsappOrder';
+import { trackViewContent, trackWhatsAppOrder } from '@/lib/metaPixel';
 import DeliveryBanner from '../components/DeliveryBanner';
 import ProductImage from '../components/ProductImage';
 import ProductCard from '@/components/ProductCard';
@@ -62,6 +63,13 @@ export default function ProductDetail() {
   const waHref = `${BRAND.whatsappUrl}?text=${encodeURIComponent(
     `Hi ${BRAND.name}, I'm interested in ${product.name} (KES ${currentPrice}). ${productPageUrl(product.slug)}`
   )}`;
+
+  // Meta Pixel — ViewContent when a product page is viewed.
+  useEffect(() => {
+    if (product) {
+      trackViewContent({ id: product.id, name: product.name, price: currentPrice, slug: product.slug });
+    }
+  }, [product?.id]);
 
   // Sticky action bar — appears once the main product view is scrolled past.
   const stickSentinelRef = useRef<HTMLDivElement>(null);
@@ -200,6 +208,7 @@ export default function ProductDetail() {
               href={`${BRAND.whatsappUrl}?text=${encodeURIComponent(`Hi Spark Lights 254! I'd like to order:\n${product.name}\nKES ${currentPrice}\nQty: ${quantity}\nOption: ${selectedSize}\n\nPlease confirm stock & delivery to my area.`)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppOrder({ name: product.name, price: currentPrice, slug: product.slug })}
               className="w-full border-2 border-[#25D366] bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all py-4 sm:py-6 flex items-center justify-center gap-2 sm:gap-3 font-black uppercase tracking-widest text-[10px] sm:text-xs mb-6"
             >
               <FaWhatsapp size={20} className="sm:w-[22px] sm:h-[22px]" /> Chat on WhatsApp to Order
@@ -233,7 +242,69 @@ export default function ProductDetail() {
           </motion.div>
         </div>
       </div>
+
+      {/* You May Also Like */}
+      {related.length > 0 && (
+        <section className="py-20 sm:py-28 bg-secondary-black border-t border-white/5">
+          <div className="container mx-auto px-6">
+            <div className="flex items-end justify-between gap-6 mb-10 sm:mb-16">
+              <div>
+                <span className="text-primary-gold uppercase tracking-[0.4em] text-[9px] sm:text-[10px] font-black mb-3 block">
+                  You May Also Like
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white leading-none">
+                  Other People Also Bought
+                </h2>
+              </div>
+              <Link
+                to="/shop"
+                className="btn-secondary btn-compact text-[9px] sm:text-[10px] px-3 py-2 sm:px-5 sm:py-3 whitespace-nowrap"
+              >
+                View All
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <DeliveryBanner />
+
+      {/* Sticky action bar — appears once the main product view is scrolled past */}
+      {showSticky && (
+        <div className="fixed bottom-0 inset-x-0 z-[80] bg-secondary-black/95 backdrop-blur-xl border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4">
+          <div className="container mx-auto flex items-center gap-3 sm:gap-5">
+            <div className="hidden sm:block w-12 h-12 shrink-0 rounded-md overflow-hidden bg-primary-black">
+              <ProductImage src={product.img} alt={product.name} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-white font-black uppercase text-xs sm:text-sm truncate">{product.name}</p>
+              <p className="text-primary-gold font-black text-[11px] sm:text-sm">KES {currentPrice}</p>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <button
+                onClick={handleAddToCart}
+                className="bg-primary-gold text-black text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-3 sm:px-6 py-2 sm:py-3 hover:bg-white transition-colors"
+              >
+                Add to Cart
+              </button>
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppOrder({ name: product.name, price: currentPrice, slug: product.slug })}
+                className="bg-[#25D366] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest px-3 sm:px-6 py-2 sm:py-3 hover:bg-[#20bd5a] transition-colors flex items-center gap-1"
+              >
+                <FaWhatsapp size={14} className="sm:w-4 sm:h-4" /> WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

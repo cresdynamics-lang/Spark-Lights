@@ -4,6 +4,7 @@ import ProductImage from './ProductImage';
 import { useCartStore } from '@/store/useCartStore';
 import { BRAND } from '@/data/brand';
 import { productPageUrl } from '@/lib/whatsappOrder';
+import { trackWhatsAppOrder } from '@/lib/metaPixel';
 import type { StoreProduct } from '@/types/product';
 
 /** Short, rotating-style business highlights shown on hover. */
@@ -67,6 +68,7 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
           href={waHref}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackWhatsAppOrder({ name: product.name, price: product.price, slug: product.slug })}
           className="flex-1 bg-[#25D366] text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest py-1.5 sm:py-2 px-2 hover:bg-[#1ebe5a] transition-colors text-center flex items-center justify-center gap-1"
         >
           <FiMessageCircle size={11} className="sm:hidden" />
