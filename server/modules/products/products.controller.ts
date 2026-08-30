@@ -545,7 +545,6 @@ export const getSaleCsv = async (_req: Request, res: Response, next: NextFunctio
         categories: { include: { category: true } },
       },
       orderBy: [{ saleSortOrder: "asc" }, { updatedAt: "desc" }],
-      take: 10,
     });
 
     const headers = [
