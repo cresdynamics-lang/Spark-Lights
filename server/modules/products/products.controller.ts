@@ -446,15 +446,14 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 
 /** Public storefront domain used to build absolute product & image URLs for feeds. */
 function getSiteDomain(): string {
-  const raw =
-    process.env.PUBLIC_SITE_URL ||
-    process.env.FRONTEND_URL ||
-    "https://sparklights.co.ke";
+  // NOTE: do NOT fall back to FRONTEND_URL — on the production server that env is
+  // "http://localhost:5173", which would make Meta reject every feed item.
+  const raw = process.env.PUBLIC_SITE_URL || 'https://sparklights.co.ke';
   try {
     const u = new URL(raw);
     return `${u.protocol}//${u.host}`;
   } catch {
-    return raw.replace(/\/$/, "");
+    return raw.replace(/\/$/, '');
   }
 }
 
