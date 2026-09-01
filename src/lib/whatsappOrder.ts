@@ -17,9 +17,10 @@ function parsePrice(price: string): number {
 }
 
 function siteBaseUrl(): string {
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin.replace(/\/$/, '');
-  }
+  // Always use the canonical storefront domain — never rely on window.location.origin.
+  // Instagram/Facebook in-app browsers can report weird origins (or strip query/path),
+  // and the dev server's origin is "http://localhost:5173", neither of which produces
+  // a link the recipient can actually open to the right product.
   return `https://${BRAND.domain}`;
 }
 

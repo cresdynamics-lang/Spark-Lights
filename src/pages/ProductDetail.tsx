@@ -23,7 +23,17 @@ export default function ProductDetail() {
   const { slug } = useParams();
   const { products } = useProducts();
   const addItem = useCartStore((s) => s.addItem);
-  const product = useMemo(() => products.find(p => p.slug === slug), [products, slug]);
+
+  // Resolve by current slug first, then by legacy/stripped slug (e.g. when the
+  // shared link says "1001033867-chandelier" but the real slug has changed).
+  // This way deep links from Instagram, WhatsApp, etc. still find the product.
+  const product = useMemo(() => {
+    if (!slug) return undefined;
+    const direct = products.find((p) => p.slug === slug);
+    if (direct) return direct;
+    const base = slug.replace(/-?\d+$/, '');
+    return products.find((p) => p.slug && p.slug.startsWith(base));
+  }, [products, slug]);
   
   const [selectedSize, setSelectedSize] = useState(product?.sizes[0]?.label || '');
   const [quantity, setQuantity] = useState(1);
