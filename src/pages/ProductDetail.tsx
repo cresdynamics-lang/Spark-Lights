@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import { FiHeart, FiShoppingCart, FiChevronRight, FiCheckCircle, FiTruck } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa6';
 import { useProducts } from '../context/ProductContext';
+import { getProductBySlug } from '../api/products';
+import { mapApiProduct } from '@/lib/mapApiProduct';
+import type { StoreProduct } from '@/types/product';
 import { BRAND } from '../data/brand';
 import { getCategoryName } from '../data/categories';
 import { useCartStore } from '../store/useCartStore';
@@ -21,20 +24,44 @@ import ProductCard from '@/components/ProductCard';
 
 export default function ProductDetail() {
   const { slug } = useParams();
-  const { products } = useProducts();
+  const { products, loading: productsLoading } = useProducts();
   const addItem = useCartStore((s) => s.addItem);
 
   // Resolve by current slug first, then by legacy/stripped slug (e.g. when the
   // shared link says "1001033867-chandelier" but the real slug has changed).
   // This way deep links from Instagram, WhatsApp, etc. still find the product.
+  const [fallbackProduct, setFallbackProduct] = useState<StoreProduct | null>(null);
+  const [fallbackLoading, setFallbackLoading] = useState(false);
+  useEffect(() => {
+    if (!slug) return;
+    let active = true;
+    setFallbackLoading(true);
+    (async () => {
+      try {
+        const res = await getProductBySlug(slug);
+        if (active && res.success && res.data) {
+          const mapped = mapApiProduct(res.data as Record<string, unknown>);
+          if (mapped) setFallbackProduct(mapped);
+        }
+      } catch {
+        /* keep null — fall through to not-found state */
+      } finally {
+        if (active) setFallbackLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, [slug]);
+
   const product = useMemo(() => {
     if (!slug) return undefined;
+    // Prefer the global list (already mapped to StoreProduct).
     const direct = products.find((p) => p.slug === slug);
     if (direct) return direct;
     const base = slug.replace(/-?\d+$/, '');
-    return products.find((p) => p.slug && p.slug.startsWith(base));
-  }, [products, slug]);
-  
+    const byPrefix = products.find((p) => p.slug && p.slug.startsWith(base));
+    return byPrefix ?? fallbackProduct ?? undefined;
+  }, [products, slug, fallbackProduct]);
+
   const [selectedSize, setSelectedSize] = useState(product?.sizes[0]?.label || '');
   const [quantity, setQuantity] = useState(1);
 
@@ -46,6 +73,14 @@ export default function ProductDetail() {
   });
 
   if (!product) {
+    if (productsLoading || fallbackLoading) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+          <span className="w-10 h-10 border-2 border-primary-gold/30 border-t-primary-gold rounded-full animate-spin" />
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-4">Loading product…</p>
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <h1 className="text-4xl font-black uppercase mb-6">Product Not Found</h1>
