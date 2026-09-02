@@ -132,32 +132,8 @@ export default function ProductDetail() {
     keywords: product ? buildProductSeoKeywords(product) : undefined,
   });
 
-  if (!product) {
-    const stillLoading =
-      (productsLoading && !directFetchTriggered) || fallbackLoading;
-    if (stillLoading) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-          <span className="w-10 h-10 border-2 border-primary-gold/30 border-t-primary-gold rounded-full animate-spin" />
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-4">Loading product…</p>
-          {fallbackError && (
-            <p className="text-[8px] uppercase tracking-widest text-red-500/70 mt-2">
-              {fallbackError.message}
-            </p>
-          )}
-        </div>
-      );
-    }
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-        <h1 className="text-4xl font-black uppercase mb-6">Product Not Found</h1>
-        <Link to="/shop" className="btn-primary">Back to Shop</Link>
-      </div>
-    );
-  }
-
-  const currentPrice = product.sizes.find(s => s.label === selectedSize)?.price || product.price;
-  const hasSizeOptions = product.sizes.length > 1 && !!selectedSize;
+  const currentPrice = product?.sizes.find(s => s.label === selectedSize)?.price || product?.price || '';
+  const hasSizeOptions = (product?.sizes.length ?? 0) > 1 && !!selectedSize;
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -172,9 +148,11 @@ export default function ProductDetail() {
     );
   };
 
-  const waHref = `${BRAND.whatsappUrl}?text=${encodeURIComponent(
-    `Hi ${BRAND.name}, I'm interested in ${product.name} (KES ${currentPrice}). ${productPageUrl(product.slug)}`
-  )}`;
+  const waHref = product
+    ? `${BRAND.whatsappUrl}?text=${encodeURIComponent(
+        `Hi ${BRAND.name}, I'm interested in ${product.name} (KES ${currentPrice}). ${productPageUrl(product.slug)}`
+      )}`
+    : '';
 
   // Meta Pixel — ViewContent when a product page is viewed.
   useEffect(() => {
@@ -199,12 +177,37 @@ export default function ProductDetail() {
 
   // "You may also like" — same category first, then any other products.
   const related = useMemo(() => {
+    if (!product) return [];
     const others = products.filter((p) => p.id !== product.id);
     const sameCat = others.filter((p) =>
       (p.categories ?? []).some((c) => (product.categories ?? []).includes(c))
     );
     return (sameCat.length ? sameCat : others).slice(0, 8);
   }, [products, product]);
+
+  if (!product) {
+    const stillLoading =
+      (productsLoading && !directFetchTriggered) || fallbackLoading;
+    if (stillLoading) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+          <span className="w-10 h-10 border-2 border-primary-gold/30 border-t-primary-gold rounded-full animate-spin" />
+          <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-4">Loading product…</p>
+          {fallbackError && (
+            <p className="text-[8px] uppercase tracking-widest text-red-500/70 mt-2">
+              {fallbackError.message}
+            </p>
+          )}
+        </div>
+      );
+    }
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-4xl font-black uppercase mb-6">Product Not Found</h1>
+        <Link to="/shop" className="btn-primary">Back to Shop</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-32">

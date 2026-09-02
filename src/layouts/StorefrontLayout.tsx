@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppFloatButton from '../components/WhatsAppFloatButton';
 import SocialFloat from '../components/SocialFloat';
+import { StorefrontErrorBoundary } from '../components/StorefrontErrorBoundary';
 import { BRAND } from '../data/brand';
 
 export default function StorefrontLayout() {
@@ -30,7 +31,9 @@ export default function StorefrontLayout() {
       </header>
 
       <main className="flex-grow pt-28 sm:pt-32">
-        <Outlet />
+        <StorefrontErrorBoundary>
+          <Outlet />
+        </StorefrontErrorBoundary>
       </main>
 
       <Footer />
