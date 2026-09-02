@@ -32,35 +32,92 @@ export default function ProductDetail() {
   // This way deep links from Instagram, WhatsApp, etc. still find the product.
   const [fallbackProduct, setFallbackProduct] = useState<StoreProduct | null>(null);
   const [fallbackLoading, setFallbackLoading] = useState(false);
-  useEffect(() => {
-    if (!slug) return;
-    let active = true;
-    setFallbackLoading(true);
-    (async () => {
-      try {
-        const res = await getProductBySlug(slug);
-        if (active && res.success && res.data) {
-          const mapped = mapApiProduct(res.data as Record<string, unknown>);
-          if (mapped) setFallbackProduct(mapped);
-        }
-      } catch {
-        /* keep null — fall through to not-found state */
-      } finally {
-        if (active) setFallbackLoading(false);
-      }
-    })();
-    return () => { active = false; };
-  }, [slug]);
+  const [fallbackError, setFallbackError] = useState<Error | null>(null);
 
-  const product = useMemo(() => {
+  // The global product list is preferred, but deep-link browsers (Instagram,
+  // WhatsApp in-app) may boot the SPA faster than the initial fetch resolves.
+  // We therefore start a fallback direct-by-slug fetch after a short grace
+  // period — either when the global list has resolved and missed, or after a
+  // timeout if the global list is still pending (mobile browsers sometimes
+  // throttle/delay the first network request).
+  const productsResolved = !productsLoading;
+  const [directFetchTriggered, setDirectFetchTriggered] = useState(false);
+
+  const cachedProduct = useMemo(() => {
     if (!slug) return undefined;
-    // Prefer the global list (already mapped to StoreProduct).
     const direct = products.find((p) => p.slug === slug);
     if (direct) return direct;
     const base = slug.replace(/-?\d+$/, '');
-    const byPrefix = products.find((p) => p.slug && p.slug.startsWith(base));
-    return byPrefix ?? fallbackProduct ?? undefined;
-  }, [products, slug, fallbackProduct]);
+    return products.find((p) => p.slug && p.slug.startsWith(base));
+  }, [products, slug]);
+
+  useEffect(() => {
+    if (directFetchTriggered) return;
+    if (!slug) return;
+
+    // If products have loaded and we still don't have the product, fetch directly.
+    // Also fetch directly if products are still loading after a grace period.
+    if (productsResolved && !cachedProduct) {
+      setDirectFetchTriggered(true);
+      return;
+    }
+  }, [productsResolved, cachedProduct, slug, directFetchTriggered]);
+
+  // Grace-period timeout: if the global list hasn't resolved after 4s,
+  // trigger the direct fetch so the user isn't stuck on a spinner.
+  useEffect(() => {
+    if (directFetchTriggered || productsResolved) return;
+    const id = setTimeout(() => setDirectFetchTriggered(true), 4000);
+    return () => clearTimeout(id);
+  }, [directFetchTriggered, productsResolved]);
+
+  // Perform the actual direct-by-slug fetch when triggered.
+  useEffect(() => {
+    if (!directFetchTriggered) return;
+    if (!slug || fallbackProduct) return;
+
+    let active = true;
+    setFallbackLoading(true);
+    setFallbackError(null);
+
+    const timeoutId = setTimeout(() => {
+      if (active) {
+        setFallbackError(new Error('Product lookup timed out'));
+        setFallbackLoading(false);
+      }
+    }, 8000);
+
+    (async () => {
+      try {
+        const res = await getProductBySlug(slug);
+        if (!active) return;
+        if (res.success && res.data) {
+          const mapped = mapApiProduct(res.data as Record<string, unknown>);
+          if (mapped) setFallbackProduct(mapped);
+          else setFallbackError(new Error('Could not map product data'));
+        } else {
+          setFallbackError(new Error(res.error?.message || 'Product not found'));
+        }
+      } catch (err) {
+        if (active) {
+          console.error('[ProductDetail] fallback fetch failed:', err);
+          setFallbackError(err instanceof Error ? err : new Error('Network error'));
+        }
+      } finally {
+        if (active) {
+          clearTimeout(timeoutId);
+          setFallbackLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      active = false;
+      clearTimeout(timeoutId);
+    };
+  }, [directFetchTriggered, slug, fallbackProduct]);
+
+  const product = cachedProduct ?? fallbackProduct ?? undefined;
 
   const [selectedSize, setSelectedSize] = useState(product?.sizes[0]?.label || '');
   const [quantity, setQuantity] = useState(1);
@@ -73,11 +130,18 @@ export default function ProductDetail() {
   });
 
   if (!product) {
-    if (productsLoading || fallbackLoading) {
+    const stillLoading =
+      (productsLoading && !directFetchTriggered) || fallbackLoading;
+    if (stillLoading) {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
           <span className="w-10 h-10 border-2 border-primary-gold/30 border-t-primary-gold rounded-full animate-spin" />
           <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-4">Loading product…</p>
+          {fallbackError && (
+            <p className="text-[8px] uppercase tracking-widest text-red-500/70 mt-2">
+              {fallbackError.message}
+            </p>
+          )}
         </div>
       );
     }
