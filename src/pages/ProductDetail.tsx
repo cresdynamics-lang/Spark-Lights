@@ -51,25 +51,28 @@ export default function ProductDetail() {
     return products.find((p) => p.slug && p.slug.startsWith(base));
   }, [products, slug]);
 
+  // Trigger the direct slug fetch IMMEDIATELY when products haven't loaded yet.
+  // This handles deep-link / direct-URL access on mobile where the global
+  // getProducts({ limit: 200 }) call can be very slow or stall entirely.
+  // On client-side navigation the product is usually in cachedProduct already
+  // so the direct fetch is never needed.
   useEffect(() => {
     if (directFetchTriggered) return;
     if (!slug) return;
 
-    // If products have loaded and we still don't have the product, fetch directly.
-    // Also fetch directly if products are still loading after a grace period.
+    // If products have loaded and we found the product, no direct fetch needed.
+    if (productsResolved && cachedProduct) return;
+
+    // If products have loaded but the product is missing, fetch directly.
     if (productsResolved && !cachedProduct) {
       setDirectFetchTriggered(true);
       return;
     }
-  }, [productsResolved, cachedProduct, slug, directFetchTriggered]);
 
-  // Grace-period timeout: if the global list hasn't resolved after 4s,
-  // trigger the direct fetch so the user isn't stuck on a spinner.
-  useEffect(() => {
-    if (directFetchTriggered || productsResolved) return;
-    const id = setTimeout(() => setDirectFetchTriggered(true), 4000);
-    return () => clearTimeout(id);
-  }, [directFetchTriggered, productsResolved]);
+    // Products haven't loaded yet — start the direct fetch right away so
+    // deep-link visitors aren't blocked by the slow global list fetch.
+    setDirectFetchTriggered(true);
+  }, [productsResolved, cachedProduct, slug, directFetchTriggered]);
 
   // Perform the actual direct-by-slug fetch when triggered.
   useEffect(() => {
@@ -85,7 +88,7 @@ export default function ProductDetail() {
         setFallbackError(new Error('Product lookup timed out'));
         setFallbackLoading(false);
       }
-    }, 8000);
+    }, 15000);
 
     (async () => {
       try {
