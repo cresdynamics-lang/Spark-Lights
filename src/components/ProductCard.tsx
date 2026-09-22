@@ -7,13 +7,6 @@ import { productPageUrl } from '@/lib/whatsappOrder';
 import { trackWhatsAppOrder } from '@/lib/metaPixel';
 import type { StoreProduct } from '@/types/product';
 
-/** Short, rotating-style business highlights shown on hover. */
-const HOVER_MESSAGES = [
-  'Visit our shop in Nyamakima, Duruma Road',
-  'We do installations & supply',
-  'Order via WhatsApp for same-day Nairobi delivery',
-];
-
 export default function ProductCard({ product }: { product: StoreProduct }) {
   const addItem = useCartStore((state) => state.addItem);
 
@@ -38,16 +31,6 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
             {product.badge}
           </span>
         )}
-        <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 hidden sm:flex flex-col items-center justify-center gap-2 p-4 text-center">
-          {HOVER_MESSAGES.map((msg) => (
-            <p
-              key={msg}
-              className="text-white text-[10px] font-bold uppercase tracking-widest leading-snug"
-            >
-              {msg}
-            </p>
-          ))}
-        </div>
       </Link>
 
       <div className="flex items-start justify-between gap-2 mb-2">

@@ -23,15 +23,15 @@ export default function BrandLogo({ size = 'md', linkToHome = true, showSubtitle
       </div>
       <div className="leading-none">
         <div className="flex items-baseline gap-0.5">
-          <span className={`font-brand ${s.spark} font-extrabold tracking-tight text-primary-gold`}>
+          <span className={`font-brand ${s.spark} font-extrabold tracking-tight text-primary-pink`}>
             Spark
           </span>
-          <span className={`font-brand ${s.lights} font-light italic tracking-wide text-white group-hover:text-primary-pink transition-colors`}>
+          <span className={`font-brand ${s.lights} font-light italic tracking-wide text-primary-gold group-hover:text-primary-pink transition-colors`}>
             lights
           </span>
         </div>
         {showSubtitle && (
-          <span className={`${s.sub} font-sans font-bold uppercase tracking-[0.35em] text-gray-500 block mt-1`}>
+          <span className={`${s.sub} font-sans font-bold uppercase tracking-[0.35em] text-accent-gold block mt-1`}>
             Nairobi · 254
           </span>
         )}

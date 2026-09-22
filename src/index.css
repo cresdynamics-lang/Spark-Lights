@@ -2,17 +2,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Syne:wght@400..800&display=swap');
 
 @theme {
-  --color-primary-black: #000000;
-  --color-secondary-black: #121212;
-  --color-tertiary-black: #0a0a0a;
+  --color-primary-black: #ffffff;
+  --color-secondary-black: #fff7fb;
+  --color-tertiary-black: #ffffff;
   
-  --color-primary-gold: #CA8A04;
-  --color-secondary-gold: #A16207;
-  --color-accent-gold: #EAB308;
-  --color-primary-pink: #DB2777;
-  --color-secondary-pink: #9D174D;
-  --color-accent-pink: #F472B6;
-  --color-soft-white: #fafafa;
+  --color-primary-gold: #EF476F;
+  --color-secondary-gold: #D62839;
+  --color-accent-gold: #F4C95D;
+  --color-primary-pink: #E91E63;
+  --color-secondary-pink: #B5174D;
+  --color-accent-pink: #FF7AA2;
+  --color-soft-white: #1f2937;
   
   --font-serif: "Cormorant", serif;
   --font-sans: "Montserrat", sans-serif;
@@ -22,14 +22,14 @@
   --animate-fade-in-up: fade-in-up 1.2s ease-out forwards;
   --animate-fade-in-down: fade-in-down 1.2s ease-out forwards;
 
-  /* Shadcn UI Variables - Gold Theme */
+  /* Shadcn UI Variables - White and Pink Theme */
   --background: oklch(0.985 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #CA8A04;
+  --primary: #EF476F;
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.96 0 0);
   --secondary-foreground: oklch(0.145 0 0);
@@ -41,17 +41,17 @@
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: oklch(0.92 0 0);
   --input: oklch(0.92 0 0);
-  --ring: #CA8A04;
+  --ring: #EF476F;
   
   /* Sidebar */
-  --sidebar: #121212;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #CA8A04;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #000000;
+  --sidebar-primary: #EF476F;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a1a;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #262626;
-  --sidebar-ring: #CA8A04;
+  --sidebar-accent: #fff1f6;
+  --sidebar-accent-foreground: #B5174D;
+  --sidebar-border: #fbcfe8;
+  --sidebar-ring: #EF476F;
   
   --radius: 0.5rem;
 
@@ -76,7 +76,7 @@
 
 @layer base {
   body {
-    @apply bg-primary-black text-soft-white font-sans antialiased selection:bg-primary-pink selection:text-white;
+    @apply bg-white text-slate-900 font-sans antialiased selection:bg-primary-pink selection:text-white;
   }
 
   .font-brand {
@@ -93,6 +93,53 @@
 }
 
 @layer utilities {
+  /* The storefront uses white surfaces with pink accents. */
+  .text-white {
+    color: #000000;
+  }
+
+  .text-black {
+    color: #B5174D;
+  }
+
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600,
+  .text-gray-700,
+  .text-slate-400,
+  .text-slate-500,
+  .text-slate-600,
+  .text-slate-700 {
+    color: #000000;
+  }
+
+  .bg-black {
+    background-color: #ffffff;
+  }
+
+  .bg-black\/85,
+  .bg-black\/95,
+  .bg-black\/80,
+  .bg-black\/70 {
+    background-color: rgba(255, 255, 255, 0.96);
+  }
+
+  .border-black {
+    border-color: #E91E63;
+  }
+
+  .bg-white\/5 {
+    background-color: rgba(236, 72, 153, 0.05);
+  }
+
+  .border-white\/5 {
+    border-color: rgba(236, 72, 153, 0.14);
+  }
+
+  .border-white\/10 {
+    border-color: rgba(236, 72, 153, 0.2);
+  }
+
   .outline-text {
     -webkit-text-stroke: 1px rgba(202, 138, 4, 0.3);
     color: transparent;
@@ -109,7 +156,7 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-gold text-black px-6 py-3 font-bold uppercase tracking-[0.15em] text-[10px] sm:text-[11px] rounded-sm transition-all duration-300 hover:bg-white hover:text-black hover:shadow-[0_0_24px_rgba(202,138,4,0.4)] hover:-translate-y-0.5 cursor-pointer;
+    @apply bg-primary-gold text-black px-6 py-3 font-bold uppercase tracking-[0.15em] text-[10px] sm:text-[11px] rounded-sm transition-all duration-300 hover:bg-white hover:text-black hover:shadow-[0_0_24px_rgba(239,71,111,0.4)] hover:-translate-y-0.5 cursor-pointer;
   }
   
   .btn-secondary {
@@ -121,7 +168,7 @@
   }
 
   .gold-gradient {
-    background: linear-gradient(135deg, #CA8A04 0%, #A16207 50%, #EAB308 100%);
+    background: linear-gradient(135deg, #EF476F 0%, #D62839 50%, #F4C95D 100%);
   }
 
   .text-gold {
@@ -176,5 +223,11 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-primary-gold/30 hover:bg-primary-gold/5 transition-colors;
+}
+
+button,
+.btn-primary,
+.btn-secondary {
+  border-radius: 9999px;
 }
 

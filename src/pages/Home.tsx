@@ -176,7 +176,7 @@ export default function Home() {
               >
                 <Link
                   to={`/category/${cat.slug}`}
-                  className="group block relative h-48 sm:h-64 overflow-hidden border border-white/5"
+                  className="group block relative h-48 sm:h-64 overflow-hidden border border-accent-gold/60 bg-accent-gold/10"
                 >
                   <img
                     src={cat.image}
@@ -184,12 +184,12 @@ export default function Home() {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-accent-gold/35 via-accent-gold/10 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
-                    <h3 className="text-sm sm:text-xl font-black uppercase text-white group-hover:text-primary-gold transition-colors">
+                    <h3 className="text-sm sm:text-xl font-black uppercase text-accent-gold group-hover:text-primary-pink transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                       {cat.name}
                     </h3>
-                    <p className="text-gray-500 text-[10px] sm:text-xs mt-1 sm:mt-2 line-clamp-2 font-medium">{cat.seoH1}</p>
+                    <p className="text-accent-gold text-[10px] sm:text-xs mt-1 sm:mt-2 line-clamp-2 font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">{cat.seoH1}</p>
                   </div>
                 </Link>
               </motion.div>

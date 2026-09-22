@@ -92,7 +92,7 @@ export default function Shop() {
       <SaleSection />
 
       {/* Filters Bar */}
-      <section className="sticky top-[80px] sm:top-[96px] z-50 bg-black/95 border-b border-white/5 backdrop-blur-xl">
+      <section className="sticky top-[80px] sm:top-[96px] z-50 bg-white/95 border-b border-primary-pink/20 backdrop-blur-xl">
         <div className="container mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-12 overflow-x-auto no-scrollbar w-full md:w-auto">
             <div className="flex items-center gap-4 text-gray-500 flex-shrink-0">

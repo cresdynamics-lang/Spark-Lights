@@ -70,7 +70,7 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className={`bg-black/85 border-b backdrop-blur-2xl transition-all duration-500 ${
+        className={`bg-white/95 border-b backdrop-blur-2xl transition-all duration-500 ${
           scrolled
             ? 'border-white/10 shadow-lg shadow-black/40'
             : 'border-white/5'
@@ -123,7 +123,7 @@ export default function Navbar() {
                     initial="hidden"
                     animate="visible"
                     exit="hidden"
-                    className="absolute top-full left-0 w-64 bg-secondary-black border border-white/10 border-t-2 border-t-primary-gold rounded-b-2xl p-3 shadow-2xl"
+                    className="absolute top-full left-0 w-64 bg-white border border-primary-pink/20 border-t-2 border-t-primary-pink rounded-b-2xl p-3 shadow-2xl"
                   >
                     <Link
                       to="/shop"
@@ -169,7 +169,7 @@ export default function Navbar() {
                     initial="hidden"
                     animate="visible"
                     exit="hidden"
-                    className="absolute top-full left-0 w-72 bg-secondary-black border border-white/10 border-t-2 border-t-primary-gold rounded-b-2xl p-3 shadow-2xl"
+                    className="absolute top-full left-0 w-72 bg-white border border-primary-pink/20 border-t-2 border-t-primary-pink rounded-b-2xl p-3 shadow-2xl"
                   >
                     <div className="grid grid-cols-1 gap-0.5">
                       {LIGHT_CATEGORIES.map((cat) => (
