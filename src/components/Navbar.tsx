@@ -76,14 +76,14 @@ export default function Navbar() {
             : 'border-white/5'
         }`}
       >
-        <div className="container mx-auto px-6 h-20 sm:h-24 flex items-center justify-between">
-          <div className="flex items-center gap-8">
+        <div className="container mx-auto px-4 sm:px-6 h-16 sm:h-20 lg:h-24 flex items-center justify-between">
+          <div className="flex items-center gap-4 sm:gap-8">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden text-white hover:text-primary-gold transition-colors"
+              className="lg:hidden p-1 text-white hover:text-primary-gold transition-colors"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+              {isMobileMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
             <BrandLogo size="md" />
           </div>
@@ -224,20 +224,20 @@ export default function Navbar() {
             </li>
           </ul>
 
-          <div className="flex items-center gap-4 sm:gap-7">
+          <div className="flex items-center gap-3 sm:gap-7">
             <button
               onClick={() => setIsSearchOpen(true)}
               className="text-white/80 hover:text-primary-gold transition-all hover:scale-110"
               aria-label="Search products"
             >
-              <FiSearch size={20} />
+              <FiSearch size={18} />
             </button>
             <button
               onClick={openCart}
               className="text-white/80 hover:text-primary-gold transition-all hover:scale-110 relative"
               aria-label="Open cart"
             >
-              <FiShoppingCart size={20} />
+              <FiShoppingCart size={18} />
               {getItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary-pink text-white text-[9px] w-5 h-5 rounded-full flex items-center justify-center font-black shadow-lg shadow-primary-pink/20">
                   {getItemCount}
@@ -260,9 +260,9 @@ export default function Navbar() {
             exit={{ opacity: 0, x: -100 }}
             className="fixed inset-0 z-[90] bg-primary-black lg:hidden flex flex-col"
           >
-            <div className="h-28 sm:h-32 shrink-0" aria-hidden />
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-6 sm:px-10 pb-10 [-webkit-overflow-scrolling:touch]">
-              <ul className="space-y-5 sm:space-y-7 pb-6">
+            <div className="h-16 sm:h-20 shrink-0" aria-hidden />
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain px-4 sm:px-6 pb-6 [-webkit-overflow-scrolling:touch]">
+              <ul className="space-y-2 sm:space-y-3 pb-3">
                 {[
                   { label: 'Home', to: '/' },
                   { label: 'Shop', to: '/shop' },
@@ -277,7 +277,7 @@ export default function Navbar() {
                       to={item.to}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={({ isActive }) =>
-                        `text-3xl sm:text-4xl font-black uppercase italic tracking-tighter transition-colors ${
+                        `text-base sm:text-lg font-black uppercase italic tracking-tighter transition-colors ${
                           isActive ? 'text-primary-gold' : 'text-white hover:text-primary-gold'
                         }`
                       }
@@ -286,17 +286,17 @@ export default function Navbar() {
                     </NavLink>
                   </li>
                 ))}
-                <li className="pt-4 border-t border-white/10">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-600 block mb-4">
+                <li className="pt-3 border-t border-white/10">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-gray-600 block mb-2">
                     Categories
                   </span>
-                  <ul className="space-y-2.5">
+                  <ul className="space-y-1.5">
                     {LIGHT_CATEGORIES.map((cat) => (
                       <li key={cat.slug}>
                         <Link
                           to={`/category/${cat.slug}`}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-base sm:text-lg font-black uppercase tracking-tight text-gray-400 hover:text-primary-gold transition-colors block py-0.5"
+                          className="text-xs sm:text-sm font-black uppercase tracking-tight text-gray-400 hover:text-primary-gold transition-colors block py-0.5"
                         >
                           {cat.name}
                         </Link>

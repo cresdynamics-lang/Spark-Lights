@@ -10,12 +10,9 @@ import { LIGHT_CATEGORIES } from '../data/categories';
 import { BRAND } from '../data/brand';
 import { usePageSEO } from '../hooks/usePageSEO';
 import { SITE_KEYWORDS } from '../lib/seo';
-import { useProducts } from '../context/ProductContext';
 import { usePublishedBlogs } from '../hooks/useBlogs';
 import InstallationGallery from '../components/InstallationGallery';
 import DeliveryBanner from '../components/DeliveryBanner';
-import ProductCard from '../components/ProductCard';
-import SaleSection from '../components/SaleSection';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -27,7 +24,6 @@ const fadeIn = {
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<string | null>(null);
-  const { products } = useProducts();
   const { posts: blogPosts } = usePublishedBlogs();
 
   usePageSEO({
@@ -44,13 +40,6 @@ export default function Home() {
     }, 8000);
     return () => clearInterval(timer);
   }, []);
-
-  // Database only — use featured badges when present, otherwise first active products
-  const featured = (products.filter((p) => p.badge).length
-    ? products.filter((p) => p.badge)
-    : products
-  ).slice(0, 4);
-  const topProducts = products;
 
   return (
     <div className="overflow-x-hidden">
@@ -87,10 +76,10 @@ export default function Home() {
             <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-black mb-6 block">
               {HERO_SLIDES[currentSlide].tagline}
             </span>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-[1.05] text-white mb-6">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-[1.05] text-white mb-6">
               {HERO_SLIDES[currentSlide].title}
             </h1>
-            <p className="text-lg sm:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
+            <p className="text-base sm:text-lg text-gray-300 mb-10 leading-relaxed max-w-2xl">
               {HERO_SLIDES[currentSlide].subtitle}
             </p>
             <div className="flex flex-row flex-wrap gap-2 sm:gap-4 w-full max-w-lg sm:max-w-none">
@@ -140,15 +129,15 @@ export default function Home() {
       </section>
 
       {/* Welcome / SEO intro */}
-      <section className="py-20 sm:py-28">
+      <section className="hidden py-20 sm:py-28">
         <div className="container mx-auto px-6 max-w-4xl text-center">
           <motion.div {...fadeIn}>
-            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white mb-6">
-              Lighting Shops in Nyamakima — Delivering Across Nairobi
+            <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white mb-6">
+              Lighting Shops in Nyamakima, Delivering Across Nairobi
             </h2>
-            <p className="text-gray-400 text-lg leading-relaxed mb-6">
+            <p className="text-gray-400 text-base leading-relaxed mb-6">
               At Spark Lights 254, Nairobi buyers find chandeliers in Nairobi price listings, modern ceiling
-              lights, pendant lights Kenya, gypsum board lighting fixtures, and wall brackets — with the KES
+              lights, pendant lights Kenya, gypsum board lighting fixtures, and wall brackets, with the KES
               price shown on every product. We are a lighting shop in Nyamakima on Duruma Road, and we supply
               and deliver modern chandeliers to Westlands, Kilimani, Karen, Lavington, and across Nairobi CBD.
             </p>
@@ -170,15 +159,15 @@ export default function Home() {
             <span className="text-primary-gold uppercase tracking-[0.5em] text-[10px] font-black mb-4 block">
               Shop by Room & Type
             </span>
-            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white">
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">
               Shop by Search Intent
             </h2>
-            <p className="text-gray-500 mt-4 max-w-2xl mx-auto text-sm">
-              Category pages match how Nairobi customers search — chandeliers price, pendant lights Kenya, gypsum lighting &amp; outdoor solar.
+            <p className="text-gray-500 mt-4 max-w-2xl mx-auto text-xs sm:text-sm">
+              Category pages match how Nairobi customers search: chandeliers price, pendant lights Kenya, gypsum lighting and outdoor solar.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {LIGHT_CATEGORIES.map((cat, idx) => (
               <motion.div
                 key={cat.slug}
@@ -187,20 +176,20 @@ export default function Home() {
               >
                 <Link
                   to={`/category/${cat.slug}`}
-                  className="group block relative h-64 overflow-hidden border border-white/5"
+                  className="group block relative h-48 sm:h-64 overflow-hidden border border-white/5"
                 >
                   <img
                     src={cat.image}
-                    alt={`${cat.name} in Nairobi — Spark Lights 254`}
+                    alt={`${cat.name} in Nairobi, Spark Lights 254`}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-xl font-black uppercase text-white group-hover:text-primary-gold transition-colors">
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
+                    <h3 className="text-sm sm:text-xl font-black uppercase text-white group-hover:text-primary-gold transition-colors">
                       {cat.name}
                     </h3>
-                    <p className="text-gray-500 text-xs mt-2 line-clamp-2 font-medium">{cat.seoH1}</p>
+                    <p className="text-gray-500 text-[10px] sm:text-xs mt-1 sm:mt-2 line-clamp-2 font-medium">{cat.seoH1}</p>
                   </div>
                 </Link>
               </motion.div>
@@ -209,99 +198,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured */}
-      <section className="py-20 sm:py-28">
-        <div className="container mx-auto px-4 sm:px-6">
-          <motion.div {...fadeIn} className="flex flex-row items-end justify-between gap-2 sm:gap-6 mb-8 sm:mb-14">
-            <div className="min-w-0 flex-1">
-              <span className="text-primary-gold uppercase tracking-[0.35em] sm:tracking-[0.5em] text-[8px] sm:text-[10px] font-black mb-2 sm:mb-4 block">
-                Featured Picks
-              </span>
-              <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black uppercase tracking-tighter text-white leading-none">
-                Popular in Nairobi
-              </h2>
-            </div>
-            <Link
-              to="/shop"
-              className="btn-secondary btn-compact shrink-0 self-end text-[8px] sm:text-[10px] px-2 py-1.5 sm:px-5 sm:py-3 whitespace-nowrap"
-            >
-              <span className="sm:hidden">All Lights →</span>
-              <span className="hidden sm:inline">View All Lights →</span>
-            </Link>
-          </motion.div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-            {featured.map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Sale — curated Meta catalog carousel */}
-      <SaleSection />
-
       {/* Why choose us */}
       <section className="py-20 sm:py-28 bg-secondary-black">
         <div className="container mx-auto px-6">
           <motion.div {...fadeIn} className="text-center mb-16">
-            <h2 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter text-white">Why Choose Us</h2>
+            <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tighter text-white">Why Choose Us</h2>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-3 gap-2 sm:gap-6">
             {WHY_CHOOSE_US.map((item, idx) => (
               <motion.div
                 key={item.title}
                 {...fadeIn}
                 transition={{ delay: idx * 0.1 }}
-                className="p-10 border border-white/5 bg-primary-black"
+                className="p-3 sm:p-6 border border-white/5 bg-primary-black"
               >
-                <div className="w-14 h-14 rounded-full bg-primary-gold/10 flex items-center justify-center text-primary-gold text-2xl mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary-gold/10 flex items-center justify-center text-primary-gold text-xl mb-5">
                   {idx === 0 ? <FiTruck /> : idx === 1 ? <FiStar /> : <FiTool />}
                 </div>
-                <h3 className="text-xl font-black uppercase text-white mb-4">{item.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-sm">{item.desc}</p>
+                <h3 className="text-lg font-black uppercase text-white mb-3">{item.title}</h3>
+                <p className="text-gray-500 leading-relaxed text-xs sm:text-sm">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Product scroll — database products only */}
-      <section className="py-20 sm:py-28 overflow-hidden">
-        <div className="container mx-auto px-6">
-          <motion.div {...fadeIn} className="mb-12">
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">All Products</h2>
-            <p className="text-gray-500 text-sm mt-3 font-medium">
-              {products.length} listing{products.length === 1 ? '' : 's'} from our Nairobi showroom
-            </p>
-          </motion.div>
-          {topProducts.length === 0 ? (
-            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest py-16 text-center">
-              Products will appear here once published from admin.
-            </p>
-          ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-8">
-            {topProducts.map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
-          </div>
-          )}
-        </div>
-      </section>
-
       <InstallationGallery />
 
       {/* Blog — SEO traffic */}
-      <section className="py-20 sm:py-28 border-y border-white/5">
+      <section className="py-16 sm:py-24 border-y border-white/5">
         <div className="container mx-auto px-6">
           <motion.div {...fadeIn} className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">Lighting Blog</h2>
-            <p className="text-gray-500 mt-4 text-sm">Guides that match how Kenyans search — gypsum, chandeliers, solar outdoor</p>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">Lighting Blog</h2>
+            <p className="text-gray-500 mt-3 text-xs sm:text-sm">Guides that match how Kenyans search: gypsum, chandeliers, solar outdoor</p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
             {blogPosts.map((post, idx) => (
-              <motion.div key={post.slug} {...fadeIn} transition={{ delay: idx * 0.05 }}>
-                <Link to={`/blog/${post.slug}`} className="block p-6 border border-white/5 bg-secondary-black hover:border-primary-gold/30 transition-colors h-full">
+              <motion.div key={post.slug} {...fadeIn} transition={{ delay: idx * 0.05 }} className="min-w-[78vw] snap-start lg:min-w-0">
+                <Link to={`/blog/${post.slug}`} className="block p-4 sm:p-6 border border-white/5 bg-secondary-black hover:border-primary-gold/30 transition-colors h-full">
                   <span className="text-[9px] font-black uppercase tracking-widest text-primary-gold">{post.category}</span>
                   <h3 className="text-sm font-black uppercase text-white mt-3 leading-tight">{post.title}</h3>
                 </Link>
@@ -322,7 +256,7 @@ export default function Home() {
       <section className="py-20 sm:py-28 bg-secondary-black">
         <div className="container mx-auto px-6 max-w-3xl">
           <motion.div {...fadeIn} className="text-center mb-14">
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white">
               Frequently Asked Questions
             </h2>
             <p className="text-gray-500 mt-4">Everything about buying lights in Nairobi</p>
@@ -332,9 +266,9 @@ export default function Home() {
               <div key={item.q} className="border border-white/5 bg-primary-black">
                 <button
                   onClick={() => setOpenFaq(openFaq === item.q ? null : item.q)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  className="w-full px-4 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                 >
-                  <span className="font-bold text-white text-sm sm:text-base pr-4">{item.q}</span>
+                  <span className="font-bold text-white text-xs sm:text-sm pr-4">{item.q}</span>
                   <FiChevronDown className={`flex-shrink-0 transition-transform ${openFaq === item.q ? 'rotate-180' : ''}`} />
                 </button>
                 <AnimatePresence>
@@ -345,7 +279,7 @@ export default function Home() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <p className="px-6 pb-5 text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+                      <p className="px-4 pb-4 text-gray-400 text-xs sm:text-sm leading-relaxed border-t border-white/5 pt-3">
                         {item.a}
                       </p>
                     </motion.div>
@@ -374,13 +308,13 @@ export default function Home() {
           <motion.div {...fadeIn} className="text-center mb-14">
             <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-white">What Nairobi Says</h2>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
             {TESTIMONIALS.map((t, idx) => (
               <motion.div
                 key={idx}
                 {...fadeIn}
                 transition={{ delay: idx * 0.1 }}
-                className="p-10 border border-white/5 bg-secondary-black"
+                className="min-w-[82vw] snap-start p-6 border border-white/5 bg-secondary-black md:min-w-0"
               >
                 <div className="flex gap-1 text-primary-gold mb-6">
                   {[...Array(t.stars)].map((_, i) => <FiStar key={i} size={14} fill="currentColor" />)}

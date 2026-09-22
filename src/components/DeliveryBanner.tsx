@@ -24,18 +24,18 @@ export default function DeliveryBanner({ compact = false }: { compact?: boolean 
   return (
     <section className="py-12 border-y border-white/5 bg-secondary-black/50">
       <div className="container mx-auto px-6">
-        <h2 className="text-sm font-black uppercase tracking-[0.3em] text-primary-gold mb-8 text-center">
-          Clear Delivery Rates — No Surprises
+        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-primary-gold mb-6 text-center">
+          Clear Delivery Rates, No Surprises
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {rates.map((rate) => (
-            <div key={rate.label} className="p-6 border border-white/5 bg-primary-black text-center md:text-left">
-              <div className="text-primary-gold text-xl mb-3 flex justify-center md:justify-start">{rate.icon}</div>
-              <h3 className="text-white font-black uppercase text-sm tracking-tight mb-1">{rate.label}</h3>
-              <p className="text-primary-gold font-black text-lg mb-2">{rate.fee}</p>
-              <p className="text-gray-500 text-xs leading-relaxed">{rate.detail}</p>
+            <div key={rate.label} className="p-2 sm:p-4 border border-white/5 bg-primary-black text-center">
+              <div className="text-primary-gold text-base sm:text-xl mb-2 flex justify-center">{rate.icon}</div>
+              <h3 className="text-white font-black uppercase text-[9px] sm:text-xs tracking-tight mb-1">{rate.label}</h3>
+              <p className="text-primary-gold font-black text-xs sm:text-base mb-1">{rate.fee}</p>
+              <p className="text-gray-500 text-[9px] sm:text-xs leading-relaxed">{rate.detail.replace(' — ', ': ')}</p>
               {'freeOver' in rate && rate.freeOver && (
-                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-3">{rate.freeOver}</p>
+                <p className="text-[8px] sm:text-[10px] text-emerald-500 font-bold uppercase tracking-widest mt-2">{rate.freeOver}</p>
               )}
             </div>
           ))}

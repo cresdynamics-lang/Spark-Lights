@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { FiStar, FiTool, FiShield, FiMapPin } from 'react-icons/fi';
 import { BRAND } from '../data/brand';
+import { TESTIMONIALS } from '../data/content';
 import { usePageSEO } from '../hooks/usePageSEO';
 
 const fadeIn = {
@@ -88,6 +89,26 @@ export default function About() {
             "Great lighting transforms any space. We make it easy to find, buy, and install — right here in Nairobi."
           </p>
           <p className="text-primary-gold text-[10px] font-black uppercase tracking-[0.4em]">Spark Lights 254 Team</p>
+        </div>
+      </section>
+
+      <section className="py-20 sm:py-24">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter text-white text-center mb-10">
+            What Nairobi Says
+          </h2>
+          <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
+            {TESTIMONIALS.map((testimonial) => (
+              <article key={testimonial.name} className="min-w-[82vw] snap-start p-6 border border-white/5 bg-secondary-black md:min-w-0">
+                <div className="flex gap-1 text-primary-gold mb-4">
+                  {[...Array(testimonial.stars)].map((_, index) => <FiStar key={index} size={13} fill="currentColor" />)}
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6">"{testimonial.review}"</p>
+                <p className="font-black text-white text-xs uppercase">{testimonial.name}</p>
+                <p className="text-gray-600 text-[10px] uppercase tracking-widest mt-1">{testimonial.location}, Nairobi</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     </div>

@@ -31,13 +31,13 @@ export default function InstallationGallery({ showCta = true, id = 'installation
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
           {INSTALLATION_PROOFS.map((item, i) => (
             <motion.article
               key={item.id}
               {...fadeIn}
               transition={{ ...fadeIn.transition, delay: i * 0.05 }}
-              className="group border border-white/5 bg-primary-black overflow-hidden"
+              className="group min-w-[82vw] snap-start border border-white/5 bg-primary-black overflow-hidden lg:min-w-0"
             >
               <div className="aspect-[4/3] overflow-hidden relative">
                 <img
@@ -50,7 +50,7 @@ export default function InstallationGallery({ showCta = true, id = 'installation
                   {item.productType}
                 </span>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-600 mb-2">
                   <FiMapPin size={12} className="text-primary-gold" />
                   {item.area} · {item.estate}
